@@ -1,10 +1,4 @@
-<<<<<<< HEAD
 Name: Radiant - Multivariate
 Description: Start Radiant - Multivariate
 Binding: radiant.multivariate
-=======
-Name: Radiant - Model
-Description: Start Radiant - Model
-Binding: radiant.model
->>>>>>> 5562ef08415585db2843b715b253b0e7774a3e0d
 Interactive: true
