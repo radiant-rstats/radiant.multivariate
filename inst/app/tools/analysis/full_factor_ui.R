@@ -140,8 +140,8 @@ observe({
     update_report(inp_main = clean_args(ff_inputs(), ff_args),
                    fun_name = "full_factor",
                    inp_out = inp_out,
-                   fig.width = round(7 * ff_plot_width()/650,2),
-                   fig.height = round(7 * ff_plot_height()/650,2),
+                   fig.width = ff_plot_width(),
+                   fig.height = ff_plot_height(),
                    xcmd = xcmd)
   })
 })

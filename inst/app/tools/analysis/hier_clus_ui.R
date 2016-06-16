@@ -136,6 +136,6 @@ observeEvent(input$hier_clus_report, {
                 inp_out = inp_out,
                 outputs = outputs,
                 figs = figs,
-                fig.width = round(7 * hc_plot_width()/650,2),
-                fig.height = round(7 * hc_plot_height()/650,2))
+                fig.width = hc_plot_width(),
+                fig.height = hc_plot_height())
 })

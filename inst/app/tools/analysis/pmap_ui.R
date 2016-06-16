@@ -171,8 +171,8 @@ observeEvent(input$pmap_report, {
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
   update_report(inp_main = clean_args(pm_inputs(), pm_args),
                 fun_name = "pmap", inp_out = inp_out,
-                fig.width = round(7 * pm_plot_width()/650,2),
-                fig.height = round(7 * pm_plot_height()/650,2),
+                fig.width = pm_plot_width(),
+                fig.height = pm_plot_height()),
                 xcmd = paste0("# store(result, name = '", input$pm_store_name, "')"))
 })
 

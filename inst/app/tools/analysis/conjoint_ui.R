@@ -159,8 +159,8 @@ observe({
     update_report(inp_main = clean_args(ca_inputs(), ca_args),
                   fun_name = "conjoint", inp_out = inp_out,
                   outputs = outputs, figs = figs,
-                  fig.width = round(7 * ca_plot_width()/650,2),
-                  fig.height = round(7 * ca_plot_height()/650,2))
+                  fig.width = ca_plot_width(),
+                  fig.height = ca_plot_height())
   })
 })
 

@@ -153,6 +153,6 @@ observeEvent(input$mds_report, {
   inp_out[[2]] <- clean_args(mds_plot_inputs(), mds_plot_args[-1])
   update_report(inp_main = clean_args(mds_inputs(), mds_args),
                  fun_name = "mds", inp_out = inp_out,
-                 fig.width = round(7 * mds_plot_width()/650,2),
-                 fig.height = round(7 * mds_plot_height()/650,2))
+                 fig.width = mds_plot_width(),
+                 fig.height = mds_plot_height())
 })
