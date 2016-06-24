@@ -8,6 +8,7 @@
 #' @param dis A numeric measure of brand dissimilarity
 #' @param method Apply metric or non-metric MDS
 #' @param nr_dim Number of dimensions
+#' @param seed Random seed
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
 #' @return A list of all variables defined in the function as an object of class mds
@@ -27,6 +28,7 @@
 mds <- function(dataset, id1, id2, dis,
                 method = "metric",
                 nr_dim = 2,
+                seed = 1234,
                 data_filter = "") {
 
 
@@ -64,7 +66,7 @@ mds <- function(dataset, id1, id2, dis,
 	# res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
 	# if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
 
-	set.seed(1234)
+	set.seed(seed)
 	res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
 	res$stress <- res$stress / 100
 
@@ -77,7 +79,7 @@ mds <- function(dataset, id1, id2, dis,
 											 sqrt
 	}
 
-	environment() %>% as.list %>% set_class(c("mds",class(.)))
+	environment() %>% as.list %>% add_class("mds")
 }
 
 #' Summary method for the mds function
@@ -85,7 +87,7 @@ mds <- function(dataset, id1, id2, dis,
 #' @details See \url{http://vnijs.github.io/radiant/marketing/mds.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{mds}}
-#' @param dec Rounding to use for output (default = 0). +1 used for coordinates. +2 used for stress measure. Not currently accessible in Radiant
+#' @param dec Rounding to use for output (default = 2). +1 used for stress measure
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -98,7 +100,7 @@ mds <- function(dataset, id1, id2, dis,
 #' @seealso \code{\link{plot.mds}} to plot results
 #'
 #' @export
-summary.mds <- function(object, dec = 1, ...) {
+summary.mds <- function(object, dec = 2, ...) {
 
 	if (is.character(object)) return(cat(object))
 
@@ -119,11 +121,11 @@ summary.mds <- function(object, dec = 1, ...) {
 	object$res$points %>% dist %>% round(dec) %>% print
 
 	cat("\nCoordinates:\n")
-	object$res$points %>% round(dec + 1) %>%
-	 set_colnames({paste("Dim ", 1:ncol(.))}) %>%
+	object$res$points %>% round(dec) %>%
+	 set_colnames({paste("Dimension ", 1:ncol(.))}) %>%
 	 print
 
-	cat("\nStress:", object$res$stress %>% round(dec + 2))
+	cat("\nStress:", object$res$stress %>% round(dec + 1))
 }
 
 #' Plot method for the mds function
