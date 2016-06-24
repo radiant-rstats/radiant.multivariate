@@ -20,11 +20,9 @@ Store factor scores to active dataset
 See \url{http://vnijs.github.io/radiant/marketing/full_factor.html} for an example in Radiant
 }
 \examples{
-\dontrun{
-result <- full_factor("diamonds",c("price","carat","table"))
-store(result)
-head(diamonds)
-}
+ full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%
+  store \%>\%
+  head
 
 }
 \seealso{

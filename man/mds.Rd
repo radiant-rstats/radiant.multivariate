@@ -4,7 +4,7 @@
 \alias{mds}
 \title{(Dis)similarity based brand maps (MDS)}
 \usage{
-mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2,
+mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2, seed = 1234,
   data_filter = "")
 }
 \arguments{
@@ -19,6 +19,8 @@ mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2,
 \item{method}{Apply metric or non-metric MDS}
 
 \item{nr_dim}{Number of dimensions}
+
+\item{seed}{Random seed}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 }

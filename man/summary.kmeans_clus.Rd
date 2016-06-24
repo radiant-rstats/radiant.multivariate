@@ -4,10 +4,12 @@
 \alias{summary.kmeans_clus}
 \title{Summary method for kmeans_clus}
 \usage{
-\method{summary}{kmeans_clus}(object, ...)
+\method{summary}{kmeans_clus}(object, dec = 2, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{kmeans_clus}}}
+
+\item{dec}{Number of decimals to show}
 
 \item{...}{further arguments passed to or from other methods}
 }

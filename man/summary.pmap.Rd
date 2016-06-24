@@ -4,12 +4,14 @@
 \alias{summary.pmap}
 \title{Summary method for the pmap function}
 \usage{
-\method{summary}{pmap}(object, cutoff = 0, ...)
+\method{summary}{pmap}(object, cutoff = 0, dec = 2, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{pmap}}}
 
 \item{cutoff}{Show only loadings with (absolute) values above cutoff (default = 0)}
+
+\item{dec}{Rounding to use for output}
 
 \item{...}{further arguments passed to or from other methods}
 }

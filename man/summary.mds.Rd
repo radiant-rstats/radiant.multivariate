@@ -4,12 +4,12 @@
 \alias{summary.mds}
 \title{Summary method for the mds function}
 \usage{
-\method{summary}{mds}(object, dec = 1, ...)
+\method{summary}{mds}(object, dec = 2, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{mds}}}
 
-\item{dec}{Rounding to use for output (default = 0). +1 used for coordinates. +2 used for stress measure. Not currently accessible in Radiant}
+\item{dec}{Rounding to use for output (default = 2). +1 used for stress measure}
 
 \item{...}{further arguments passed to or from other methods}
 }

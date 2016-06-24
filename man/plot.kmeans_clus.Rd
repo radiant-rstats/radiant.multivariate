@@ -24,6 +24,7 @@ See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an examp
 \examples{
 result <- kmeans_clus("shopping", vars = c("v1:v6"))
 plot(result)
+shopping \%>\% kmeans_clus(, vars = c("v1:v6")) \%>\% plot
 
 }
 \seealso{

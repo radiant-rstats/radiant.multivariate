@@ -4,12 +4,14 @@
 \alias{summary.conjoint}
 \title{Summary method for the conjoint function}
 \usage{
-\method{summary}{conjoint}(object, mc_diag = FALSE, ...)
+\method{summary}{conjoint}(object, mc_diag = FALSE, dec = 3, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}
 
 \item{mc_diag}{Shows multicollinearity diagnostics.}
+
+\item{dec}{Number of decimals to show}
 
 \item{...}{further arguments passed to or from other methods}
 }

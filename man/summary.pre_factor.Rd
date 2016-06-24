@@ -4,10 +4,12 @@
 \alias{summary.pre_factor}
 \title{Summary method for the pre_factor function}
 \usage{
-\method{summary}{pre_factor}(object, ...)
+\method{summary}{pre_factor}(object, dec = 2, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{pre_factor}}}
+
+\item{dec}{Rounding to use for output}
 
 \item{...}{further arguments passed to or from other methods}
 }

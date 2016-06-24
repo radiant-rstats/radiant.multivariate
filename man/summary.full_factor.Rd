@@ -4,7 +4,8 @@
 \alias{summary.full_factor}
 \title{Summary method for the full_factor function}
 \usage{
-\method{summary}{full_factor}(object, cutoff = 0, fsort = FALSE, ...)
+\method{summary}{full_factor}(object, cutoff = 0, fsort = FALSE, dec = 2,
+  ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{full_factor}}}
@@ -12,6 +13,8 @@
 \item{cutoff}{Show only loadings with (absolute) values above cutoff (default = 0)}
 
 \item{fsort}{Sort factor loadings}
+
+\item{dec}{Number of decimals to show}
 
 \item{...}{further arguments passed to or from other methods}
 }
