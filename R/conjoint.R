@@ -32,7 +32,7 @@ conjoint <- function(dataset, rvar, evar,
 
 	if (reverse) {
 		ca_dep <- dat[[rvar]]
-		dat[[rvar]] <- abs(ca_dep - max(ca_dep)) + 1
+		dat[[rvar]] <- (max(ca_dep) + 1) - ca_dep
 	}
 
 	lm_mod <- lm(formula, data = dat)
@@ -49,6 +49,7 @@ conjoint <- function(dataset, rvar, evar,
 #'
 #' @param object Return value from \code{\link{conjoint}}
 #' @param mc_diag Shows multicollinearity diagnostics.
+#' @param dec Number of decimals to show
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -64,37 +65,26 @@ conjoint <- function(dataset, rvar, evar,
 #' @export
 summary.conjoint <- function(object,
                              mc_diag = FALSE,
+                             dec = 3,
                              ...) {
 
 	cat("Conjoint analysis\n")
-  cat("Data     :", object$dataset, "\n")
+  cat("Data                 :", object$dataset, "\n")
 	if (object$data_filter %>% gsub("\\s","",.) != "")
-		cat("Filter   :", gsub("\\n","", object$data_filter), "\n")
-  cat("Response variable   :", object$rvar, "\n")
+		cat("Filter               :", gsub("\\n","", object$data_filter), "\n")
+  cat("Response variable    :", object$rvar, "\n")
   cat("Explanatory variables:", paste0(object$evar, collapse=", "), "\n\n")
 
 	object$the_table %>%
 	{ cat("Conjoint part-worths:\n")
-		print(.$PW, row.names = FALSE)
+		print(formatdf(.$PW, dec), row.names = FALSE)
 		cat("\nConjoint importance weights:\n")
-		print(.$IW, row.names = FALSE)
+		print(formatdf(.$IW, dec), row.names = FALSE)
 	}
-
-  # coeff <- tidy(model)
-  # coeff$` ` <- sig_stars(coeff$p.value) %>% format(justify = "left")
-  # colnames(coeff) <- c("  ","coefficient","std.error","t.value","p.value"," ")
-  # isFct <- sapply(select(dat,-1), function(x) is.factor(x) || is.logical(x))
-  # if (sum(isFct) > 0) {
-  #   for (i in names(isFct[isFct]))
-  #     coeff$`  ` %<>% gsub(i, paste0(i,"|"), .) %>% gsub("\\|\\|","\\|",.)
-
-  #   rm(i, isFct)
-  # }
-  # coeff$`  ` %<>% format(justify = "left")
 
 	cat("\nConjoint regression results:\n")
   for (i in object$evar) object$model$term %<>% gsub(i, paste0(i,"|"), .) %>% gsub("\\|\\|","\\|",.)
-	object$model$estimate %>% data.frame %>% round(3) %>%
+	object$model$estimate %>% data.frame %>% round(dec) %>%
 	  set_colnames("coefficient") %>%
 	  set_rownames(object$model$term) %>% print(.)
 	cat("\n")
@@ -106,7 +96,7 @@ summary.conjoint <- function(object,
       car::vif(object$lm_mod) %>%
         { if (!dim(.) %>% is.null) .[,"GVIF"] else . } %>% # needed when factors are included
         data.frame("VIF" = ., "Rsq" = 1 - 1/.) %>%
-        round(3) %>%
+        round(dec) %>%
         .[order(.$VIF, decreasing=T),] %>%
         { if (nrow(.) < 8) t(.) else . } %>% print
     } else {
@@ -134,8 +124,7 @@ summary.conjoint <- function(object,
 #' @seealso \code{\link{summary.conjoint}} to summarize results
 #'
 #' @export
-plot.conjoint <- function(x,
-                          plots = "pw",
+plot.conjoint <- function(x, plots = "pw",
                           scale_plot = FALSE,
                           shiny = FALSE,
                           ...) {
