@@ -2,7 +2,7 @@
 # Perceptual map using factor analysis
 #########################################
 
-pm_nr_dim <- c("2-dims" = 2, "3-dims" = 3)
+pm_nr_dim <- c("2 dimensions" = 2, "3 dimensions" = 3)
 
 ## list of function arguments
 pm_args <- as.list(formals(pmap))
@@ -172,7 +172,7 @@ observeEvent(input$pmap_report, {
   update_report(inp_main = clean_args(pm_inputs(), pm_args),
                 fun_name = "pmap", inp_out = inp_out,
                 fig.width = pm_plot_width(),
-                fig.height = pm_plot_height()),
+                fig.height = pm_plot_height(),
                 xcmd = paste0("# store(result, name = '", input$pm_store_name, "')"))
 })
 

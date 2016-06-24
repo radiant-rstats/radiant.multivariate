@@ -66,6 +66,7 @@ output$ui_conjoint <- renderUI({
 })
 
 ca_plot <- reactive({
+	req(input$ca_plots)
 	nrVars <- length(input$ca_evar)
 	plot_height <- plot_width <- 500
 	if (input$ca_plots == 'pw') {

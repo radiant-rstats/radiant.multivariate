@@ -41,7 +41,7 @@ output$ui_pre_factor <- renderUI({
                  multiple = TRUE,
                  options = list(placeholder = "Select plot(s)",
                                 plugins = list("remove_button", "drag_drop"))),
-        numericInput("pf_cutoff", "Plot cutoff:", min = 0, max = 2, value = state_init("pf_cutoff",0.2), step = .05)
+        numericInput("pf_cutoff", "Plot cutoff:", min = 0, max = 2, value = state_init("pf_cutoff",0.1), step = .05)
       )
 	  ),
     help_and_report(modal_title = "Pre-factor analysis",

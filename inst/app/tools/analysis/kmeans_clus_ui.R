@@ -129,8 +129,8 @@ output$kmeans_clus <- renderUI({
 observeEvent(input$kmeans_clus_report, {
   update_report(inp_main = clean_args(km_inputs(), km_args),
                 fun_name = "kmeans_clus",
-                fig.width = km_plot_width()),
-                fig.height = km_plot_height()),
+                fig.width = km_plot_width(),
+                fig.height = km_plot_height(),
 								xcmd = paste0("# store(result, name = '", input$km_store_name,"')\n# write.csv(result$clus_means, file = '~/kmeans.csv')"))
 })
 

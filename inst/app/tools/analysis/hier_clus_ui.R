@@ -66,8 +66,10 @@ output$ui_hier_clus <- renderUI({
 })
 
 hc_plot <- reactive({
-	input$hc_plots %>% { if (length(.) == 1 && . == "dendro") 800 else 400 } -> bh
-  list(plot_width = 650, plot_height = bh * length(input$hc_plots))
+  plots <- input$hc_plots
+	ph <- plots %>% { if (length(.) == 1 && . == "dendro") 800 else 400 }
+  pw <- if (!is_empty(plots) && plots == "dendro") 900 else 650
+  list(plot_width = pw, plot_height = ph * length(plots))
 })
 
 hc_plot_width <- function()
@@ -107,7 +109,7 @@ output$hier_clus <- renderUI({
 
 .summary_hier_clus <- reactive({
   if (not_available(input$hc_vars))
-    return("This analysis requires one or more variables of type numeric or integer.\nIf these variable types are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+    return("This analysis requires one or more variables of type integer or numeric.\nIf these variable types are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
 
   if (not_pressed(input$hc_run)) return("** Press the Estimate button to generate cluster solution **")
 

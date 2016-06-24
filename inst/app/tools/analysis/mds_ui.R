@@ -2,7 +2,7 @@
 # Multidimensional scaling
 ###############################
 
-mds_nr_dim <- c("2-dims" = 2, "3-dims" = 3)
+mds_nr_dim <- c("2 dimensions" = 2, "3 dimensions" = 3)
 mds_method <- c("metric" = "metric", "non-metric" = "non-metric")
 
 ## list of function arguments
@@ -55,7 +55,7 @@ output$ui_mds_dis <- renderUI({
 
 output$ui_mds_rev_dim <- renderUI({
 	rev_list <- list()
-	rev_list[paste("Dim",1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
+	rev_list[paste("dimension",1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
 	checkboxGroupInput("mds_rev_dim", "Reverse:", rev_list,
    	selected = state_init("mds_rev_dim", ""),
    	inline = TRUE)
@@ -136,7 +136,7 @@ output$mds <- renderUI({
 
 .summary_mds <- reactive({
   if (.mds_available() != "available") return(.mds_available())
-  .mds() %>% { if (is.character(.)) . else summary(., dec = 1) }
+  .mds() %>% { if (is.character(.)) . else summary(., dec = 2) }
 })
 
 .plot_mds <- reactive({
