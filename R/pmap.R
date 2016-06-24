@@ -53,11 +53,11 @@ pmap <- function(dataset, brand, attr,
 		pref_cor$communalities <- rowSums(pref_cor^2)
 	}
 
-	rm(dat, f_data, m, cscm)
+	rm(f_data, m, cscm)
 
 	if (!is_string(dataset)) dataset <- "-----"
 
-	environment() %>% as.list %>% set_class(c("pmap",class(.)))
+	environment() %>% as.list %>% add_class(c("pmap","full_factor"))
 }
 
 #' Summary method for the pmap function
@@ -66,6 +66,7 @@ pmap <- function(dataset, brand, attr,
 #'
 #' @param object Return value from \code{\link{pmap}}
 #' @param cutoff Show only loadings with (absolute) values above cutoff (default = 0)
+#' @param dec Rounding to use for output
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -83,6 +84,7 @@ pmap <- function(dataset, brand, attr,
 #' @export
 summary.pmap <- function(object,
                          cutoff = 0,
+                         dec = 2,
                          ...) {
 
  	cat("Attribute based brand map\n")
@@ -97,7 +99,7 @@ summary.pmap <- function(object,
 	cat("Observations:", object$nrObs, "\n")
 
 	cat("\nBrand - Factor scores:\n")
-	round(object$fres$scores,2) %>% print
+	round(object$fres$scores,dec) %>% print
 
 	cat("\nAttribute - Factor loadings:\n")
 
@@ -110,13 +112,13 @@ summary.pmap <- function(object,
 
 	## show only the loadings > ff_cutoff
   ind <- abs(lds) < cutoff
-  print_lds <- round(lds,2)
+  print_lds <- round(lds,dec)
   print_lds[ind] <- ""
   print(print_lds)
 
 	if (!is.null(object$pref) && object$pref != "") {
 		cat("\nPreference correlations:\n")
-		print(round(object$pref_cor,2), digits = 2)
+		print(round(object$pref_cor,dec), digits = dec)
 	}
 
   ## fit measures
@@ -124,13 +126,13 @@ summary.pmap <- function(object,
 	colSums(lds^2) %>%
 		rbind(., . / length(dn[[1]])) %>%
 		rbind(., cumsum(.[2,])) %>%
-		round(2) %>%
+		round(dec) %>%
 		set_rownames(c("Eigenvalues","Variance %","Cumulative %")) %>%
 		print
 
 	cat("\nAttribute communalities:")
 	data.frame(1 - object$fres$uniqueness) %>%
-		set_colnames("") %>% round(2) %>%
+		set_colnames("") %>% round(dec) %>%
 		print
 }
 
@@ -240,12 +242,3 @@ plot.pmap <- function(x,
 
 	par(op)
 }
-
-#' Store factor scores from attribute based perceptual map
-#' @param object Return value from \code{\link{pmap}}
-#' @param ... Additional arguments
-#' @param name Name of factor score variables
-#' @seealso Use \code{\link{store.full_factor}} instead
-#' @export
-store.pmap <- store.full_factor
-

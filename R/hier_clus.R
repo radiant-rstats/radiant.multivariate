@@ -91,8 +91,7 @@ summary.hier_clus <- function(object, ...) {
 #' @seealso \code{\link{summary.hier_clus}} to summarize results
 #'
 #' @export
-plot.hier_clus <- function(x,
-                           plots = c("scree","change"),
+plot.hier_clus <- function(x, plots = c("scree","change"),
                            cutoff = 0.05,
                            shiny = FALSE,
                            ...) {
@@ -108,9 +107,9 @@ plot.hier_clus <- function(x,
 		plot_list[["scree"]] <-
 			object$hc_out$height[object$hc_out$height > cutoff] %>%
 			data.frame(height = ., nr_clus = length(.):1) %>%
-			ggplot(aes(x=factor(nr_clus,levels=nr_clus), y=height, group = 1)) +
-					  geom_line(colour="blue", linetype = 'dotdash', size=.7) +
-		  		  geom_point(colour="blue", size=4, shape=21, fill="white") +
+			ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = height, group = 1)) +
+					  geom_line(colour = "blue", linetype = 'dotdash', size = .7) +
+		  		  geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
 			 		  scale_y_continuous(labels = scales::percent) +
 			  	  labs(list(title = paste("Scree plot"), x = "# clusters",
 			  	       y = "Within-cluster heterogeneity"))

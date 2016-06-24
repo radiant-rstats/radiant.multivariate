@@ -60,6 +60,7 @@ pre_factor <- function(dataset, vars,
 #' @details See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{pre_factor}}
+#' @param dec Rounding to use for output
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -73,11 +74,11 @@ pre_factor <- function(dataset, vars,
 #' @seealso \code{\link{plot.pre_factor}} to plot results
 #'
 #' @export
-summary.pre_factor <- function(object, ...) {
+summary.pre_factor <- function(object, dec = 2, ...) {
 
 	if (is.character(object)) return(cat(object))
 
-	if (object$pre_r2 %>% is.character) {
+	if (is.character(object$pre_r2)) {
 		cat(object$pre_r2)
 		return(invisible())
 	}
@@ -93,25 +94,25 @@ summary.pre_factor <- function(object, ...) {
 	cat("\nBartlett test\n")
 	cat("Null hyp.: variables are not correlated\n")
 	cat("Alt. hyp.: variables are correlated\n")
-	bt <- object$btest$p.value %>% { if (. < .001) "< .001" else round(.,3) }
+	bt <- object$btest$p.value %>% { if (. < .001) "< .001" else round(.,dec + 1) }
 	cat(paste0("Chi-square: ", round(object$btest$chisq,2), " df(",
 	    object$btest$df, "), p.value ", bt, "\n"))
 
-	cat("\nKMO test: ", round(object$pre_kmo$MSA,2), "\n")
+	cat("\nKMO test: ", round(object$pre_kmo$MSA, dec), "\n")
 	# cat("\nMeasures of sampling adequacy:\n")
-	# print(object$pre_kmo$MSAi, digits = 3)
+	# print(object$pre_kmo$MSAi, digits = dec)
 
   cat("\nVariable collinearity:\n")
-  print(round(object$pre_r2, 2), digits = 2)
+  print(round(object$pre_r2, dec), digits = dec)
 
 	cat("\n")
 	object$pre_eigen %>%
 	  { data.frame(Factor = 1:length(.),
-							   Eigenvalues = round(.,2),
+							   Eigenvalues = round(., dec),
 							   `Variance %` = ./sum(.),
 							   `Cumulative %` = cumsum(./sum(.)),
 							   check.names = FALSE) } %>%
-	  round(2) %>%
+	  round(dec) %>%
 	  print(., row.names = FALSE)
 }
 
@@ -133,15 +134,12 @@ summary.pre_factor <- function(object, ...) {
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #'
 #' @export
-plot.pre_factor <- function(x,
-                           	plots = c("scree","change"),
+plot.pre_factor <- function(x, plots = c("scree","change"),
                            	cutoff = 0.2,
                            	shiny = FALSE,
                             ...){
 
 	object <- x; rm(x)
-	# print(object)
-	# return(invisible())
 	if (is.character(object) || is.character(object$pre_r2) ||
 	    length(plots) == 0) return(invisible())
 
@@ -159,9 +157,6 @@ plot.pre_factor <- function(x,
 				geom_hline(yintercept = 1, color = 'black', linetype = 'solid', size = 1) +
 			  labs(list(title = "Screeplot", x = "# factors", y = "Eigenvalues"))
 	}
-
-
-	# pre_eigen <- pre_eigen/sum(pre_eigen)
 
 	if ("change" %in% plots) {
 		plot_list[["change"]] <-
