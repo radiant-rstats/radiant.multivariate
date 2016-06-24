@@ -52,14 +52,13 @@ full_factor <- function(dataset, vars,
 	}
 
 	## convert loadings object to data.frame
-	floadings <- fres$loadings %>%
-	         {dn <- dimnames(.)
-	          matrix(., nrow = length(dn[[1]])) %>%
-	          set_colnames(., dn[[2]]) %>%
-	          set_rownames(., dn[[1]]) %>%
-	          data.frame}
-
-	rm(dat)
+	floadings <-
+	  fres$loadings %>%
+     {dn <- dimnames(.)
+      matrix(., nrow = length(dn[[1]])) %>%
+      set_colnames(., dn[[2]]) %>%
+      set_rownames(., dn[[1]]) %>%
+      data.frame}
 
   environment() %>% as.list %>% set_class(c("full_factor",class(.)))
 }
@@ -71,6 +70,7 @@ full_factor <- function(dataset, vars,
 #' @param object Return value from \code{\link{full_factor}}
 #' @param cutoff Show only loadings with (absolute) values above cutoff (default = 0)
 #' @param fsort Sort factor loadings
+#' @param dec Number of decimals to show
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -91,6 +91,7 @@ full_factor <- function(dataset, vars,
 summary.full_factor <- function(object,
                                 cutoff = 0,
                                 fsort = FALSE,
+                                dec = 2,
                                 ...) {
 
 	if (is.character(object)) return(cat(object))
@@ -108,15 +109,17 @@ summary.full_factor <- function(object,
 	cat("\nFactor loadings:\n")
 
 	## show only the loadings > cutoff
-  with(object, clean_loadings(floadings, cutoff, fsort, 2)) %>% print
+  with(object, clean_loadings(floadings, cutoff, fsort, dec)) %>% print
   cat("\n")
 
   ## fit measures
 	colSums(object$floadings^2) %>%
 		rbind(., . / nrow(object$floadings)) %>%
 		rbind(., cumsum(.[2,])) %>%
-		round(2) %>%
+		# round(2) %>%
 		set_rownames(c("Eigenvalues","Variance %","Cumulative %")) %>%
+		as.data.frame %>%
+		formatdf(dec = dec) %>%
 		print
 
 	# results from psych - uncomment to validate results
@@ -126,13 +129,15 @@ summary.full_factor <- function(object,
 
 	cat("\nAttribute communalities:\n")
 	data.frame(1 - object$fres$uniqueness) %>%
-		set_colnames("") %>% round(2) %>%
+	  formatdf(dec = dec, perc = TRUE) %>%
+		set_rownames(object$vars) %>%
+		set_colnames("") %>%
 		print
 
 	cat("\nFactor scores (max 10 shown):\n")
 	as.data.frame(object$fres$scores) %>%
-  	round(2) %>%
   	slice(1:min(nrow(.), 10)) %>%
+  	formatdf(dec = dec) %>%
   	print(row.names = FALSE)
 }
 
@@ -200,11 +205,9 @@ plot.full_factor <- function(x,
 #' @param name Name of factor score variables
 #'
 #' @examples
-#' \dontrun{
-#' result <- full_factor("diamonds",c("price","carat","table"))
-#' store(result)
-#' head(diamonds)
-#' }
+#'  full_factor(shopping, "v1:v6", nr_fact = 3) %>%
+#'	  store %>%
+#'	  head
 #'
 #' @seealso \code{\link{full_factor}} to generate results
 #' @seealso \code{\link{summary.full_factor}} to summarize results
@@ -214,30 +217,15 @@ plot.full_factor <- function(x,
 store.full_factor <- function(object, ..., name = "") {
 	## membership variable name
 	fscores <- as.data.frame(object$fres$scores)
-  if (is_empty(name))
-  	name <- paste0("factor",1:ncol(fscores))
-  else
-  	name <- paste0(name,1:ncol(fscores))
+  if (is_empty(name)) name <- "factor"
 
-	indr <- indexr(object$dataset, object$vars, object$data_filter)
+  dat <- {if (object$dataset == "-----") object$dat else object$dataset}
+	indr <- indexr(dat, object$vars, object$data_filter)
 	fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)))
 	fs[indr$ind, ] <- fscores
 
-	# fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = object$nr_fact))
-	# fs <- scores
-
-	# changedata(object$dataset, vars = as.factor(km), var_names = name)
-  changedata(object$dataset, vars = fs, var_names = name)
+  changedata(dat, vars = fs, var_names = paste0(name,1:ncol(fscores)))
 }
-
-#' Deprecated function to store factor loadings
-#' @param object Return value from \code{\link{full_factor}}
-#' @param ... Additional arguments
-#' @param name Name of factor score variables
-#' @seealso Use \code{\link{store.full_factor}} instead
-#' @export
-save_factors <- store.full_factor
-
 
 #' Sort and clean loadings
 #'
@@ -272,12 +260,3 @@ clean_loadings <- function(floadings,
   }
   floadings
 }
-
-
-
-
-
-
-
-
-
