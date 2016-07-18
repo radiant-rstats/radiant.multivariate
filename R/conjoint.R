@@ -36,11 +36,11 @@ conjoint <- function(dataset, rvar, evar,
 	}
 
 	lm_mod <- lm(formula, data = dat)
-	model <- lm_mod %>% tidy
+	model <- tidy(lm_mod)
 
 	the_table <- the_table(model, dat, evar)
 
-	environment() %>% as.list %>% set_class(c("conjoint",class(.)))
+	as.list(environment()) %>% add_class("conjoint")
 }
 
 #' Summary method for the conjoint function
@@ -72,7 +72,8 @@ summary.conjoint <- function(object,
   cat("Data                 :", object$dataset, "\n")
 	if (object$data_filter %>% gsub("\\s","",.) != "")
 		cat("Filter               :", gsub("\\n","", object$data_filter), "\n")
-  cat("Response variable    :", object$rvar, "\n")
+	rvar <- if (object$reverse) paste0(object$rvar, " (reversed)") else object$rvar
+  cat("Response variable    :", rvar, "\n")
   cat("Explanatory variables:", paste0(object$evar, collapse=", "), "\n\n")
 
 	object$the_table %>%
@@ -90,7 +91,6 @@ summary.conjoint <- function(object,
 	cat("\n")
 
 	if (mc_diag) {
-
     if (length(object$evar) > 1) {
       cat("Multicollinearity diagnostics:\n")
       car::vif(object$lm_mod) %>%

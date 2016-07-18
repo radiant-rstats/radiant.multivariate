@@ -26,7 +26,8 @@ hier_clus <- function(dataset, vars,
 
 	dat <- getdata(dataset, vars, filt = data_filter)
 	if (nrow(dat) > max_cases)
-	  return(set_class("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box.", c("hier_clus","character")))
+	  return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
+	         add_class("hier_clus"))
 
 	dat %>%
 	  scale %>%
@@ -39,7 +40,7 @@ hier_clus <- function(dataset, vars,
 
 	if (!is_string(dataset)) dataset <- "-----"
 
-	environment() %>% as.list %>% set_class(c("hier_clus",class(.)))
+	as.list(environment()) %>% add_class("hier_clus")
 }
 
 #' Summary method for the hier_clus function

@@ -64,12 +64,12 @@ kmeans_clus <- function(dataset, vars,
 		group_by(clus_var) %>%
 		summarise_each(funs(mean)) %>%
 		select(-clus_var) %>%
-		set_rownames(clus_names) %>%
-		as.data.frame
+		as.data.frame %>%
+		set_rownames(clus_names)
 
 	nr_obs <- length(km_out$cluster)
 
-	environment() %>% as.list %>% set_class(c("kmeans_clus",class(.)))
+	as.list(environment()) %>% add_class("kmeans_clus")
 }
 
 #' Summary method for kmeans_clus

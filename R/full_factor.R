@@ -33,9 +33,8 @@ full_factor <- function(dataset, vars,
 
 	nrObs <- nrow(dat)
 	if (nrObs <= ncol(dat)) {
-		ret <- "Data should have more observations than variables.\nPlease reduce the number of variables." %>%
-						 set_class(c("full_factor",class(.)))
-		return(ret)
+		return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
+		  add_class("full_factor"))
 	}
 
 	nrFac <- max(1,as.numeric(nr_fact))
@@ -60,7 +59,7 @@ full_factor <- function(dataset, vars,
       set_rownames(., dn[[1]]) %>%
       data.frame}
 
-  environment() %>% as.list %>% set_class(c("full_factor",class(.)))
+  as.list(environment()) %>% add_class("full_factor")
 }
 
 #' Summary method for the full_factor function

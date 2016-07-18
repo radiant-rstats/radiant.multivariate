@@ -55,7 +55,8 @@ mds <- function(dataset, id1, id2, dis,
 	} else if ((lower + nrLev) == nrObs) {
 		mds_dis_mat[lower.tri(mds_dis_mat, diag = TRUE)] <- d
 	} else {
-		return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>% set_class(c("mds",class(.))))
+		return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
+		       add_class("mds"))
 	}
 
 	mds_dis_mat %<>% set_rownames(lab) %>%
@@ -79,7 +80,7 @@ mds <- function(dataset, id1, id2, dis,
 											 sqrt
 	}
 
-	environment() %>% as.list %>% add_class("mds")
+	as.list(environment()) %>% add_class("mds")
 }
 
 #' Summary method for the mds function
@@ -125,7 +126,7 @@ summary.mds <- function(object, dec = 2, ...) {
 	 set_colnames({paste("Dimension ", 1:ncol(.))}) %>%
 	 print
 
-	cat("\nStress:", object$res$stress %>% round(dec + 1))
+	cat("\nStress:", round(object$res$stress, dec + 1))
 }
 
 #' Plot method for the mds function

@@ -26,9 +26,8 @@ pre_factor <- function(dataset, vars,
 	if (!is_string(dataset)) dataset <- "-----"
 
 	if (nrObs <= ncol(dat)) {
-		ret <- "Data should have more observations than variables.\nPlease reduce the number of variables." %>%
-						 set_class(c("pre_factor",class(.)))
-		return(ret)
+		return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
+		       add_class("pre_factor"))
 	}
 
   cmat <- cor(dat)
@@ -52,7 +51,7 @@ pre_factor <- function(dataset, vars,
 
   rm(dat)
 
-  environment() %>% as.list %>% set_class(c("pre_factor",class(.)))
+  as.list(environment()) %>% add_class("pre_factor")
 }
 
 #' Summary method for the pre_factor function
