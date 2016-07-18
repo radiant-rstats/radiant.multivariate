@@ -8,7 +8,6 @@ globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci"))
 #' @import radiant.data shiny ggplot2
 #' @importFrom dplyr select select_ filter mutate funs group_by group_by_ summarise_each lag slice
 #' @importFrom magrittr %>% %<>% %T>% set_colnames set_rownames
-#' @importFrom broom tidy
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom scales percent
 #' @importFrom import from
