@@ -13,7 +13,7 @@ r_url_list[["Conjoint"]] <-
 options(radiant.url.list = r_url_list); rm(r_url_list)
 
 ## design menu
-multivariate_ui <-
+options(radiant.multivariate_ui =
 	tagList(
 	  navbarMenu("Multivariate",
 	    "Maps",
@@ -29,3 +29,4 @@ multivariate_ui <-
 	    tabPanel("Conjoint", uiOutput("conjoint"))
     )
   )
+)
