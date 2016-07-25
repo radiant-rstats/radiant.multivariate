@@ -18,7 +18,7 @@ rem_old <- function(app) {
 	unlink(paste0(dirwin, "/", app, "*"))
 }
 
-sapply("radiant.basics", rem_old)
+sapply("radiant.multivariate", rem_old)
 
 ## avoid 'loaded namespace' stuff when building for mac
 system(paste0(Sys.which("R"), " -e \"source('~/gh/radiant.multivariate/build/build_mac.R')\""))
