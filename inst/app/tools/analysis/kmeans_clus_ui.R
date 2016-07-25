@@ -127,11 +127,20 @@ output$kmeans_clus <- renderUI({
 })
 
 observeEvent(input$kmeans_clus_report, {
+  outputs <- c("summary")
+  inp_out <- list(list(dec = 2), "")
+  figs <- FALSE
+  if (length(input$km_plots) > 0) {
+    figs <- TRUE
+    outputs <- c("summary","plot")
+    inp_out[[2]] <- list(plots = input$km_plots)
+  }
   update_report(inp_main = clean_args(km_inputs(), km_args),
-                fun_name = "kmeans_clus",
+                fun_name = "kmeans_clus", inp_out = inp_out,
+                outputs = outputs, figs = figs,
                 fig.width = km_plot_width(),
                 fig.height = km_plot_height(),
-								xcmd = paste0("# store(result, name = '", input$km_store_name,"')\n# write.csv(result$clus_means, file = '~/kmeans.csv')"))
+                xcmd = paste0("# store(result, name = '", input$km_store_name,"')\n# write.csv(result$clus_means, file = '~/kmeans.csv')"))
 })
 
 output$dl_km_means <- downloadHandler(

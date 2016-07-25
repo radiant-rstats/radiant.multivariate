@@ -144,25 +144,21 @@ output$conjoint <- renderUI({
        							shiny = TRUE)
 })
 
-observe({
-  if (not_pressed(input$conjoint_report)) return()
-  isolate({
-    outputs <- c("summary","plot")
-    inp_out <- list()
-    inp_out[[1]] <- list(mc_diag = input$ca_mc_diag)
-  	inp_out[[2]] <- list(plots = input$ca_plots, scale_plot = input$ca_scale_plot)
-    figs <- TRUE
-    if (length(input$ca_plots) == 0) {
-      figs <- FALSE
-      outputs <- c("summary")
-    	inp_out[[2]] <- ""
-    }
-    update_report(inp_main = clean_args(ca_inputs(), ca_args),
-                  fun_name = "conjoint", inp_out = inp_out,
-                  outputs = outputs, figs = figs,
-                  fig.width = ca_plot_width(),
-                  fig.height = ca_plot_height())
-  })
+observeEvent(input$conjoint_report, {
+  outputs <- c("summary","plot")
+  inp_out <- list(list(mc_diag = input$ca_mc_diag, dec = 3),
+                  list(plots = input$ca_plots, scale_plot = input$ca_scale_plot))
+  figs <- TRUE
+  if (length(input$ca_plots) == 0) {
+    figs <- FALSE
+    outputs <- c("summary")
+    inp_out[[2]] <- ""
+  }
+  update_report(inp_main = clean_args(ca_inputs(), ca_args),
+                fun_name = "conjoint", inp_out = inp_out,
+                outputs = outputs, figs = figs,
+                fig.width = ca_plot_width(),
+                fig.height = ca_plot_height())
 })
 
 output$dl_ca_PWs <- downloadHandler(

@@ -60,7 +60,8 @@ output$ui_full_factor <- renderUI({
 })
 
 ff_plot <- reactive({
- 	nrPlots <- (input$ff_nr_fact * (input$ff_nr_fact - 1)) / 2
+  nrFact <- min(input$ff_nr_fact, length(input$ff_vars))
+ 	nrPlots <- (nrFact * (nrFact - 1)) / 2
 
 	plot_height <- plot_width <- 350
 	if (nrPlots > 2)
@@ -128,22 +129,16 @@ output$full_factor <- renderUI({
   plot(.full_factor(), shiny = TRUE)
 })
 
-observe({
- if (not_pressed(input$full_factor_report)) return()
-  isolate({
-    outputs <- c("summary","plot")
-    inp_out <- list()
-    inp_out[[1]] <- list(cutoff = input$ff_cutoff, fsort = input$ff_fsort)
-  	inp_out[[2]] <- ""
-    xcmd = paste0("# store(result, name = '", input$ff_store_name, "')\n# clean_loadings(result$floadings,", input$ff_cutoff, ",", input$ff_fsort, ") %>% write.csv(file = '~/loadings.csv')")
-
-    update_report(inp_main = clean_args(ff_inputs(), ff_args),
-                   fun_name = "full_factor",
-                   inp_out = inp_out,
-                   fig.width = ff_plot_width(),
-                   fig.height = ff_plot_height(),
-                   xcmd = xcmd)
-  })
+observeEvent(input$full_factor_report, {
+  outputs <- c("summary","plot")
+  inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2),"")
+  xcmd = paste0("# store(result, name = '", input$ff_store_name, "')\n# clean_loadings(result$floadings, cutoff = ", input$ff_cutoff, ", fsort = ", input$ff_fsort, ", dec = 8) %>% write.csv(file = '~/loadings.csv')")
+  update_report(inp_main = clean_args(ff_inputs(), ff_args),
+                fun_name = "full_factor",
+                inp_out = inp_out,
+                fig.width = ff_plot_width(),
+                fig.height = ff_plot_height(),
+                xcmd = xcmd)
 })
 
 ## save factor loadings when download button is pressed

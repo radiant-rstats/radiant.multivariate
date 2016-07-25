@@ -104,6 +104,19 @@ output$pre_factor <- renderUI({
   plot(.pre_factor(), plots = input$pf_plots, cutoff = input$pf_cutoff, shiny = TRUE)
 })
 
-observeEvent(input$pre_factor_report,{
-  update_report(inp_main = clean_args(pf_inputs(), pf_args), fun_name = "pre_factor")
+observeEvent(input$pre_factor_report, {
+  outputs <- c("summary")
+  inp_out <- list(list(dec = 2), "")
+  figs <- FALSE
+  if (length(input$pf_plots) > 0) {
+    figs <- TRUE
+    outputs <- c("summary","plot")
+    inp_out[[2]] <- list(plots = input$pf_plots)
+  }
+  update_report(inp_main = clean_args(pf_inputs(), pf_args),
+                fun_name = "pre_factor", inp_out = inp_out,
+                outputs = outputs, figs = figs,
+                fig.width = pf_plot_width(),
+                fig.height = pf_plot_height())
 })
+

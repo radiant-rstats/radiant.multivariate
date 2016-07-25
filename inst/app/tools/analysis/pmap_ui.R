@@ -167,7 +167,7 @@ output$pmap <- renderUI({
 
 observeEvent(input$pmap_report, {
   outputs <- c("summary","plot")
-  inp_out <- list("","")
+  inp_out <- list(list(cutoff = input$pm_cutoff, dec = 2),"")
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
   update_report(inp_main = clean_args(pm_inputs(), pm_args),
                 fun_name = "pmap", inp_out = inp_out,

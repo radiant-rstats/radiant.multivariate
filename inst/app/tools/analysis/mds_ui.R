@@ -148,8 +148,7 @@ output$mds <- renderUI({
 
 observeEvent(input$mds_report, {
   outputs <- c("summary","plot")
-  inp_out <- list()
-	inp_out[[1]] <- ""
+  inp_out <- list(list(dec = 2), "")
   inp_out[[2]] <- clean_args(mds_plot_inputs(), mds_plot_args[-1])
   update_report(inp_main = clean_args(mds_inputs(), mds_args),
                  fun_name = "mds", inp_out = inp_out,
