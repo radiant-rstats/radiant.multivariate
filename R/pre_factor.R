@@ -1,6 +1,6 @@
 #' Evaluate if data are appropriate for PCA / Factor analysis
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param vars Variables to include in the analysis
@@ -56,7 +56,7 @@ pre_factor <- function(dataset, vars,
 
 #' Summary method for the pre_factor function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{pre_factor}}
 #' @param dec Rounding to use for output
@@ -117,7 +117,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 
 #' Plot method for the pre_factor function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 #' @param x Return value from \code{\link{pre_factor}}
 #' @param plots Plots to return. "change" shows the change in eigenvalues as variables are grouped into different number of factors, "scree" shows a scree plot of eigenvalues
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., eigenvalues of .8 or higher) factors with the least explanatory power are removed from the plot

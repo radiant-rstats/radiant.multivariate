@@ -22,7 +22,7 @@
 Summary method for the full_factor function
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/full_factor.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
 result <- full_factor("diamonds",c("price","carat","depth","table","x"))

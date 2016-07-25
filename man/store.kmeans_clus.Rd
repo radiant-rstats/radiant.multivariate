@@ -17,7 +17,7 @@
 Add a cluster membership variable to the active dataset
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 }
 \examples{
 kmeans_clus(shopping, vars = c("v1:v6")) \%>\% store \%>\% head

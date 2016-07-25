@@ -31,7 +31,7 @@ A list of all variables defined in the function as an object of class mds
 (Dis)similarity based brand maps (MDS)
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/mds.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 }
 \examples{
 result <- mds("city", "from", "to", "distance")

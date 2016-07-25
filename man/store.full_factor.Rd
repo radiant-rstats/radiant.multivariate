@@ -17,7 +17,7 @@
 Store factor scores to active dataset
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/full_factor.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
  full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%

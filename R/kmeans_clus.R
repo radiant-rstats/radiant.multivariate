@@ -1,6 +1,6 @@
 #' K-means cluster analysis
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param vars Vector of variables to include in the analysis
@@ -74,7 +74,7 @@ kmeans_clus <- function(dataset, vars,
 
 #' Summary method for kmeans_clus
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{kmeans_clus}}
 #' @param dec Number of decimals to show
@@ -125,7 +125,7 @@ summary.kmeans_clus <- function(object, dec = 2, ...) {
 
 #' Plot method for kmeans_clus
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 #'
 #' @param x Return value from \code{\link{kmeans_clus}}
 #' @param plots One of "density", "bar", or "scatter")
@@ -195,7 +195,7 @@ plot.kmeans_clus <- function(x,
 
 #' Add a cluster membership variable to the active dataset
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{kmeans_clus}}
 #' @param ... Additional arguments

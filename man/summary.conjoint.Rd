@@ -19,7 +19,7 @@
 Summary method for the conjoint function
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/conjoint.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
 \examples{
 result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")

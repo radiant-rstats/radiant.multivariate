@@ -19,7 +19,7 @@ clean_loadings(floadings, cutoff = 0, fsort = FALSE, dec = 8)
 Sort and clean loadings
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/full_factor.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
 result <- full_factor("diamonds",c("price","carat","table","x","y"))

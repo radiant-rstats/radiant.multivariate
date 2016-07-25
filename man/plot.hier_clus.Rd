@@ -22,7 +22,7 @@
 Plot method for the hier_clus function
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/hier_clus.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
 }
 \examples{
 result <- hier_clus("shopping", vars = c("v1:v6"))

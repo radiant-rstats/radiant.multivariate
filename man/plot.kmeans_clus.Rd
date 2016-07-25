@@ -19,7 +19,7 @@
 Plot method for kmeans_clus
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/kmeans_clus.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/kmeans_clus.html} for an example in Radiant
 }
 \examples{
 result <- kmeans_clus("shopping", vars = c("v1:v6"))

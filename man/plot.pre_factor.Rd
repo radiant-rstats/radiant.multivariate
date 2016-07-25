@@ -22,7 +22,7 @@
 Plot method for the pre_factor function
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 }
 \examples{
 result <- pre_factor("diamonds",c("price","carat","table"))

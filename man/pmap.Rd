@@ -26,7 +26,7 @@ A list of all variables defined in the function as an object of class pmap
 Attribute based brand maps
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/pmap.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
 }
 \examples{
 result <- pmap("computer","brand","high_end:business")

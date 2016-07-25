@@ -20,7 +20,7 @@ A list with all variables defined in the function as an object of class pre_fact
 Evaluate if data are appropriate for PCA / Factor analysis
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/pre_factor.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 }
 \examples{
 result <- pre_factor("diamonds",c("price","carat","table"))

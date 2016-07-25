@@ -1,6 +1,6 @@
 #' (Dis)similarity based brand maps (MDS)
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/mds.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param id1 A character variable or factor with unique entries
@@ -85,7 +85,7 @@ mds <- function(dataset, id1, id2, dis,
 
 #' Summary method for the mds function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/mds.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{mds}}
 #' @param dec Rounding to use for output (default = 2). +1 used for stress measure
@@ -131,7 +131,7 @@ summary.mds <- function(object, dec = 2, ...) {
 
 #' Plot method for the mds function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/mds.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 #'
 #' @param x Return value from \code{\link{mds}}
 #' @param rev_dim Flip the axes in plots

@@ -1,6 +1,6 @@
 #' Hierarchical cluster analysis
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param vars Vector of variables to include in the analysis
@@ -45,7 +45,7 @@ hier_clus <- function(dataset, vars,
 
 #' Summary method for the hier_clus function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{hier_clus}}
 #' @param ... further arguments passed to or from other methods
@@ -74,7 +74,7 @@ summary.hier_clus <- function(object, ...) {
 
 #' Plot method for the hier_clus function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
 #'
 #' @param x Return value from \code{\link{hier_clus}}
 #' @param plots Plots to return. "change" shows the percentage change in within-cluster heterogeneity as respondents are grouped into different number of clusters, "dendro" shows the dendrogram, "scree" shows a scree plot of within-cluster heterogeneity

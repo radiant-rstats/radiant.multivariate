@@ -27,7 +27,7 @@ A list of all variables used in hier_clus as an object of class hier_clus
 Hierarchical cluster analysis
 }
 \details{
-See \url{http://vnijs.github.io/radiant/marketing/hier_clus.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
 }
 \examples{
 result <- hier_clus("shopping", vars = "v1:v6")

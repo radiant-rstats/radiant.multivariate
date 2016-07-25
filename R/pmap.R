@@ -1,6 +1,6 @@
 #' Attribute based brand maps
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param brand A character variable with brand names
@@ -62,7 +62,7 @@ pmap <- function(dataset, brand, attr,
 
 #' Summary method for the pmap function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{pmap}}
 #' @param cutoff Show only loadings with (absolute) values above cutoff (default = 0)
@@ -138,7 +138,7 @@ summary.pmap <- function(object,
 
 #' Plot method for the pmap function
 #'
-#' @details See \url{http://vnijs.github.io/radiant/marketing/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
 #'
 #' @param x Return value from \code{\link{pmap}}
 #' @param plots Components to include in the plot ("brand", "attr"). If data on preferences is available use "pref" to add preference arrows to the plot
