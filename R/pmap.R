@@ -57,7 +57,7 @@ pmap <- function(dataset, brand, attr,
 
 	if (!is_string(dataset)) dataset <- "-----"
 
-	environment() %>% as.list %>% add_class(c("pmap","full_factor"))
+	as.list(environment()) %>% add_class(c("pmap","full_factor"))
 }
 
 #' Summary method for the pmap function

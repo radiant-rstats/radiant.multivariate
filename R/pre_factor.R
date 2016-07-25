@@ -136,7 +136,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 plot.pre_factor <- function(x, plots = c("scree","change"),
                            	cutoff = 0.2,
                            	shiny = FALSE,
-                            ...){
+                            ...) {
 
 	object <- x; rm(x)
 	if (is.character(object) || is.character(object$pre_r2) ||
