@@ -57,7 +57,7 @@ output$ui_mds_rev_dim <- renderUI({
 	rev_list <- list()
 	rev_list[paste("dimension",1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
 	checkboxGroupInput("mds_rev_dim", "Reverse:", rev_list,
-   	selected = state_init("mds_rev_dim", ""),
+   	selected = state_group("mds_rev_dim", ""),
    	inline = TRUE)
 })
 

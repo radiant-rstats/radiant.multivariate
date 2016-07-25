@@ -12,6 +12,6 @@ help_multivariate_panel <- tagList(
     HTML("<label>Multivariate menu: <i id='help_multivariate_all' title='Check all' href='#' class='action-button glyphicon glyphicon-ok'></i>
     <i id='help_multivariate_none' title='Uncheck all' href='#' class='action-button glyphicon glyphicon-remove'></i></label>"),
     checkboxGroupInput("help_multivariate", NULL, help_multivariate,
-      selected = state_init("help_multivariate"), inline = TRUE)
+      selected = state_group("help_multivariate"), inline = TRUE)
   )
 )
