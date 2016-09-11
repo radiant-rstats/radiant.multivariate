@@ -83,7 +83,7 @@ output$pre_factor <- renderUI({
 })
 
 .pre_factor <- eventReactive(input$pf_run, {
-  withProgress(message = 'Estimating factor solution', value = 0,
+  withProgress(message = 'Estimating factor solution', value = 1,
     do.call(pre_factor, pf_inputs())
   )
 })

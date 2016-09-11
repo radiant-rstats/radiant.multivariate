@@ -102,7 +102,7 @@ output$hier_clus <- renderUI({
 })
 
 .hier_clus <- eventReactive(input$hc_run, {
-  withProgress(message = 'Estimating cluster solution', value = 0,
+  withProgress(message = 'Estimating cluster solution', value = 1,
 	  do.call(hier_clus, hc_inputs())
   )
 })

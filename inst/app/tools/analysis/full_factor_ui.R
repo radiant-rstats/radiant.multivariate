@@ -112,7 +112,7 @@ output$full_factor <- renderUI({
 })
 
 .full_factor <- eventReactive(input$ff_run, {
-  withProgress(message = 'Estimating factor solution', value = 0,
+  withProgress(message = 'Estimating factor solution', value = 1,
 	  do.call(full_factor, ff_inputs())
   )
 })

@@ -150,7 +150,7 @@ output$pmap <- renderUI({
 
 
 .pmap <- eventReactive(input$pm_run, {
-  withProgress(message = 'Generating perceptual map', value = 0,
+  withProgress(message = 'Generating perceptual map', value = 1,
 	  do.call(pmap, pm_inputs())
 	)
 })

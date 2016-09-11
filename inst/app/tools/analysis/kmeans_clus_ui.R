@@ -110,7 +110,7 @@ output$kmeans_clus <- renderUI({
 })
 
 .kmeans_clus <- eventReactive(input$km_run, {
-  withProgress(message = 'Estimating cluster solution', value = 0,
+  withProgress(message = 'Estimating cluster solution', value = 1,
     # do.call(ann, ann_inputs())
     do.call(kmeans_clus, km_inputs())
   )

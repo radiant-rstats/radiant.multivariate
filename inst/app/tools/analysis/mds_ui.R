@@ -129,7 +129,7 @@ output$mds <- renderUI({
 })
 
 .mds <- eventReactive(input$mds_run, {
-  withProgress(message = 'Generating MDS solution', value = 0,
+  withProgress(message = 'Generating MDS solution', value = 1,
 	  do.call(mds, mds_inputs())
   )
 })

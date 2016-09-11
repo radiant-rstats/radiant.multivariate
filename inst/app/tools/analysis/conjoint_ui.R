@@ -112,7 +112,7 @@ output$conjoint <- renderUI({
 })
 
 .conjoint <- eventReactive(input$ca_run, {
-  withProgress(message = 'Estimating model', value = 0,
+  withProgress(message = 'Estimating model', value = 1,
 	  do.call(conjoint, ca_inputs())
 	)
 })
