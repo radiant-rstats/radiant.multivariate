@@ -5,77 +5,119 @@ trim <- function(x) gsub("^\\s+|\\s+$", "", x)
 # library(radiant.multivariate)
 # library(testthat)
 
-# context("Compare means")
-#
-# test_that("compare_means 1", {
-#   result <- compare_means("diamonds","cut","price")
-#   res1 <- capture.output(summary(result))[9] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "Fair 4505.238  101 3749.540 373.093 740.206"
-#   expect_equal(res1,res2)
-# })
-#
-# test_that("compare_means 2", {
-#   result <- compare_means("diamonds","cut","price")
-#   res1 <- capture.output(summary(result, show = TRUE))[19] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "Fair = Ideal          Fair not equal to Ideal          1035.014 0.009   389.429  2.658   118.618  263.879 1806.149 **"
-#   expect_equal(res1,res2)
-# })
-#
-# context("Compare proportions")
-#
-# test_that("compare_props 1", {
-#   result <- compare_props("titanic", "pclass", "survived")
-#   res1 <- capture.output(summary(result))[9] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "1st 179 103 282 0.635 0.029 0.056"
-#   expect_equal(res1,res2)
-# })
-#
-#
-# test_that("compare_props 2", {
-#   result <- compare_props("titanic", "pclass", "survived")
-#   res1 <- capture.output(summary(result, show = TRUE))[14] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "1st = 2nd   1st not equal to 2nd   0.194 < .001   20.576     1  0.112 0.277 ***"
-#   expect_equal(res1,res2)
-# })
-#
-# context("Single proportion")
-#
-# test_that("single_prop 1", {
-#   result <- single_prop("diamonds", "color")
-#   expect_equal(result$lev, "D")
-#   res1 <- capture.output(summary(result))[13] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "-0.373 382  < .001 0.116  0.14 ***"
-#   expect_equal(res1,res2)
-# })
-#
-# test_that("single_prop 2", {
-#   result <- single_prop("diamonds", "clarity", lev = "IF", comp_value = 0.05)
-#   expect_equal(result$lev, "IF")
-#   res1 <- capture.output(summary(result))[13] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "-0.017 99  < .001 0.027  0.04 ***"
-#   expect_equal(res1,res2)
-# })
-#
-# context("Single mean")
-#
-# test_that("single_mean 1", {
-#   result <- single_mean("diamonds", "carat")
-#   res1 <- capture.output(summary(result))[12] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "0.794 0.009  91.816  < .001 2999 0.777 0.811 ***"
-#   expect_equal(res1,res2)
-# })
-#
-# test_that("single_mean 2", {
-#   result <- single_mean("titanic", "age", comp_value = 40)
-#   res1 <- capture.output(summary(result))[12] %>% trim
-#   # cat(paste0(res1, "\n"))
-#   res2 <- "-10.187 0.445   -22.9  < .001 1042 28.94 30.686 ***"
-#   expect_equal(res1,res2)
-# })
+context("Maps")
+
+test_that("City MDS points", {
+  result <- mds("city", "from", "to", "distance")
+	# str(result)
+  res1 <- result$res$points
+  # dput(result$res$points)
+  res2 <- structure(c(-1348.66832957982, -1198.87410814714, -1076.98554040122,
+-1226.93901099845, -428.454832718783, 1596.1594018405, 1697.22828135996,
+1464.04701004452, 522.48712860043, -462.400598146569, -306.546900234988,
+-136.432035420421, 1013.62838366558, -174.603164807742, -639.307768963489,
+131.685862779591, 560.580459896188, 13.3957612318459), .Dim = c(9L,
+2L), .Dimnames = list(c("Boston", "NY", "DC", "Miami", "Chicago",
+"Seattle", "SF", "LA", "Denver"), NULL))
+  expect_equal(res1,res2)
+})
+
+test_that("Computer perceptual map", {
+	result <- pmap("computer","brand","high_end:business")
+	# str(result)
+	res1 <- result$fres$scores
+	# dput(result$res$points)
+	res2 <- structure(c(1.2990975042645, -0.318156927318684, -1.18661978839803,
+	-0.522421680770708, 0.728100892222923, 0.0936804393886441, -0.208948184854464,
+	-0.934302935231416, 1.64813821225715, -0.598567531559918), .Dim = c(5L,
+	2L), .Dimnames = list(c("Apple", "Dell", "Gateway", "HP", "Sony"
+	), c("RC1", "RC2")))
+  expect_equal(res1,res2)
+})
+
+context("Factor/PCA analysis")
+
+test_that("Pre nalysis for diamonds", {
+	result <- pre_factor("diamonds",c("price","carat","table"))
+	# str(result)
+	res1 <- result$pre_r2
+	# dput(result$pre_r2)
+	res2 <- structure(list(Rsq = c(0.861258211951766, 0.86356619173057, 0.0450708598611924
+)), .Names = "Rsq", row.names = c("price", "carat", "table"), class = "data.frame")
+  expect_equal(res1,res2)
+})
+
+test_that("Factor/PCA analysis for diamonds", {
+	result <- full_factor("diamonds",c("price","carat","table"))
+	# str(result)
+	res1 <- result$floadings
+	# dput(result$floadings)
+	res2 <- structure(list(PC1 = c(0.964483176117948, 0.972902482025944,
+0.325710945731448)), .Names = "PC1", row.names = c("price", "carat",
+"table"), class = "data.frame")
+  expect_equal(res1,res2)
+})
+
+context("Cluster analysis")
+
+test_that("Hierarchical cluster analysis", {
+	result <- hier_clus("shopping", vars = "v1:v6")
+	# str(result)
+	res1 <- result$hc_out$height
+	# dput(result$hc_out$height)
+	res2 <- c(0.693447070258665, 0.77981545158788, 1.19609257290417, 1.20263048421394,
+1.20263048421394, 1.25874249684769, 1.59728591646143, 1.76984887051771,
+1.88396035104441, 2.06113619040031, 3.37654118004185, 3.5167211043475,
+3.77286952167201, 5.26961961999936, 7.6948927428698, 9.4541210015406,
+12.7002828285666, 76.1882734993453, 92.3810886131668)
+  expect_equal(res1,res2)
+})
+
+test_that("Kmeans cluster analysis", {
+	result <- kmeans_clus("shopping", vars = "v1:v6")
+	# str(result)
+	res1 <- result$clus_means
+	# dput(result$clus_means)
+	res2 <- structure(list(v1 = c(5.75, 2.58333333333333), v2 = c(3.625,
+4.41666666666667), v3 = c(6, 2.58333333333333), v4 = c(3.125,
+4.75), v5 = c(1.875, 4.5), v6 = c(3.875, 4.66666666666667)), class = "data.frame", row.names = c("Cluster 1",
+"Cluster 2"), .Names = c("v1", "v2", "v3", "v4", "v5", "v6"))
+  expect_equal(res1,res2)
+})
+
+context("Conjoint analysis")
+
+test_that("Conjoint on mp3 data", {
+  result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
+	# str(result)
+	res1 <- result$the_table
+	# dput(result$the_table)
+	res2 <- structure(list(PW = structure(list(Attributes = c("Memory", "Memory",
+"Memory", "Radio", "Radio", "Size", "Size", "Size", "Price",
+"Price", "Price", "Shape", "Shape", "Shape", "Base utility"),
+    Levels = c("4GB", "6GB", "8GB", "No", "Yes", "Large", "Medium",
+    "Small", "$50", "$100", "$150", "Circular", "Rectangular",
+    "Square", "~"), PW = c(0, 7.667, 29.667, 0, 6.111, 0, 6.333,
+    8.5, 0, -6.833, -33.833, 0, -27.833, -13.333, 58.111)), .Names = c("Attributes",
+"Levels", "PW"), row.names = c("Memory4GB", "Memory6GB", "Memory8GB",
+"RadioNo", "RadioYes", "SizeLarge", "SizeMedium", "SizeSmall",
+"Price$50", "Price$100", "Price$150", "ShapeCircular", "ShapeRectangular",
+"ShapeSquare", "15"), class = "data.frame"), IW = structure(list(
+    Attributes = c("Memory", "Radio", "Size", "Price", "Shape"
+    ), IW = c(0.28, 0.058, 0.08, 0.319, 0.263)), .Names = c("Attributes",
+"IW"), row.names = c(NA, -5L), class = "data.frame"), plot_ylim = structure(list(
+    Min = c(0, 0, 0, -34.1716666666667, -34.1716666666667), Max = c(34.1716666666667,
+    34.1716666666667, 34.1716666666667, 0, 0)), .Names = c("Min",
+"Max"), row.names = c("Memory", "Radio", "Size", "Price", "Shape"
+), class = "data.frame")), .Names = c("PW", "IW", "plot_ylim"
+))
+  expect_equal(res1,res2)
+})
+
+
+
+
+
+
+
+
