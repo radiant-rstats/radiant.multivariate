@@ -40,7 +40,8 @@ kclus <- function(dataset, vars,
 		stop("K-medians requires at least two variables as input")
 
 	# converting factors to integers
-	dat <- mutate_each(dat, funs(if (is.factor(.)) as.integer(.) else .))
+	convert <- function(x) as.integer(x) %>% {. - min(.)}
+	dat <- mutate_each(dat, funs(if (is.factor(.)) convert(.) else .))
 
 	if (hc_init) {
 		init <- hclus(dat, vars, distance = distance, method = method, max_cases = Inf)
@@ -70,7 +71,7 @@ kclus <- function(dataset, vars,
 			mutate_each(funs(as.vector(scale(.)))) %>%
 			{ if (fun == "median") {
   		    km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
-  		    Gmedian::kGmedian(., ncenters = nr_clus)
+  		    Gmedian::kGmedian(., ncenters = km_cent)
   		  } else {
 			    kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
   		  }
@@ -83,14 +84,14 @@ kclus <- function(dataset, vars,
 	  km_out$withinss <-
 			mutate(sdat, clus_var = km_out$cluster) %>%
 			group_by(clus_var) %>%
-			# summarize_each(funs(sum((. - median(.))^2))) %>%
-			summarize_each(funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			# summarize_each(funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			summarize_each(funs(sum((. - mean(.))^2))) %>%
 			select(-clus_var) %>%
 			rowSums
 	  km_out$tot.withinss <- sum(km_out$withinss)
 	  km_out$totss <-
-			# summarize_each(sdat, funs(sum((. - median(.))^2))) %>%
-			summarize_each(sdat, funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			summarize_each(sdat, funs(sum((. - mean(.))^2))) %>%
+			# summarize_each(sdat, funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
 			sum(.)
 	  km_out$betweenss <- km_out$totss - km_out$tot.withinss
 	  rm(sdat)
