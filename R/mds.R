@@ -67,7 +67,7 @@ mds <- function(dataset, id1, id2, dis,
 	# res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
 	# if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
 
-	set.seed(seed)
+  seed %>% gsub("[^0-9]","",.) %>% { if (!is_empty(.)) set.seed(seed) }
 	res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
 	res$stress <- res$stress / 100
 

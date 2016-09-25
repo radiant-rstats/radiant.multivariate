@@ -2,6 +2,8 @@
 % Please edit documentation in R/deprecated.R
 \docType{package}
 \name{radiant.multivariate-deprecated}
+\alias{hier_clus}
+\alias{kmeans_clus}
 \alias{radiant.multivariate-deprecated}
 \alias{radiant.multivariate-deprecated-package}
 \alias{save_factors}
@@ -21,7 +23,9 @@ radiant. They will eventually be  removed.
 
 \tabular{rl}{
   \code{save_factors} is now a synonym for \code{\link{store.full_factor}}\cr
-  \code{save_membership} is now a synonym for \code{\link{store.kmeans_clus}}\cr
+  \code{save_membership} is now a synonym for \code{\link{store.kclus}}\cr
+  \code{kmeans_clus} is now a synonym for \code{\link{kclus}}\cr
+  \code{hier_clus} is now a synonym for \code{\link{hclus}}\cr
 }
 }
 

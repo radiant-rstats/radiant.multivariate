@@ -61,7 +61,7 @@ test_that("Factor/PCA analysis for diamonds", {
 context("Cluster analysis")
 
 test_that("Hierarchical cluster analysis", {
-	result <- hier_clus("shopping", vars = "v1:v6")
+	result <- hclus("shopping", vars = "v1:v6")
 	# str(result)
 	res1 <- result$hc_out$height
 	# dput(result$hc_out$height)
@@ -73,8 +73,8 @@ test_that("Hierarchical cluster analysis", {
   expect_equal(res1,res2)
 })
 
-test_that("Kmeans cluster analysis", {
-	result <- kmeans_clus("shopping", vars = "v1:v6")
+test_that("K-clustering", {
+	result <- kclus("shopping", vars = "v1:v6")
 	# str(result)
 	res1 <- result$clus_means
 	# dput(result$clus_means)

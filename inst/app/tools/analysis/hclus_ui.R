@@ -7,7 +7,7 @@ hc_distance <- c("Squared euclidean" = "sq.euclidian", "Euclidian" = "euclidean"
 hc_plots <- c("Scree" = "scree", "Change" = "change", "Dendrogram" = "dendro")
 
 ## list of function arguments
-hc_args <- as.list(formals(hier_clus))
+hc_args <- as.list(formals(hclus))
 
 hc_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
@@ -31,7 +31,7 @@ output$ui_hc_vars <- renderUI({
 	  multiple = TRUE, size = min(8, length(vars)), selectize = FALSE)
 })
 
-output$ui_hier_clus <- renderUI({
+output$ui_hclus <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
@@ -60,8 +60,8 @@ output$ui_hier_clus <- renderUI({
       ))
   	),
   	help_and_report(modal_title = "Hierarchical cluster analysis",
-  	                fun_name = "hier_clus",
-  	                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/hier_clus.md")))
+  	                fun_name = "hclus",
+  	                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/hclus.md")))
 	)
 })
 
@@ -79,51 +79,51 @@ hc_plot_height <- function()
   hc_plot() %>% { if (is.list(.)) .$plot_height else 400 }
 
 ## output is called from the main radiant ui.R
-output$hier_clus <- renderUI({
+output$hclus <- renderUI({
 
-		register_print_output("summary_hier_clus", ".summary_hier_clus")
-		register_plot_output("plot_hier_clus", ".plot_hier_clus",
+		register_print_output("summary_hclus", ".summary_hclus")
+		register_plot_output("plot_hclus", ".plot_hclus",
                          	width_fun = "hc_plot_width",
                          	height_fun = "hc_plot_height")
 
 		## one output with components stacked
 		hc_output_panels <- tagList(
-	     tabPanel("Summary", verbatimTextOutput("summary_hier_clus")),
+	     tabPanel("Summary", verbatimTextOutput("summary_hclus")),
 	     tabPanel("Plot",
-                plot_downloader("hier_clus", height = hc_plot_height()),
-                plotOutput("plot_hier_clus", height = "100%"))
+                plot_downloader("hclus", height = hc_plot_height()),
+                plotOutput("plot_hclus", height = "100%"))
 	  )
 
 		stat_tab_panel(menu = "Multivariate > Cluster",
 		               tool = "Hierarchical",
-		               tool_ui = "ui_hier_clus",
+		               tool_ui = "ui_hclus",
 		             	 output_panels = hc_output_panels)
 
 })
 
-.hier_clus <- eventReactive(input$hc_run, {
+.hclus <- eventReactive(input$hc_run, {
   withProgress(message = 'Estimating cluster solution', value = 1,
-	  do.call(hier_clus, hc_inputs())
+	  do.call(hclus, hc_inputs())
   )
 })
 
-.summary_hier_clus <- reactive({
+.summary_hclus <- reactive({
   if (not_available(input$hc_vars))
     return("This analysis requires one or more variables of type integer or numeric.\nIf these variable types are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
 
   if (not_pressed(input$hc_run)) return("** Press the Estimate button to generate cluster solution **")
 
-  summary(.hier_clus())
+  summary(.hclus())
 })
 
-.plot_hier_clus <- reactive({
+.plot_hclus <- reactive({
   if (not_available(input$hc_vars) || not_pressed(input$hc_run))
 		return(invisible())
 
-  capture_plot( plot(.hier_clus(), plots = input$hc_plots, cutoff = input$hc_cutoff) )
+  capture_plot( plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff) )
 })
 
-observeEvent(input$hier_clus_report, {
+observeEvent(input$hclus_report, {
   if (length(input$hc_plots) > 0) {
     inp_out <- list(plots = input$hc_plots) %>% list("",.)
     outputs <- c("summary","plot")
@@ -134,7 +134,7 @@ observeEvent(input$hier_clus_report, {
     figs <- FALSE
   }
   update_report(inp_main = clean_args(hc_inputs(), hc_args),
-                fun_name = "hier_clus",
+                fun_name = "hclus",
                 inp_out = inp_out,
                 outputs = outputs,
                 figs = figs,

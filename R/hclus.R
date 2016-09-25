@@ -1,6 +1,6 @@
 #' Hierarchical cluster analysis
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param vars Vector of variables to include in the analysis
@@ -9,25 +9,25 @@
 #' @param max_cases Maximum number of cases allowed (default is 1000)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
-#' @return A list of all variables used in hier_clus as an object of class hier_clus
+#' @return A list of all variables used in hclus as an object of class hclus
 #'
 #' @examples
-#' result <- hier_clus("shopping", vars = "v1:v6")
+#' result <- hclus("shopping", vars = "v1:v6")
 #'
-#' @seealso \code{\link{summary.hier_clus}} to summarize results
-#' @seealso \code{\link{plot.hier_clus}} to plot results
+#' @seealso \code{\link{summary.hclus}} to summarize results
+#' @seealso \code{\link{plot.hclus}} to plot results
 #'
 #' @export
-hier_clus <- function(dataset, vars,
-                      distance = "sq.euclidian",
-                      method = "ward.D",
-                      max_cases = 1000,
-                      data_filter = "") {
+hclus <- function(dataset, vars,
+                  distance = "sq.euclidian",
+                  method = "ward.D",
+                  max_cases = 1000,
+                  data_filter = "") {
 
 	dat <- getdata(dataset, vars, filt = data_filter)
 	if (nrow(dat) > max_cases)
 	  return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
-	         add_class("hier_clus"))
+	         add_class("hclus"))
 
 	dat %>%
 	  scale %>%
@@ -40,25 +40,25 @@ hier_clus <- function(dataset, vars,
 
 	if (!is_string(dataset)) dataset <- "-----"
 
-	as.list(environment()) %>% add_class("hier_clus")
+	as.list(environment()) %>% add_class("hclus")
 }
 
-#' Summary method for the hier_clus function
+#' Summary method for the hclus function
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 #'
-#' @param object Return value from \code{\link{hier_clus}}
+#' @param object Return value from \code{\link{hclus}}
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- hier_clus("shopping", vars = c("v1:v6"))
+#' result <- hclus("shopping", vars = c("v1:v6"))
 #' summary(result)
 #'
-#' @seealso \code{\link{hier_clus}} to generate results
-#' @seealso \code{\link{plot.hier_clus}} to plot results
+#' @seealso \code{\link{hclus}} to generate results
+#' @seealso \code{\link{plot.hclus}} to plot results
 #'
 #' @export
-summary.hier_clus <- function(object, ...) {
+summary.hclus <- function(object, ...) {
 
   if (is.character(object)) return(object)
 
@@ -72,31 +72,30 @@ summary.hier_clus <- function(object, ...) {
 	cat("Observations:", length(object$hc_out$order), "\n")
 }
 
-#' Plot method for the hier_clus function
+#' Plot method for the hclus function
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hier_clus.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 #'
-#' @param x Return value from \code{\link{hier_clus}}
+#' @param x Return value from \code{\link{hclus}}
 #' @param plots Plots to return. "change" shows the percentage change in within-cluster heterogeneity as respondents are grouped into different number of clusters, "dendro" shows the dendrogram, "scree" shows a scree plot of within-cluster heterogeneity
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., 0.05 percent) the initial steps in hierachical cluster analysis are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- hier_clus("shopping", vars = c("v1:v6"))
+#' result <- hclus("shopping", vars = c("v1:v6"))
 #' plot(result, plots = c("change", "scree"), cutoff = .05)
 #' plot(result, plots = "dendro", cutoff = 0)
-#' shopping %>% hier_clus(vars = c("v1:v6")) %>% plot
+#' shopping %>% hclus(vars = c("v1:v6")) %>% plot
 #'
-#' @seealso \code{\link{hier_clus}} to generate results
-#' @seealso \code{\link{summary.hier_clus}} to summarize results
+#' @seealso \code{\link{hclus}} to generate results
+#' @seealso \code{\link{summary.hclus}} to summarize results
 #'
 #' @export
-plot.hier_clus <- function(x, plots = c("scree","change"),
-                           cutoff = 0.05,
-                           shiny = FALSE,
-                           ...) {
-
+plot.hclus <- function(x, plots = c("scree","change"),
+                       cutoff = 0.05,
+                       shiny = FALSE,
+                       ...) {
 
 	object <- x; rm(x)
   if (is.character(object)) return(invisible())

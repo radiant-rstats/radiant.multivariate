@@ -1,6 +1,6 @@
 help_multivariate <- c("(Dis)similarity map" = "mds.md", "Attribute map" = "pmap.md",
                        "Pre-factor" = "pre_factor.md", "Factor" = "full_factor.md",
-                       "Hierarchical clustering" = "hier_clus.md", "Kmeans clustering" = "kmeans_clus.md",
+                       "Hierarchical clustering" = "hclus.md", "K-clustering" = "kclus.md",
                        "Conjoint" = "conjoint.md")
 
 output$help_multivariate <- reactive(append_help("help_multivariate", file.path(getOption("radiant.path.multivariate"),"app/tools/help/")))
