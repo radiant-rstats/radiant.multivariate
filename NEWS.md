@@ -5,6 +5,6 @@
 
 ## BUG FIXES
 
-## DEPRICATED
+## DEPRECATED
 - kmeans_clus was replaced by kclus
 - hier_clus was replaced by hclus
