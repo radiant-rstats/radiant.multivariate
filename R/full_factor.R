@@ -19,7 +19,7 @@
 #' @seealso \code{\link{summary.full_factor}} to summarize results
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
-#' @importFrom psych principal
+#' @importFrom psych principal fa
 #'
 #' @export
 full_factor <- function(dataset, vars,
@@ -47,7 +47,9 @@ full_factor <- function(dataset, vars,
 		fres <- psych::principal(dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
 		               oblique.scores = FALSE)
 	} else {
-		fres <- factanal(dat, nrFac, rotation = rotation, scores = "regression")
+		fres <- psych::fa(dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
+		               oblique.scores = FALSE, fm = "ml")
+		# fres <- factanal(dat, nrFac, rotation = rotation, scores = "regression")
 	}
 
 	## convert loadings object to data.frame
@@ -115,7 +117,6 @@ summary.full_factor <- function(object,
 	colSums(object$floadings^2) %>%
 		rbind(., . / nrow(object$floadings)) %>%
 		rbind(., cumsum(.[2,])) %>%
-		# round(2) %>%
 		set_rownames(c("Eigenvalues","Variance %","Cumulative %")) %>%
 		as.data.frame %>%
 		formatdf(dec = dec) %>%

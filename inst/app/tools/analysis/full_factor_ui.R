@@ -1,5 +1,7 @@
-ff_method <- c('Principal components' = 'PCA', 'Maximum Likelihood' = "maxlik")
-ff_rotation <- c('Varimax' = 'varimax', 'None' = 'none')
+ff_method <- c("Principal components" = "PCA", "Maximum Likelihood" = "maxlik")
+ff_rotation <- c("None" = "none", "Varimax" = "varimax", "Quartimax" = "quartimax",
+                 "Equamax" = "equamax", "Promax" = "promax",
+                 "Oblimin" = "oblimin", "Simplimax" = "simplimax")
 
 ## list of function arguments
 ff_args <- as.list(formals(full_factor))
@@ -43,9 +45,8 @@ output$ui_full_factor <- renderUI({
   	  conditionalPanel(condition = "input.tabs_full_factor == 'Summary'",
         checkboxInput("ff_fsort", "Sort", value = state_init("ff_fsort",FALSE))
       ),
-      radioButtons("ff_rotation", label = "Rotation:", ff_rotation,
-      	selected = state_init("ff_rotation", "varimax"),
-      	inline = TRUE),
+      selectInput("ff_rotation", label = "rotation:", ff_rotation,
+        selected = state_single("ff_rotation", ff_rotation, "varimax")),
       conditionalPanel(condition = "input.ff_vars != null",
         tags$table(
           tags$td(textInput("ff_store_name", "Store scores:", state_init("ff_store_name","factor"))),
