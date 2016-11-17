@@ -41,6 +41,9 @@ shinyServer(function(input, output, session) {
     radiant.data::copy_all(radiant.multivariate)
   }
 
+  copy_from(radiant.model, predict_model, print_predict_model)
+  source(file.path(getOption("radiant.path.model"),"app/radiant.R"), encoding = getOption("radiant.encoding"), local = TRUE)
+
  	## source analysis tools for multivariate menu
   for (file in list.files(c("tools/analysis"), pattern="\\.(r|R)$", full.names = TRUE))
     source(file, encoding = getOption("radiant.encoding"), local = TRUE)

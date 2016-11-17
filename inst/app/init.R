@@ -9,7 +9,9 @@ r_url_list[["Hierarchical"]] <-
 r_url_list[["K-clustering"]] <-
   list("tabs_kclus" = list("Summary" = "multivariate/kclus/", "Plot" = "multivariate/kclus/plot/"))
 r_url_list[["Conjoint"]] <-
-  list("tabs_conjoint" = list("Summary" = "multivariate/conjoint/", "Plot" = "multivariate/plot/"))
+  list("tabs_conjoint" = list("Summary" = "multivariate/conjoint/",
+                              "Predict" = "multivariate/predict/",
+                              "Plot" = "multivariate/plot/"))
 options(radiant.url.list = r_url_list); rm(r_url_list)
 
 ## design menu

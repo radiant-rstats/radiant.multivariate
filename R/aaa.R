@@ -1,12 +1,12 @@
 # to avoid 'no visible binding for global variable' NOTE
-globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci","cent"))
+globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci","cent","r_environment"))
 
 #' radiant.multivariate
 #'
 #' @name radiant.multivariate
 #' @docType package
 #' @import radiant.data shiny ggplot2
-#' @importFrom dplyr select select_ filter mutate funs group_by group_by_ summarise_each lag slice summarize_each
+#' @importFrom dplyr select select_ filter mutate funs group_by group_by_ summarise_each lag slice summarize_each filter_ bind_rows
 #' @importFrom magrittr %>% %<>% %T>% set_colnames set_rownames
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom scales percent
@@ -14,7 +14,8 @@ globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci","cen
 #' @importFrom grDevices rainbow
 #' @importFrom graphics abline arrows par plot points text title
 #' @importFrom methods is
-#' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd
+#' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd as.formula predict
+#' @importFrom utils head
 NULL
 
 #' Conjoint data for MP3 players
