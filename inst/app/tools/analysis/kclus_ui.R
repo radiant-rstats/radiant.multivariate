@@ -122,8 +122,7 @@ output$kclus <- renderUI({
 })
 
 .kclus <- eventReactive(input$km_run, {
-  withProgress(message = 'Estimating cluster solution', value = 1,
-    # do.call(ann, ann_inputs())
+  withProgress(message = "Estimating cluster solution", value = 1,
     do.call(kclus, km_inputs())
   )
 })
@@ -152,7 +151,7 @@ observeEvent(input$kclus_report, {
                 outputs = outputs, figs = figs,
                 fig.width = km_plot_width(),
                 fig.height = km_plot_height(),
-                xcmd = paste0("# store(result, name = '", input$km_store_name,"')\n# write.csv(result$clus_means, file = '~/kclus.csv')"))
+                xcmd = paste0("# store(result, name = \"", input$km_store_name,"\")\n# write.csv(result$clus_means, file = \"~/kclus.csv\")"))
 })
 
 output$dl_km_means <- downloadHandler(

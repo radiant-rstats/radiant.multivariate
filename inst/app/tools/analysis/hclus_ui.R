@@ -125,7 +125,10 @@ output$hclus <- renderUI({
 
 observeEvent(input$hclus_report, {
   if (length(input$hc_plots) > 0) {
-    inp_out <- list(plots = input$hc_plots) %>% list("",.)
+    if (input$hc_cutoff != 0.05)
+      inp_out <- list(plots = input$hc_plots, cutoff = input$hc_cutoff) %>% list("",.)
+    else
+      inp_out <- list(plots = input$hc_plots) %>% list("",.)
     outputs <- c("summary","plot")
     figs <- TRUE
   } else {

@@ -21,7 +21,7 @@
 hclus <- function(dataset, vars,
                   distance = "sq.euclidian",
                   method = "ward.D",
-                  max_cases = 1000,
+                  max_cases = 5000,
                   data_filter = "") {
 
 	dat <- getdata(dataset, vars, filt = data_filter)
