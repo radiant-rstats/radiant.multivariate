@@ -110,7 +110,6 @@ output$ui_ca_store <- renderUI({
     HTML("<label>Store all PWs in a new dataset:</label>"),
     tags$table(
 	    tags$td(textInput("ca_store_pw_name", NULL, state_init("ca_store_pw_name","PWs"))),
-	    # tags$td(actionButton("ca_store_pw", "Store"))
 	    tags$td(actionButton("ca_store_pw", "Store"), style="padding-top:5px;")
 	  ),
 	  tags$br(),
@@ -342,23 +341,6 @@ output$conjoint <- renderUI({
   ca_plot_inputs() %>% { .$shiny <- TRUE; . } %>% { do.call(plot, c(list(x = .conjoint()), .)) }
  })
 
-# observeEvent(input$conjoint_report, {
-#   outputs <- c("summary","plot")
-#   inp_out <- list(list(mc_diag = input$ca_mc_diag, dec = 3),
-#                   list(plots = input$ca_plots, scale_plot = input$ca_scale_plot))
-#   figs <- TRUE
-#   if (length(input$ca_plots) == 0) {
-#     figs <- FALSE
-#     outputs <- c("summary")
-#     inp_out[[2]] <- ""
-#   }
-#   update_report(inp_main = clean_args(ca_inputs(), ca_args),
-#                 fun_name = "conjoint", inp_out = inp_out,
-#                 outputs = outputs, figs = figs,
-#                 fig.width = ca_plot_width(),
-#                 fig.height = ca_plot_height())
-# })
-
 observeEvent(input$conjoint_report, {
   outputs <- c("summary")
   inp_out <- list("","")
@@ -371,7 +353,7 @@ observeEvent(input$conjoint_report, {
   }
   xcmd <- ""
   if (input$ca_by != "none")
-    xcmd <- paste0("store(result, name = \"", input$ca_store_pw_name, "\", type = \"PW\")\n")
+    xcmd <- paste0("# store(result, name = \"", input$ca_store_pw_name, "\", type = \"PW\")\n")
 
   if (!is_empty(input$ca_predict, "none") &&
       (!is_empty(input$ca_pred_data) || !is_empty(input$ca_pred_cmd))) {
@@ -381,8 +363,8 @@ observeEvent(input$conjoint_report, {
 
     xcmd <- paste0(xcmd, "print(pred, n = 10)")
     if (input$ca_predict %in% c("data","datacmd") || input$ca_by != "none") {
-      xcmd <- paste0(xcmd, "\nstore(pred, data = \"", input$ca_pred_data, "\", name = \"", input$ca_store_pred_name,"\")")
-      xcmd <- paste0(xcmd, "\n# write.csv(getdata(\"", input$ca_store_pred_name, "\"), file = \"~/", input$ca_store_pred_name, ".csv\", row.names = FALSE)")
+      xcmd <- paste0(xcmd, "\n# store(pred, data = \"", input$ca_pred_data, "\", name = \"", input$ca_store_pred_name,"\")")
+      xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/", input$ca_store_pred_name, ".csv\", row.names = FALSE)")
     } else {
       xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/ca_predictions.csv\", row.names = FALSE)")
     }

@@ -6,7 +6,6 @@
 #' @param rvar The response variable (e.g., profile ratings)
 #' @param evar Explanatory variables in the regression
 #' @param by Variable to group data by before analysis (e.g., a respondent id)
-#' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param reverse Reverse the values of the response variable (`rvar`)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
@@ -22,7 +21,6 @@
 #' @export
 conjoint <- function(dataset, rvar, evar,
                      by = "none",
-                     show = NULL,
                      reverse = FALSE,
                      data_filter = "") {
 
@@ -35,33 +33,43 @@ conjoint <- function(dataset, rvar, evar,
 	evar <- colnames(dat)[-1]
 	if (by != "none") {
 		evar <- setdiff(evar, by)
-		if (is.null(show)) show <- dat[[by]] %>% as_factor %>% levels %>% .[1]
-		## in case a data.frame was passed to conjoint(...)
-    if(dataset == "-----") store_dat <- dat
-		dat <- filter_(dat, paste0(by, " == ", show))
+    levs <- dat[[by]] %>% as_factor %>% levels
+    model_list <- vector("list", length(levs)) %>% set_names(levs)
+	} else {
+		levs <- "full"
+    model_list <- list(full = list(model = NA, coeff = NA, tab = NA))
 	}
 
 	formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
 
-	if (reverse) {
-		ca_dep <- dat[[rvar]]
-		dat[[rvar]] <- (max(ca_dep) + 1) - ca_dep
-	}
+	for (i in seq_along(levs)) {
+		if (!by == "none")
+ 		  cdat <- filter_(dat, paste0(by, " == ", levs[i])) %>% select_(.dots = setdiff(colnames(dat), by))
+ 		else
+ 			cdat <- dat
 
-	model <- lm(formula, data = dat)
-	coeff <- tidy(model)
-	the_table <- the_table(coeff, dat, evar)
+		if (reverse)
+			cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
 
-  coeff$` ` <- sig_stars(coeff$p.value) %>% format(justify = "left")
-  colnames(coeff) <- c("  ","coefficient","std.error","t.value","p.value"," ")
-  isFct <- sapply(select(dat,-1), function(x) is.factor(x) || is.logical(x))
-  if (sum(isFct) > 0) {
-    for (i in names(isFct[isFct]))
-      coeff$`  ` %<>% gsub(i, paste0(i,"|"), .) %>% gsub("\\|\\|","\\|",.)
+		model <- lm(formula, data = cdat)
+		coeff <- tidy(model)
+		tab <- the_table(coeff, cdat, evar)
 
-    rm(i, isFct)
+	  coeff$` ` <- sig_stars(coeff$p.value) %>% format(justify = "left")
+	  colnames(coeff) <- c("  ","coefficient","std.error","t.value","p.value"," ")
+	  isFct <- sapply(select(cdat,-1), function(x) is.factor(x) || is.logical(x))
+	  if (sum(isFct) > 0) {
+	    for (j in names(isFct[isFct]))
+	      coeff$`  ` %<>% gsub(j, paste0(j,"|"), .) %>% gsub("\\|\\|","\\|",.)
+
+	    rm(j, isFct)
+	  }
+	  coeff$`  ` %<>% format(justify = "left")
+
+    model_list[[levs[i]]] <- list(model = model, coeff = coeff, tab = tab)
   }
-  coeff$`  ` %<>% format(justify = "left")
+
+  rm(model, coeff, tab)
 
 	as.list(environment()) %>% add_class("conjoint")
 }
@@ -71,6 +79,7 @@ conjoint <- function(dataset, rvar, evar,
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{conjoint}}
+#' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param mc_diag Shows multicollinearity diagnostics.
 #' @param additional Show additional regression results
 #' @param dec Number of decimals to show
@@ -88,6 +97,7 @@ conjoint <- function(dataset, rvar, evar,
 #'
 #' @export
 summary.conjoint <- function(object,
+                             show = "",
                              mc_diag = FALSE,
                              additional = FALSE,
                              dec = 3,
@@ -98,12 +108,15 @@ summary.conjoint <- function(object,
 	if (object$data_filter %>% gsub("\\s","",.) != "")
 		cat("Filter               :", gsub("\\n","", object$data_filter), "\n")
 	if (object$by != "none")
-		cat("Show                 :", object$by, "==", object$show, "\n")
+		cat("Show                 :", object$by, "==", show, "\n")
 	rvar <- if (object$reverse) paste0(object$rvar, " (reversed)") else object$rvar
   cat("Response variable    :", rvar, "\n")
   cat("Explanatory variables:", paste0(object$evar, collapse=", "), "\n\n")
 
-	object$the_table %>%
+  if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list))
+  	show <- names(object$model_list)[1]
+
+	object$model_list[[show]]$tab %>%
 	{ cat("Conjoint part-worths:\n")
 		print(formatdf(.$PW, dec), row.names = FALSE)
 		cat("\nConjoint importance weights:\n")
@@ -112,7 +125,7 @@ summary.conjoint <- function(object,
 
 	cat("\nConjoint regression results:\n\n")
 
-	coeff <- object$coeff
+	coeff <- object$model_list[[show]]$coeff
   if (!additional) {
 	  coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
 	  print(coeff[,1:2], row.names=FALSE)
@@ -130,30 +143,29 @@ summary.conjoint <- function(object,
 	    print(coeff, row.names=FALSE)
 	  }
 
-	  if (nrow(object$model$model) <= (length(object$evar) + 1))
+	  model <- object$model_list[[show]]$model
+
+	  if (nrow(model$model) <= (length(object$evar) + 1))
 	    return("\nInsufficient observations to estimate model")
 
 	  ## adjusting df for included intercept term
-	  df_int <- if (attr(object$model$terms, "intercept")) 1L else 0L
+	  df_int <- if (attr(model$terms, "intercept")) 1L else 0L
 
-	  ## if stepwise returns only an intercept
-	  if (nrow(coeff) == 1) return("\nModel contains only an intercept. No additional output shown")
-
-	  reg_fit <- glance(object$model) %>% round(dec)
+	  reg_fit <- glance(model) %>% round(dec)
 	  if (reg_fit['p.value'] < .001) reg_fit['p.value'] <- "< .001"
 	  cat("\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
 	  cat("R-squared:", paste0(reg_fit$r.squared, ", "), "Adjusted R-squared:", reg_fit$adj.r.squared, "\n")
 	  cat("F-statistic:", reg_fit$statistic, paste0("df(", reg_fit$df - df_int, ",", reg_fit$df.residual, "), p.value"), reg_fit$p.value)
 	  cat("\nNr obs:", formatnr(reg_fit$df + reg_fit$df.residual, dec = 0), "\n\n")
 
-	  if (anyNA(object$model$coeff))
+	  if (anyNA(model$coeff))
 	    cat("The set of explanatory variables exhibit perfect multicollinearity.\nOne or more variables were dropped from the estimation.\n")
 	}
 
 	if (mc_diag) {
     if (length(object$evar) > 1) {
       cat("Multicollinearity diagnostics:\n")
-      car::vif(object$model) %>%
+      car::vif(object$model_list[[show]]$model) %>%
         { if (!dim(.) %>% is.null) .[,"GVIF"] else . } %>% # needed when factors are included
         data.frame("VIF" = ., "Rsq" = 1 - 1/.) %>%
         round(dec) %>%
@@ -218,20 +230,13 @@ predict.conjoint <- function(object,
     pred_val
   }
 
-  # radiant.model::predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
   if (object$by == "none") {
+  	object$model <- object$model_list[["full"]]$model
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
   } else {
     predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec)
   }
 }
-
-
-# result <- conjoint("mp2", rvar = "Rating", evar = "Memory:Shape", by = "ID", show = "2")
-# object <- result
-# x <- predict(result, "mp3")
-# str(x)
-# x
 
 #' Predict method for the conjoint function when a by variables is used
 #'
@@ -261,57 +266,14 @@ predict_conjoint_by <- function(object, pfun,
                                 dec = 3,
                                 ...) {
 
-	# library(radiant.multivariate)
-	# load("~/Desktop/mp2.rda")
-	# c1 <- filter(mp2, ID == 1)
-	# c2 <- filter(mp2, ID == 2)
-
-	# res <- list()
-	# res[[1]] <- c1
-	# for (i in 2:10) {
-	# 	tmp <- c1
-	# 	tmp$Rating <- round(c1$Rating + rnorm(18, 0, 2), 0)
-	# 	tmp$ID <- i
-	# 	res[[i]] <- tmp
-	# }
-
-	# c2$ID <- 11
-	# res[[11]] <- c2
-	# for (i in 12:20) {
-	# 	tmp <- c2
-	# 	tmp$Rating <- round(c2$Rating + rnorm(18, 0, 2), 0)
-	# 	tmp$ID <- i
-	# 	res[[i]] <- tmp
-	# }
-
-	# mp3_segment <- bind_rows(res)
-	# mp3_segment$ID <- as_integer(mp3_segment$ID)
-	# mp3_segment$Rating <- as_integer(mp3_segment$Rating)
-	# save(mp3_segment, file = "~/Desktop/mp3_segment.rda")
-
-	# object <- conjoint(dataset = "mp2", rvar = "Rating", evar = c("Memory", "Radio", "Size", "Price", "Shape"), by = "ID", show = "2")
-	# pred_data <- "mp3"
-	# pred_cmd <- ""
- #  conf_lev = 0.95
- #  se = FALSE
- #  dec = 3
-	# envir <- parent.frame()
-	# se <- TRUE
-
   if (is.character(object)) return(object)
 
-	vars <- c(object$rvar, object$evar, object$by)
-	dataset <- if (object$dataset == "-----") object$store_data else object$dataset
-	dat <- getdata(dataset, vars, filt = object$data_filter)
-
-  levs <- dat[[object$by]] %>% as_factor %>% levels
   pred <- list()
+	levs <- object$levs
 
 	for (i in seq_along(levs)) {
-		# i <- 1
-		cdat <- filter_(dat, paste0(object$by, " == ", levs[i])) %>% select_(.dots = setdiff(colnames(dat), object$by))
-    pred[[i]] <- conjoint(cdat, object$rvar, object$evar, reverse = object$reverse) %>%
-    	predict_model(., pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
+		object$model <- object$model_list[[levs[i]]]$model
+    pred[[i]] <- predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
 
     ## when se is true reordering the columns removes attributes for some reason
     if (i == 1) att <- attributes(pred[[1]])
@@ -339,7 +301,6 @@ predict_conjoint_by <- function(object, pfun,
 #'
 #' @export
 print.conjoint.predict <- function(x, ..., n = 50) {
-  # radiant.model::print_predict_model(x, ..., n = n, header = "Conjoint Analysis")
   print_predict_model(x, ..., n = n, header = "Conjoint Analysis")
 }
 
@@ -349,6 +310,7 @@ print.conjoint.predict <- function(x, ..., n = 50) {
 #'
 #' @param x Return value from \code{\link{conjoint}}
 #' @param plots Show either the part-worth ("pw") or importance-weights ("iw") plot
+#' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param scale_plot Scale the axes of the part-worth plots to the same range
 #' @param shiny Did the function call originate inside a shiny app
 #' @param ... further arguments passed to or from other methods
@@ -363,18 +325,24 @@ print.conjoint.predict <- function(x, ..., n = 50) {
 #'
 #' @export
 plot.conjoint <- function(x, plots = "pw",
+                          show = "",
                           scale_plot = FALSE,
                           shiny = FALSE,
                           ...) {
 
 	object <- x; rm(x)
 
-	the_table <- object$the_table
+  if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list))
+  	show <- names(object$model_list)[1]
+
+	the_table <- object$model_list[[show]]$tab
 	plot_ylim <- the_table$plot_ylim
 	plot_list <- list()
 
 	if ("pw" %in% plots) {
 		PW.df <- the_table[["PW"]]
+
+		lab <- if (object$by == "none") "" else paste0("(", show, ")")
 
 		for (var in object$evar) {
 			PW.var <- PW.df[PW.df[["Attributes"]] == var,]
@@ -386,7 +354,7 @@ plot.conjoint <- function(x, plots = "pw",
 			p <- ggplot(PW.var, aes_string(x="Levels", y="PW", group = 1)) +
 				  geom_line(colour="blue", linetype = 'dotdash', size=.7) +
 	  		  geom_point(colour="blue", size=4, shape=21, fill="white") +
-		  	  labs(list(title = paste("Part-worths for", var), x = ""))
+		  	  labs(list(title = paste("Part-worths for", var, lab), x = ""))
 		  	  # theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 		  if (scale_plot) p <- p + ylim(plot_ylim[var,"Min"],plot_ylim[var,"Max"])
@@ -396,10 +364,11 @@ plot.conjoint <- function(x, plots = "pw",
 
 	if ("iw" %in% plots) {
 		IW.df <- the_table[['IW']]
+		lab <- if (object$by == "none") "" else paste0(" (", show, ")")
 		plot_list[["iw"]] <- ggplot(IW.df, aes_string(x="Attributes", y="IW", fill = "Attributes")) +
 		                   geom_bar(stat = "identity", alpha = .5) +
 		                   theme(legend.position = "none") +
-		                   labs(list(title = "Importance weights"))
+		                   labs(list(title = paste0("Importance weights", lab)))
 	}
 
 	sshhr( do.call(gridExtra::arrangeGrob, c(plot_list, list(ncol = min(length(plot_list),2)))) ) %>%
@@ -493,28 +462,17 @@ the_table <- function(model, dat, evar) {
 #' @export
 store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.frame(), ...) {
 
-	# library(radiant.multivariate)
-	# load("~/Desktop/mp2.rda")
-	# object <- conjoint(dataset = "mp2", rvar = "Rating", evar = c("Memory", "Radio", "Size", "Price", "Shape"), by = "ID", show = "2")
-	# type <- "PW"
-	# name <- "PWs"
-	# envir <- parent.frame()
-
-	vars <- c(object$rvar, object$evar, object$by)
-	dataset <- if (object$dataset == "-----") object$store_data else object$dataset
-	dat <- getdata(dataset, vars, filt = object$data_filter)
-
-  levs <- dat[[object$by]] %>% as_factor %>% levels
+  levs <- object$levs
 
   if (type == "PW") {
-    cn <- tidy(object$model)$term[-1]
+    cn <- tidy(object$model_list[[1]]$model)$term[-1]
 
     for (i in object$evar)
     	cn %<>% gsub(i, paste0(i, "_"), .) %>% gsub("\\_\\_","\\_",.)
 
     cn <- gsub("[^A-z0-9_\\.]", "", cn)
   } else {
-    cn <- object$the_table$IW$Attribute %>%
+    cn <- object$model_list[[1]]$tab$IW$Attribute %>%
       gsub("[^A-z0-9_\\.]", "", .)
   }
 
@@ -524,13 +482,10 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
   res[[object$by]] <- levs
 
 	for (i in seq_along(levs)) {
-		cdat <- filter_(dat, paste0(object$by, " == ", levs[i])) %>% select_(.dots = setdiff(colnames(dat), object$by))
-    cres <- conjoint(cdat, object$rvar, object$evar, reverse = object$reverse)
-    cres
 		if (type == "IW") {
-      res[i, 2:ncol(res)] <- cres$the_table[[type]][[type]]
+      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$tab$IW$IW
 		} else {
-      res[i, 2:ncol(res)] <- cres$coef$coefficient[-1]
+      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$coeff$coefficient[-1]
 		}
 	}
 
@@ -544,7 +499,7 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
     return(invisible())
   }
 
-  # ## use data description from the original if available
+  ## use data description from the original if available
   if (is_empty(env$r_data[[paste0(name, "_descr")]])) {
   	s <- ifelse(type == "PW", "PWs", "IWs")
     attr(res, "description") <- paste0("## Conjoint ", s, "\n\nThis dataset contains ", s, " derived from dataset ", object$dataset)
