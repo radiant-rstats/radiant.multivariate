@@ -21,7 +21,7 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for a
 }
 \examples{
 result <- conjoint(dataset = "mp3", rvar = "Rating", evar = "Memory:Shape")
-the_table(result$model, result$dat, result$evar)
+the_table(tidy(result$model), result$dat, result$evar)
 
 }
 \seealso{

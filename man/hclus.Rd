@@ -5,7 +5,7 @@
 \title{Hierarchical cluster analysis}
 \usage{
 hclus(dataset, vars, distance = "sq.euclidian", method = "ward.D",
-  max_cases = 1000, data_filter = "")
+  max_cases = 5000, data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant}
