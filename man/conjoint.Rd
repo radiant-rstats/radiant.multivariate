@@ -4,7 +4,8 @@
 \alias{conjoint}
 \title{Conjoint analysis}
 \usage{
-conjoint(dataset, rvar, evar, reverse = FALSE, data_filter = "")
+conjoint(dataset, rvar, evar, by = "none", show = NULL, reverse = FALSE,
+  data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant}
@@ -12,6 +13,10 @@ conjoint(dataset, rvar, evar, reverse = FALSE, data_filter = "")
 \item{rvar}{The response variable (e.g., profile ratings)}
 
 \item{evar}{Explanatory variables in the regression}
+
+\item{by}{Variable to group data by before analysis (e.g., a respondent id)}
+
+\item{show}{Level in by variable to analyse (e.g., a specific respondent)}
 
 \item{reverse}{Reverse the values of the response variable (`rvar`)}
 
