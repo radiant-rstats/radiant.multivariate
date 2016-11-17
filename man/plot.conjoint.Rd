@@ -4,13 +4,15 @@
 \alias{plot.conjoint}
 \title{Plot method for the conjoint function}
 \usage{
-\method{plot}{conjoint}(x, plots = "pw", scale_plot = FALSE,
+\method{plot}{conjoint}(x, plots = "pw", show = "", scale_plot = FALSE,
   shiny = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{conjoint}}}
 
 \item{plots}{Show either the part-worth ("pw") or importance-weights ("iw") plot}
+
+\item{show}{Level in by variable to analyse (e.g., a specific respondent)}
 
 \item{scale_plot}{Scale the axes of the part-worth plots to the same range}
 

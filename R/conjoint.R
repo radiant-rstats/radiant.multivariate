@@ -385,7 +385,7 @@ plot.conjoint <- function(x, plots = "pw",
 #'
 #' @examples
 #' result <- conjoint(dataset = "mp3", rvar = "Rating", evar = "Memory:Shape")
-#' the_table(tidy(result$model), result$dat, result$evar)
+#' the_table(tidy(result$model_list[[1]][["model"]]), result$dat, result$evar)
 #'
 #' @seealso \code{\link{conjoint}} to generate results
 #' @seealso \code{\link{summary.conjoint}} to summarize results

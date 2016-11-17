@@ -90,8 +90,7 @@ context("Conjoint analysis")
 test_that("Conjoint on mp3 data", {
   result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
 	# str(result)
-	res1 <- result$the_table
-	# dput(result$the_table)
+	res1 <- result$model_list[[1]]$tab
 	res2 <- structure(list(PW = structure(list(Attributes = c("Memory", "Memory",
 "Memory", "Radio", "Radio", "Size", "Size", "Size", "Price",
 "Price", "Price", "Shape", "Shape", "Shape", "Base utility"),

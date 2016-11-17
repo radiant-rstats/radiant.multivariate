@@ -4,7 +4,7 @@
 \alias{conjoint}
 \title{Conjoint analysis}
 \usage{
-conjoint(dataset, rvar, evar, by = "none", show = NULL, reverse = FALSE,
+conjoint(dataset, rvar, evar, by = "none", reverse = FALSE,
   data_filter = "")
 }
 \arguments{
@@ -15,8 +15,6 @@ conjoint(dataset, rvar, evar, by = "none", show = NULL, reverse = FALSE,
 \item{evar}{Explanatory variables in the regression}
 
 \item{by}{Variable to group data by before analysis (e.g., a respondent id)}
-
-\item{show}{Level in by variable to analyse (e.g., a specific respondent)}
 
 \item{reverse}{Reverse the values of the response variable (`rvar`)}
 
