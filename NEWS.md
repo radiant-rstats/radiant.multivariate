@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate VERSION 0.6.3 (unreleased)
+# CHANGES IN radiant.multivariate VERSION 0.7
 
 ## NEW FEATURES
 - Added k-medians, from the Gmedians package, as an option in _Multivariate > K-clustering_

@@ -592,8 +592,6 @@ store.conjoint.predict.by <- function(object, name = "predict_by", envir = paren
   env$r_data[["datasetlist"]] <- c(name, env$r_data[["datasetlist"]]) %>% unique
 }
 
-
-
 ## code for 'exploded logistic regression' when ranking data is provided
 # library(MASS)
 # library(dplyr)

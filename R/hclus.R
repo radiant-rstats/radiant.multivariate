@@ -134,6 +134,10 @@ plot.hclus <- function(x, plots = c("scree","change"),
 		if (length(plots) > 1)
 			xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in R > Report to view different plot types."
 
+		## can't combine base graphics with grid graphics
+		## https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html
+		## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
+
 		if (cutoff == 0) {
 			plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
 		} else {
