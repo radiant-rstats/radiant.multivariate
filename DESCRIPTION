@@ -1,8 +1,8 @@
 Package: radiant.multivariate
 Type: Package
 Title: Multivariate Menu for Radiant: Business Analytics using R and Shiny
-Version: 0.7
-Date: 2017-1-10
+Version: 0.7.2
+Date: 2017-2-5
 Authors@R: person("Vincent", "Nijs", , "radiant@rady.ucsd.edu", c("aut", "cre"))
 Description: The Radiant Multivariate menu includes interfaces for perceptual
     mapping, factor analysis, cluster analysis, and conjoint analysis. The
@@ -19,6 +19,7 @@ Imports:
     scales (>= 0.4.0),
     magrittr (>= 1.5),
     psych (>= 1.6.6),
+    GPArotation (>= 2014.11-1),
     car (>= 2.1.1),
     MASS (>= 7.3),
     wordcloud (>= 2.5),

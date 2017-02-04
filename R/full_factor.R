@@ -20,6 +20,7 @@
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
 #' @importFrom psych principal fa
+#' @importFrom GPArotation quartimax oblimin simplimax
 #'
 #' @export
 full_factor <- function(dataset, vars,

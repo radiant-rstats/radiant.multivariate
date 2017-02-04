@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate VERSION 0.7
+# CHANGES IN radiant.multivariate VERSION 0.7.1
 
 ## NEW FEATURES
 - Added k-medians, from the Gmedians package, as an option in _Multivariate > K-clustering_
@@ -9,6 +9,7 @@
 - Derive and store predictions based on conjoint analysis for multiple respondents
 
 ## BUG FIXES
+- Import from `GPArotation`
 
 ## DEPRECATED
 - kmeans_clus was replaced by kclus
