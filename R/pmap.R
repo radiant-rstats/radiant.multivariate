@@ -55,7 +55,7 @@ pmap <- function(dataset, brand, attr,
 
 	rm(f_data, m, cscm)
 
-	if (!is_string(dataset)) dataset <- "-----"
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
 	as.list(environment()) %>% add_class(c("pmap","full_factor"))
 }

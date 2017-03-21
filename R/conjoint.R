@@ -27,7 +27,7 @@ conjoint <- function(dataset, rvar, evar,
 	vars <- c(rvar, evar)
 	if (by != "none") vars <- c(vars, by)
 	dat <- getdata(dataset, vars, filt = data_filter)
-	if (!is_string(dataset)) dataset <- "-----"
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
 	## in case : was used to select a range of variables
 	evar <- colnames(dat)[-1]
@@ -539,7 +539,8 @@ store.conjoint.predict <- function(object, ..., data = attr(object,"pred_data"),
   }
 
   vars <- colnames(object)[1:(ind-1)]
-  indr <- indexr(data, vars, "")
+  indr <- indexr(data, vars, "", cmd = attr(object, "pred_cmd"))
+
   pred <- as_data_frame(matrix(NA, nrow = indr$nr, ncol = ncol(df)))
   pred[indr$ind, ] <- as.vector(df) ## as.vector removes all attributes from df
 

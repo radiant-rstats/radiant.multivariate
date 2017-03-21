@@ -34,7 +34,7 @@ kclus <- function(dataset, vars,
                   data_filter = "") {
 
 	dat <- getdata(dataset, vars, filt = data_filter)
-	if (!is_string(dataset)) dataset <- "-----"
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
 	if (fun == "median" && length(vars) < 2)
 		stop("K-medians requires at least two variables as input")
@@ -249,7 +249,7 @@ plot.kclus <- function(x, plots = "density",
 #' @param name Name of cluster membership variable
 #'
 #' @examples
-#' kclus(shopping, vars = c("v1:v6")) %>% store %>% head
+#' kclus(shopping, vars = "v1:v6") %>% store %>% head
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
@@ -259,7 +259,8 @@ plot.kclus <- function(x, plots = "density",
 store.kclus <- function(object, ..., name = "") {
 	## membership variable name
   if (is_empty(name)) name <- paste0("kclus",object$nr_clus)
-  dat <- {if (object$dataset == "-----") object$dat else object$dataset}
+  # dat <- {if (object$dataset == "-----") object$dat else object$dataset}
+  dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
 	indr <- indexr(dat, object$vars, object$data_filter)
 	km <- rep(NA,indr$nr)
 	km[indr$ind] <- object$km_out$cluster

@@ -30,7 +30,7 @@ full_factor <- function(dataset, vars,
                         data_filter = "") {
 
 	dat <- getdata(dataset, vars, filt = data_filter)
-	if (!is_string(dataset)) dataset <- "-----"
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
 	nrObs <- nrow(dat)
 	if (nrObs <= ncol(dat)) {
@@ -220,7 +220,7 @@ store.full_factor <- function(object, ..., name = "") {
 	fscores <- as.data.frame(object$fres$scores)
   if (is_empty(name)) name <- "factor"
 
-  dat <- {if (object$dataset == "-----") object$dat else object$dataset}
+  dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
 	indr <- indexr(dat, object$vars, object$data_filter)
 	fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)))
 	fs[indr$ind, ] <- fscores

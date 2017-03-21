@@ -38,8 +38,7 @@ hclus <- function(dataset, vars,
 			}
 		} %>% hclust(d = ., method = method) -> hc_out
 
-	if (!is_string(dataset)) dataset <- "-----"
-
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE) 
 	as.list(environment()) %>% add_class("hclus")
 }
 

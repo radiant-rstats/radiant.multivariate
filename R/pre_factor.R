@@ -23,7 +23,7 @@ pre_factor <- function(dataset, vars,
 	dat <- getdata(dataset, vars, filt = data_filter)
 	nrObs <- nrow(dat)
 
-	if (!is_string(dataset)) dataset <- "-----"
+	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
 	if (nrObs <= ncol(dat)) {
 		return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
