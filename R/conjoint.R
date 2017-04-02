@@ -44,7 +44,7 @@ conjoint <- function(dataset, rvar, evar,
 
 	for (i in seq_along(levs)) {
 		if (!by == "none")
- 		  cdat <- filter_(dat, paste0(by, " == ", levs[i])) %>% select_(.dots = setdiff(colnames(dat), by))
+ 		  cdat <- filter_(dat, paste0(by, " == '", levs[i],"'")) %>% select_(.dots = setdiff(colnames(dat), by))
  		else
  			cdat <- dat
 
