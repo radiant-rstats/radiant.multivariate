@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate VERSION 0.7.3
+# CHANGES IN radiant.multivariate VERSION 0.7.5
 
 ## NEW FEATURES
 - Added k-medians, from the Gmedians package, as an option in _Multivariate > K-clustering_
@@ -8,6 +8,7 @@
 - Store PWs or IWs from conjoint analysis for multiple respondents
 - Derive and store predictions based on conjoint analysis for multiple respondents
 - Show dataset name in output if dataframe passed directly to analysis function
+- As an alternative to using the Estimate button to run a model you can now also use CTRL-enter or CMD-enter
 
 ## BUG FIXES
 - Import from `GPArotation`

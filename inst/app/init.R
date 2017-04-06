@@ -18,6 +18,9 @@ options(radiant.url.list = r_url_list); rm(r_url_list)
 options(radiant.multivariate_ui =
 	tagList(
 	  navbarMenu("Multivariate",
+      tags$head(
+        tags$script(src = "www_multivariate/js/run_return.js")
+      ),
 	    "Maps",
 	    tabPanel("(Dis)similarity", uiOutput("mds")),
       tabPanel("Attributes", uiOutput("pmap")),
