@@ -51,7 +51,7 @@ conjoint <- function(dataset, rvar, evar,
 		if (reverse)
 			cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
 
-		model <- lm(formula, data = cdat)
+		model <- sshhr(lm(formula, data = cdat))
 		coeff <- tidy(model)
 		tab <- the_table(coeff, cdat, evar)
 
