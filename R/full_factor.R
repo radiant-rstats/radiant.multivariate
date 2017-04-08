@@ -193,7 +193,7 @@ plot.full_factor <- function(x,
   	}
 	}
 
-	sshhr( do.call(gridExtra::arrangeGrob, c(plots, list(ncol = min(length(plots),2)))) ) %>%
+	sshhr( do.call(gridExtra::grid.arrange, c(plots, list(ncol = min(length(plots),2)))) ) %>%
 	 	{if (shiny) . else print(.)}
 }
 

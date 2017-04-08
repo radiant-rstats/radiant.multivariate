@@ -170,6 +170,6 @@ plot.pre_factor <- function(x, plots = c("scree","change"),
 					     x = "# factors", y = "Rate of change index"))
 	}
 
-	sshhr( do.call(gridExtra::arrangeGrob, c(plot_list, list(ncol = 1))) ) %>%
+	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = 1))) ) %>%
 	 	{ if (shiny) . else print(.) }
 }

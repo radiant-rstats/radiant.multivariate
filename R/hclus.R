@@ -134,7 +134,7 @@ plot.hclus <- function(x, plots = c("scree","change"),
 			xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in R > Report to view different plot types."
 
 		## can't combine base graphics with grid graphics
-		## https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html
+		## https://cran.r-project.org/web/packages/gridExtra/vignettes/grid.arrange.html
 		## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
 
 		if (cutoff == 0) {
@@ -146,6 +146,6 @@ plot.hclus <- function(x, plots = c("scree","change"),
 		return(invisible())
 	}
 
-	sshhr( do.call(gridExtra::arrangeGrob, c(plot_list, list(ncol = 1))) ) %>%
+	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = 1))) ) %>%
 	 	{ if (shiny) . else print(.) }
 }
