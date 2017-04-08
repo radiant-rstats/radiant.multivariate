@@ -95,13 +95,16 @@ output$ui_ca_by <- renderUI({
 })
 
 output$ui_ca_show <- renderUI({
-	req(input$ca_by != "none")
+  levs <- c()
   if (available(input$ca_by))
     levs <- .getdata()[[input$ca_by]] %>% as_factor %>% levels
-  else
-    levs <- c()
   selectInput(inputId = "ca_show", label = "Show:", choices = levs,
   	selected = state_single("ca_show", levs, levs[1]), multiple = FALSE)
+})
+
+## reset ca_show if needed
+observeEvent(input$ca_by == "none" && !is_empty(input$ca_show), {
+  updateSelectInput(session = session, inputId = "ca_show", selected = NULL)
 })
 
 output$ui_ca_store <- renderUI({
@@ -141,7 +144,8 @@ output$ui_ca_store_pred <- renderUI({
 
 ## reset prediction settings when the dataset changes
 observeEvent(input$dataset, {
-  updateSelectInput(session = session, inputId = "ca_predict", selected = "none")
+  if (input$nav_radiant != "Conjoint")
+    updateSelectInput(session = session, inputId = "ca_predict", selected = "none")
 })
 
 output$ui_ca_predict_plot <- renderUI({
@@ -153,9 +157,9 @@ output$ui_ca_predict_plot <- renderUI({
 })
 
 output$ui_ca_pred_data <- renderUI({
-    selectizeInput(inputId = "ca_pred_data", label = "Predict for profiles:",
-                choices = c("None" = "", r_data$datasetlist),
-                selected = state_single("ca_pred_data", c("None" = "", r_data$datasetlist)), multiple = FALSE)
+  selectizeInput(inputId = "ca_pred_data", label = "Predict for profiles:",
+                 choices = c("None" = "", r_data$datasetlist),
+                 selected = state_single("ca_pred_data", c("None" = "", r_data$datasetlist)), multiple = FALSE)
 })
 
 output$ui_conjoint <- renderUI({
@@ -200,7 +204,7 @@ output$ui_conjoint <- renderUI({
 	    uiOutput("ui_ca_rvar"),
 	    uiOutput("ui_ca_evar"),
 	    uiOutput("ui_ca_by"),
-		  conditionalPanel(condition = "input.tabs_conjoint != 'Predict'",
+		  conditionalPanel(condition = "input.tabs_conjoint != 'Predict' & input.ca_by != 'none'",
 	      uiOutput("ui_ca_show")
 	    ),
 		  conditionalPanel(condition = "input.tabs_conjoint == 'Summary'",
@@ -286,9 +290,9 @@ output$conjoint <- renderUI({
 	  )
 
 		stat_tab_panel(menu = "Multivariate > Conjoint",
-		              tool = "Conjoint",
-		              tool_ui = "ui_conjoint",
-		             	output_panels = ca_output_panels)
+		               tool = "Conjoint",
+		               tool_ui = "ui_conjoint",
+		             	 output_panels = ca_output_panels)
 })
 
 .conjoint <- eventReactive(input$ca_run, {
@@ -301,7 +305,6 @@ output$conjoint <- renderUI({
 .summary_conjoint <- reactive({
   if (ca_available() != "available") return(ca_available())
   if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
-  # summary(.conjoint(), mc_diag = input$ca_mc_diag, additional = input$ca_additional)
   do.call(summary, c(list(object = .conjoint()), ca_sum_inputs()))
 })
 
