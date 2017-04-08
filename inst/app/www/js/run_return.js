@@ -17,3 +17,21 @@ $(document).keydown(function(event) {
     $("#ca_run").click();
   }
 });
+
+$(document).keydown(function(event) {
+  if ($("#conjoint_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#conjoint_report").click();
+  } else if ($("#full_factor_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#full_factor_report").click();
+  } else if ($("#hclus_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#hclus_report").click();
+  } else if ($("#kclus_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#kclus_report").click();
+  } else if ($("#mds_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#mds_report").click();
+  } else if ($("#pmap_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#pmap_report").click();
+  } else if ($("#pre_factor_report").is(":visible") && event.altKey && event.keyCode == 13) {
+    $("#pre_factor_report").click();
+  }
+});
