@@ -470,7 +470,7 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
     for (i in object$evar)
     	cn %<>% gsub(i, paste0(i, "_"), .) %>% gsub("\\_\\_","\\_",.)
 
-    cn <- gsub("[^A-z0-9_\\.]", "", cn)
+    cn <- gsub("[^A-z0-9_\\.]", "", cn) %>% c("Intercept", .)
   } else {
     cn <- object$model_list[[1]]$tab$IW$Attribute %>%
       gsub("[^A-z0-9_\\.]", "", .)
@@ -485,7 +485,7 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
 		if (type == "IW") {
       res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$tab$IW$IW
 		} else {
-      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$coeff$coefficient[-1]
+      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$coeff$coefficient
 		}
 	}
 
