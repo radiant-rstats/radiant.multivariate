@@ -4,7 +4,7 @@
 \alias{conjoint}
 \title{Conjoint analysis}
 \usage{
-conjoint(dataset, rvar, evar, by = "none", reverse = FALSE,
+conjoint(dataset, rvar, evar, int = "", by = "none", reverse = FALSE,
   data_filter = "")
 }
 \arguments{
@@ -13,6 +13,8 @@ conjoint(dataset, rvar, evar, by = "none", reverse = FALSE,
 \item{rvar}{The response variable (e.g., profile ratings)}
 
 \item{evar}{Explanatory variables in the regression}
+
+\item{int}{Interaction terms to include in the model}
 
 \item{by}{Variable to group data by before analysis (e.g., a respondent id)}
 

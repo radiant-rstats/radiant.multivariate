@@ -4,12 +4,14 @@
 \alias{plot.full_factor}
 \title{Plot method for the full_factor function}
 \usage{
-\method{plot}{full_factor}(x, shiny = FALSE, ...)
+\method{plot}{full_factor}(x, shiny = FALSE, custom = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{full_factor}}}
 
 \item{shiny}{Did the function call originate inside a shiny app}
+
+\item{custom}{Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.}
 
 \item{...}{further arguments passed to or from other methods}
 }
