@@ -132,7 +132,7 @@ output$full_factor <- renderUI({
 
 observeEvent(input$full_factor_report, {
   outputs <- c("summary","plot")
-  inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2),"")
+  inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2), list(custom = FALSE))
   xcmd = paste0("# store(result, name = \"", input$ff_store_name, "\")\n# clean_loadings(result$floadings, cutoff = ", input$ff_cutoff, ", fsort = ", input$ff_fsort, ", dec = 8) %>% write.csv(file = \"~/loadings.csv\")")
   update_report(inp_main = clean_args(ff_inputs(), ff_args),
                 fun_name = "full_factor",

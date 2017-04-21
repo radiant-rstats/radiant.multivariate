@@ -79,6 +79,7 @@ summary.hclus <- function(object, ...) {
 #' @param plots Plots to return. "change" shows the percentage change in within-cluster heterogeneity as respondents are grouped into different number of clusters, "dendro" shows the dendrogram, "scree" shows a scree plot of within-cluster heterogeneity
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., 0.05 percent) the initial steps in hierachical cluster analysis are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -94,6 +95,7 @@ summary.hclus <- function(object, ...) {
 plot.hclus <- function(x, plots = c("scree","change"),
                        cutoff = 0.05,
                        shiny = FALSE,
+                       custom = FALSE,
                        ...) {
 
 	object <- x; rm(x)
@@ -140,12 +142,15 @@ plot.hclus <- function(x, plots = c("scree","change"),
 		if (cutoff == 0) {
 			plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
 		} else {
-			plot(hc, ylim = c(cutoff,1), leaflab='none',
+			plot(hc, ylim = c(cutoff,1), leaflab = "none",
 			     main = "Cutoff dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
 		}
 		return(invisible())
 	}
 
-	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = 1))) ) %>%
-	 	{ if (shiny) . else print(.) }
+  if (custom)
+    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+
+	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+	 	{if (shiny) . else print(.)}
 }

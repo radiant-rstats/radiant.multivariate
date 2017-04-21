@@ -122,6 +122,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @param plots Plots to return. "change" shows the change in eigenvalues as variables are grouped into different number of factors, "scree" shows a scree plot of eigenvalues
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., eigenvalues of .8 or higher) factors with the least explanatory power are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -136,6 +137,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 plot.pre_factor <- function(x, plots = c("scree","change"),
                            	cutoff = 0.2,
                            	shiny = FALSE,
+                           	custom = FALSE,
                             ...) {
 
 	object <- x; rm(x)
@@ -149,8 +151,7 @@ plot.pre_factor <- function(x, plots = c("scree","change"),
 
 	plot_list <- list()
 	if ("scree" %in% plots) {
-		plot_list[["scree"]] <-
-			ggplot(dat, aes(x=x, y=y, group = 1)) +
+		plot_list[[which("scree" == plots)]] <- ggplot(dat, aes(x=x, y=y, group = 1)) +
 		    geom_line(colour="blue", linetype = 'dotdash', size=.7) +
 		    geom_point(colour="blue", size=4, shape=21, fill="white") +
 				geom_hline(yintercept = 1, color = 'black', linetype = 'solid', size = 1) +
@@ -158,8 +159,7 @@ plot.pre_factor <- function(x, plots = c("scree","change"),
 	}
 
 	if ("change" %in% plots) {
-		plot_list[["change"]] <-
-			pre_eigen %>%
+		plot_list[[which("change" == plots)]] <- pre_eigen %>%
 			{(. - lag(.)) / lag(.)} %>%
 			{. / min(., na.rm = TRUE)} %>%
 				data.frame(bump = ., nr_fact = paste0(0:(length(.)-1), "-", 1:length(.))) %>%
@@ -170,6 +170,9 @@ plot.pre_factor <- function(x, plots = c("scree","change"),
 					     x = "# factors", y = "Rate of change index"))
 	}
 
-	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = 1))) ) %>%
-	 	{ if (shiny) . else print(.) }
+  if (custom)
+    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+
+	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+	 	{if (shiny) . else print(.)}
 }

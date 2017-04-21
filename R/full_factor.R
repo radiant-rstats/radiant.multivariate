@@ -148,6 +148,7 @@ summary.full_factor <- function(object,
 #'
 #' @param x Return value from \code{\link{full_factor}}
 #' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -160,9 +161,7 @@ summary.full_factor <- function(object,
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
 #' @export
-plot.full_factor <- function(x,
-                             shiny = FALSE,
-                             ...) {
+plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
 
 	object <- x; rm(x)
 
@@ -178,14 +177,14 @@ plot.full_factor <- function(x,
 	df <- object$floadings
 	rnames <- rownames(df)
 	cnames <- colnames(df)
-	plots <- list()
+	plot_list <- list()
 	pnr <- 1
 	ab_df <- data.frame(a = c(0,0), b = c(1, 0))
 	for (i in 1:(length(cnames) - 1)) {
 		for (j in (i + 1):length(cnames)) {
 			i_name <- cnames[i]; j_name <- cnames[j]
 		  df2 <- cbind(df[, c(i_name,j_name)],rnames)
-  		plots[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = 'rnames', label = 'rnames')) +
+  		plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = 'rnames', label = 'rnames')) +
   										  geom_text() + theme(legend.position = "none") +
   										  xlim(-1,1) + ylim(-1,1) + geom_vline(xintercept = 0) +
   										  geom_hline(yintercept = 0)
@@ -193,7 +192,10 @@ plot.full_factor <- function(x,
   	}
 	}
 
-	sshhr( do.call(gridExtra::grid.arrange, c(plots, list(ncol = min(length(plots),2)))) ) %>%
+  if (custom)
+    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+
+	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
 	 	{if (shiny) . else print(.)}
 }
 

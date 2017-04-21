@@ -2,8 +2,8 @@
 # Conjoint regression - UI
 ################################################################
 
+ca_show_interactions <- c("None" = "", "2-way" = 2, "3-way" = 3)
 ca_predict <- c("None" = "none", "Data" = "data","Command" = "cmd", "Data & Command" = "datacmd")
-
 ca_plots <- list("Part-worths" = "pw", "Importance-weights" = "iw")
 
 # list of function arguments
@@ -87,6 +87,33 @@ output$ui_ca_evar <- renderUI({
   	selected = state_multiple("ca_evar", vars), multiple = TRUE,
   	size = min(10, length(vars)), selectize = FALSE)
 })
+
+output$ui_ca_show_interactions <- renderUI({
+  choices <- ca_show_interactions[1:max(min(3,length(input$ca_evar)),1)]
+  radioButtons(inputId = "ca_show_interactions", label = "Interactions:",
+    choices = choices, selected = state_init("ca_show_interactions"),
+    inline = TRUE)
+})
+
+output$ui_ca_int <- renderUI({
+
+  if (isolate("ca_show_interactions" %in% names(input)) &&
+      is_empty(input$ca_show_interactions)) {
+    choices <- character(0)
+  } else if (is_empty(input$ca_show_interactions)) {
+    return()
+  } else {
+    vars <- input$ca_evar
+    if (not_available(vars) || length(vars) < 2) return()
+    ## list of interaction terms to show
+    choices <- iterms(vars, input$ca_show_interactions)
+  }
+
+  selectInput("ca_int", label = NULL, choices = choices,
+    selected = state_init("ca_int"),
+    multiple = TRUE, size = min(4,length(choices)), selectize = FALSE)
+})
+
 
 output$ui_ca_by <- renderUI({
  	vars <- c("None" = "none", varnames())
@@ -203,6 +230,10 @@ output$ui_conjoint <- renderUI({
   	wellPanel(
 	    uiOutput("ui_ca_rvar"),
 	    uiOutput("ui_ca_evar"),
+      # uiOutput("ui_ca_show_interactions"),
+      # conditionalPanel(condition = "input.ca_show_interactions != ''",
+      #   uiOutput("ui_ca_int")
+      # ),
 	    uiOutput("ui_ca_by"),
 		  conditionalPanel(condition = "input.tabs_conjoint != 'Predict' & input.ca_by != 'none'",
 	      uiOutput("ui_ca_show")
@@ -351,6 +382,7 @@ observeEvent(input$conjoint_report, {
   figs <- FALSE
   if (!is_empty(input$ca_plots)) {
     inp_out[[2]] <- clean_args(ca_plot_inputs(), ca_plot_args[-1])
+    inp_out[[2]]$custom <- FALSE
     outputs <- c(outputs, "plot")
     figs <- TRUE
   }

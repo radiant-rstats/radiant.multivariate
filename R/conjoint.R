@@ -5,6 +5,7 @@
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param rvar The response variable (e.g., profile ratings)
 #' @param evar Explanatory variables in the regression
+#' @param int Interaction terms to include in the model
 #' @param by Variable to group data by before analysis (e.g., a respondent id)
 #' @param reverse Reverse the values of the response variable (`rvar`)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
@@ -20,6 +21,7 @@
 #'
 #' @export
 conjoint <- function(dataset, rvar, evar,
+										 int = "",
                      by = "none",
                      reverse = FALSE,
                      data_filter = "") {
@@ -29,10 +31,15 @@ conjoint <- function(dataset, rvar, evar,
 	dat <- getdata(dataset, vars, filt = data_filter)
 	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
+  # vars <- ""
+  radiant.model::var_check(evar, colnames(dat)[-1], int) %>%
+    { vars <<- .$vars; evar <<- .$ev; int <<- .$intv }
+
 	## in case : was used to select a range of variables
-	evar <- colnames(dat)[-1]
+	# evar <- colnames(dat)[-1]
 	if (by != "none") {
 		evar <- setdiff(evar, by)
+		vars <- setdiff(vars, by)
     levs <- dat[[by]] %>% as_factor %>% levels
     model_list <- vector("list", length(levs)) %>% set_names(levs)
 	} else {
@@ -40,7 +47,8 @@ conjoint <- function(dataset, rvar, evar,
     model_list <- list(full = list(model = NA, coeff = NA, tab = NA))
 	}
 
-	formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
+	# formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
+	formula <- paste(rvar, "~", paste(vars, collapse = " + ")) %>% as.formula
 
 	for (i in seq_along(levs)) {
 		if (!by == "none")
@@ -313,6 +321,7 @@ print.conjoint.predict <- function(x, ..., n = 50) {
 #' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param scale_plot Scale the axes of the part-worth plots to the same range
 #' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -328,6 +337,7 @@ plot.conjoint <- function(x, plots = "pw",
                           show = "",
                           scale_plot = FALSE,
                           shiny = FALSE,
+                          custom = FALSE,
                           ...) {
 
 	object <- x; rm(x)
@@ -354,8 +364,8 @@ plot.conjoint <- function(x, plots = "pw",
 			p <- ggplot(PW.var, aes_string(x="Levels", y="PW", group = 1)) +
 				  geom_line(colour="blue", linetype = 'dotdash', size=.7) +
 	  		  geom_point(colour="blue", size=4, shape=21, fill="white") +
-		  	  labs(list(title = paste("Part-worths for", var, lab), x = ""))
-		  	  # theme(axis.text.x = element_text(angle = 45, hjust = 1))
+		  	  labs(title = paste("Part-worths for", var, lab), x = "") +
+		  	  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 		  if (scale_plot) p <- p + ylim(plot_ylim[var,"Min"],plot_ylim[var,"Max"])
 			plot_list[[var]] <- p
@@ -368,11 +378,14 @@ plot.conjoint <- function(x, plots = "pw",
 		plot_list[["iw"]] <- ggplot(IW.df, aes_string(x="Attributes", y="IW", fill = "Attributes")) +
 		                   geom_bar(stat = "identity", alpha = .5) +
 		                   theme(legend.position = "none") +
-		                   labs(list(title = paste0("Importance weights", lab)))
+		                   labs(title = paste0("Importance weights", lab))
 	}
 
-	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = min(length(plot_list),2)))) ) %>%
-	 	{ if (shiny) . else print(.) }
+  if (custom)
+    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+
+	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
+	 	{if (shiny) . else print(.)}
 }
 
 #' Function to calculate the PW and IW table for conjoint

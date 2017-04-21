@@ -9,6 +9,7 @@
 - Derive and store predictions based on conjoint analysis for multiple respondents
 - Show dataset name in output if dataframe passed directly to analysis function
 - As an alternative to using the Estimate button to run a model you can now also use CTRL-enter or CMD-enter
+- Use ALT-enter to put code into R > Report
 
 ## BUG FIXES
 - Import from `GPArotation`

@@ -177,9 +177,12 @@ plot.mds <- function(x,
 	## plot maps
 	for (i in 1:(object$nr_dim - 1)) {
 		for (j in (i + 1):object$nr_dim) {
-			plot(c(-lim, lim), type = "n", xlab= "", ylab = "", axes = FALSE, asp = 1,
+			plot(c(-lim, lim), type = "n", xlab = "", ylab = "", axes = FALSE, asp = 1,
 			     yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim, lim))
-			title(paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
+
+			if (object$nr_dim > 2)
+				title(main = paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
+			
 			points(object$res$points[ ,i], object$res$points[ ,j], pch = 16, cex = .6)
 			wordcloud::textplot(object$res$points[ ,i], object$res$points[ ,j] +
 			                    (.04 * lim), object$lab, col = rainbow(object$nrLev, start = .6, end = .1),

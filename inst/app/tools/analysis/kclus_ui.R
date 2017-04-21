@@ -41,6 +41,14 @@ output$ui_kclus <- renderUI({
     wellPanel(
       actionButton("km_run", "Estimate", width = "100%")
     ),
+
+    conditionalPanel(condition = "input.tabs_kclus == 'Plot'",
+      wellPanel(
+       selectInput("km_plots", label = "Plot(s):", choices = km_plots,
+                   selected = state_multiple("km_plots", km_plots, "density"),
+                   multiple = FALSE)
+      )
+    ),
   	wellPanel(
       selectInput("km_fun", label = "Algorithm:", choices = km_algorithm,
         selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE),
@@ -61,11 +69,6 @@ output$ui_kclus <- renderUI({
 		  ),
 	    numericInput("km_nr_clus", "Number of clusters:", min = 2,
 	    	value = state_init('km_nr_clus',2)),
-      conditionalPanel(condition = "input.tabs_kclus == 'Plot'",
-        selectInput("km_plots", label = "Plot(s):", choices = km_plots,
-                 selected = state_multiple("km_plots", km_plots, "density"),
-                 multiple = FALSE)
-      ),
       conditionalPanel(condition = "input.km_vars != null",
         tags$table(
           tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name","kclus"))),
@@ -138,13 +141,14 @@ output$kclus <- renderUI({
 })
 
 observeEvent(input$kclus_report, {
-  outputs <- c("summary")
   inp_out <- list(list(dec = 2), "")
-  figs <- FALSE
   if (length(input$km_plots) > 0) {
     figs <- TRUE
     outputs <- c("summary","plot")
-    inp_out[[2]] <- list(plots = input$km_plots)
+    inp_out[[2]] <- list(plots = input$km_plots, custom = FALSE)
+  } else {
+    outputs <- c("summary")
+    figs <- FALSE
   }
   update_report(inp_main = clean_args(km_inputs(), km_args),
                 fun_name = "kclus", inp_out = inp_out,

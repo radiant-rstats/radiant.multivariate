@@ -31,9 +31,6 @@ output$ui_pre_factor <- renderUI({
     wellPanel(
       actionButton("pf_run", "Estimate", width = "100%")
     ),
-  	wellPanel(
-	  	uiOutput("ui_pf_vars")
-    ),
     conditionalPanel(condition = "input.tabs_pre_factor == 'Plot'",
       wellPanel(
         selectizeInput("pf_plots", label = "Plot(s):", choices = pf_plots,
@@ -43,7 +40,10 @@ output$ui_pre_factor <- renderUI({
                                 plugins = list("remove_button", "drag_drop"))),
         numericInput("pf_cutoff", "Plot cutoff:", min = 0, max = 2, value = state_init("pf_cutoff",0.1), step = .05)
       )
-	  ),
+    ),
+  	wellPanel(
+	  	uiOutput("ui_pf_vars")
+    ),
     help_and_report(modal_title = "Pre-factor analysis",
                     fun_name = "pre_factor",
                     help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/pre_factor.md")))
@@ -105,13 +105,14 @@ output$pre_factor <- renderUI({
 })
 
 observeEvent(input$pre_factor_report, {
-  outputs <- c("summary")
   inp_out <- list(list(dec = 2), "")
-  figs <- FALSE
   if (length(input$pf_plots) > 0) {
     figs <- TRUE
     outputs <- c("summary","plot")
-    inp_out[[2]] <- list(plots = input$pf_plots)
+    inp_out[[2]] <- list(plots = input$pf_plots, custom = FALSE)
+  } else {
+    outputs <- c("summary")
+    figs <- FALSE
   }
   update_report(inp_main = clean_args(pf_inputs(), pf_args),
                 fun_name = "pre_factor", inp_out = inp_out,

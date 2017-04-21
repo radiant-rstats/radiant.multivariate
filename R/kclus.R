@@ -174,6 +174,7 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @param x Return value from \code{\link{kclus}}
 #' @param plots One of "density", "bar", or "scatter")
 #' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -187,7 +188,7 @@ summary.kclus <- function(object, dec = 2, ...) {
 #'
 #' @export
 plot.kclus <- function(x, plots = "density",
-                       shiny = FALSE, ...) {
+                       shiny = FALSE, custom = FALSE, ...) {
 
 	x$dat <- mutate(x$dat, Cluster = as.factor(x$km_out$cluster))
 	vars <- colnames(x$dat) %>% .[-length(.)]
@@ -201,11 +202,12 @@ plot.kclus <- function(x, plots = "density",
 
 	if ("density" %in% plots) {
 		for (var in vars) {
-			plot_list[[var]] <- ggplot(x$dat, aes_string(x=var, fill = "Cluster")) +
+			plot_list[[paste0("dens_", var)]] <- ggplot(x$dat, aes_string(x=var, fill = "Cluster")) +
 					geom_density(adjust=2.5, alpha=.3) +
 					labs(y = "") + theme(axis.text.y = element_blank())
 		}
-	} else if ("bar" %in% plots) {
+	} 
+	if ("bar" %in% plots) {
 
 	  ci_calc <- function(se, n, conf.lev = .95)
 	 	  se * qt(conf.lev/2 + .5, n - 1)
@@ -219,25 +221,28 @@ plot.kclus <- function(x, plots = "density",
 		                        se = sd/sqrt(n),
 		                        ci = ci_calc(se,n,.95)))
 
-		  plot_list[[var]] <-
+		  plot_list[[paste0("bar_", var)]] <-
 		    ggplot(dat_summary,
 		           aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
 		    geom_bar(stat = "identity")  +
 		    geom_errorbar(width = .1, aes(ymin = cent - ci, ymax = cent + ci)) +
 		    geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), colour = "blue") +
 		    theme(legend.position = "none") +
-		    ylab(paste0(var, " (", x$fun, ")"))
+		    labs(y = paste0(var, " (", x$fun, ")"))
 		 }
-
 	} else {
-		 plot_list <-
-		   visualize(x$dat, xvar = "Cluster", yvar = vars, type = "scatter",
-		             check = "jitter", custom = TRUE)
+		for (var in vars) {
+		  plot_list[[paste0("scatter_", var)]] <-
+		     visualize(x$dat, xvar = "Cluster", yvar = var, type = "scatter",
+		               check = "jitter", custom = TRUE)
+		}
 	}
 
-	sshhr( do.call(gridExtra::grid.arrange, c(plot_list, list(ncol = min(length(plot_list),2)))) ) %>%
-	 	{ if (shiny) . else print(.) }
+  if (custom)
+    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
 
+	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
+	 	{if (shiny) . else print(.)}
 }
 
 #' Add a cluster membership variable to the active dataset

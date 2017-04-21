@@ -201,7 +201,10 @@ plot.pmap <- function(x,
 
 			plot(c(-lim, lim),type = "n",xlab = "", ylab = "", axes = FALSE, asp = 1,
 			     yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim,lim))
-			title(paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
+
+			if (object$nr_dim > 2)
+				title(paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
+			
 			abline(v=0, h=0)
 
 			object$brand
