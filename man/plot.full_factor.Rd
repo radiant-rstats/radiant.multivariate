@@ -33,4 +33,3 @@ summary(result)
 
 \code{\link{plot.full_factor}} to plot results
 }
-

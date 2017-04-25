@@ -39,9 +39,11 @@ kclus <- function(dataset, vars,
 	if (fun == "median" && length(vars) < 2)
 		stop("K-medians requires at least two variables as input")
 
-	# converting factors to integers
-	convert <- function(x) as.integer(x) %>% {. - min(.)}
-	dat <- mutate_each(dat, funs(if (is.factor(.)) convert(.) else .))
+	# converting factors to integer with first level = 1
+	convert <- function(x) {
+    as.integer(x == levels(x)[1])
+	}
+	dat <- mutate_if_tmp(dat, is.factor, convert)
 
 	if (hc_init) {
 		init <- hclus(dat, vars, distance = distance, method = method, max_cases = Inf)
@@ -50,10 +52,10 @@ kclus <- function(dataset, vars,
 		hc_cent <- c()
 		km_out <- dat %>%
 			mutate(clus_var = clus_var) %>%
-			mutate_each(funs(as.vector(scale(.)))) %T>%
+			mutate_all(funs(as.vector(scale(.)))) %T>%
 			{ hc_cent <<-
 			   group_by(., clus_var) %>%
-				 summarise_each(funs(mean)) %>%
+				 summarise_all(funs(mean)) %>%
 				 select(-clus_var) %>%
 				 as.matrix
 			} %>% select(-clus_var) %>%
@@ -68,7 +70,7 @@ kclus <- function(dataset, vars,
 	} else {
     seed %>% gsub("[^0-9]","",.) %>% { if (!is_empty(.)) set.seed(seed) }
 		km_out <- dat %>%
-			mutate_each(funs(as.vector(scale(.)))) %>%
+			mutate_all(funs(as.vector(scale(.)))) %>%
 			{ if (fun == "median") {
   		    km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
   		    Gmedian::kGmedian(., ncenters = km_cent)
@@ -80,18 +82,18 @@ kclus <- function(dataset, vars,
 
 	## same calculations of SST etc. as for kmeans (verified)
 	if (fun == "median") {
-		sdat <- mutate_each(dat, funs(as.vector(scale(.))))
+		sdat <- mutate_all(dat, funs(as.vector(scale(.))))
 	  km_out$withinss <-
 			mutate(sdat, clus_var = km_out$cluster) %>%
 			group_by(clus_var) %>%
-			# summarize_each(funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
-			summarize_each(funs(sum((. - mean(.))^2))) %>%
+			# summarise_each(funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			summarise_all(funs(sum((. - mean(.))^2))) %>%
 			select(-clus_var) %>%
 			rowSums
 	  km_out$tot.withinss <- sum(km_out$withinss)
 	  km_out$totss <-
-			summarize_each(sdat, funs(sum((. - mean(.))^2))) %>%
-			# summarize_each(sdat, funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			# summarise_each(sdat, funs(sum((. - as.vector(Gmedian::Gmedian(.)))^2))) %>%
+			summarise_all(sdat, funs(sum((. - mean(.))^2))) %>%
 			sum(.)
 	  km_out$betweenss <- km_out$totss - km_out$tot.withinss
 	  rm(sdat)
@@ -104,7 +106,7 @@ kclus <- function(dataset, vars,
 		group_by(clus_var) %>%
 		## need as.vector - see https://github.com/hadley/tibble/issues/175
 		# summarise_each(funs(if (fun == "median") as.vector(Gmedian::Gmedian(.)) else mean(.))) %>%
-		summarise_each(funs(mean(.))) %>%
+		summarise_all(funs(mean(.))) %>%
 		select(-clus_var) %>%
 		as.data.frame %>%
 		set_rownames(clus_names)
@@ -217,7 +219,7 @@ plot.kclus <- function(x, plots = "density",
   	  dat_summary <-
 		    select_(x$dat, .dots = c(var, "Cluster"))  %>%
 		    group_by_("Cluster") %>%
-		    summarise_each(funs(cent = fun(.), n = length(.), sd,
+		    summarise_all(funs(cent = fun(.), n = length(.), sd,
 		                        se = sd/sqrt(n),
 		                        ci = ci_calc(se,n,.95)))
 
@@ -230,7 +232,8 @@ plot.kclus <- function(x, plots = "density",
 		    theme(legend.position = "none") +
 		    labs(y = paste0(var, " (", x$fun, ")"))
 		 }
-	} else {
+	} 
+	if ("scatter" %in% plots) {
 		for (var in vars) {
 		  plot_list[[paste0("scatter_", var)]] <-
 		     visualize(x$dat, xvar = "Cluster", yvar = var, type = "scatter",

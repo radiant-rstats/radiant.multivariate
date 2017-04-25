@@ -22,4 +22,3 @@ Store predicted values generated in predict.conjoint
 \details{
 See \url{http://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
-

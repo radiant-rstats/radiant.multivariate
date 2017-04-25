@@ -36,4 +36,3 @@ computer \%>\% pmap("brand","high_end:dated", pref = c("innovative","business"))
 
 \code{\link{plot.pmap}} to plot results
 }
-

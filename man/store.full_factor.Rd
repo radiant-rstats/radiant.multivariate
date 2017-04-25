@@ -32,4 +32,3 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} fo
 
 \code{\link{plot.full_factor}} to plot results
 }
-

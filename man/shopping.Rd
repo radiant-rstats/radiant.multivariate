@@ -15,4 +15,3 @@ Shopping attitudes
 Attitudinal data on shopping for 20 consumers. Description provided in attr(shopping,"description")
 }
 \keyword{datasets}
-

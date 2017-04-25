@@ -40,4 +40,3 @@ predict(result, pred_data = "mp3")
 
 \code{\link{plot.conjoint}} to plot results
 }
-

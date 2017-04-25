@@ -31,4 +31,3 @@ city \%>\% mds("from", "to", "distance") \%>\% summary
 
 \code{\link{plot.mds}} to plot results
 }
-

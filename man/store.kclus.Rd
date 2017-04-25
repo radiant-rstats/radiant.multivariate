@@ -30,4 +30,3 @@ kclus(shopping, vars = "v1:v6") \%>\% store \%>\% head
 
 \code{\link{plot.kclus}} to plot results
 }
-

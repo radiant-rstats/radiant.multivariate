@@ -26,4 +26,3 @@ result <- full_factor("diamonds",c("price","carat","table","x","y"))
 clean_loadings(result$floadings, TRUE, .5, 2)
 
 }
-

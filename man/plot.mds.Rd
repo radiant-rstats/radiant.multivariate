@@ -33,4 +33,3 @@ plot(result, rev_dim = 1:2, fontsz = 2)
 
 \code{\link{summary.mds}} to plot results
 }
-

@@ -37,4 +37,3 @@ mp3 \%>\% conjoint(rvar = "Rating", evar = "Memory:Shape") \%>\% summary(., mc_d
 
 \code{\link{plot.conjoint}} to plot results
 }
-

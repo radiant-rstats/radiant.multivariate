@@ -38,4 +38,3 @@ result <- hclus("shopping", vars = "v1:v6")
 
 \code{\link{plot.hclus}} to plot results
 }
-

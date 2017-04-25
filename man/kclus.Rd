@@ -47,4 +47,3 @@ result <- kclus("shopping", c("v1:v6"))
 
 \code{\link{store.kclus}} to add cluster membership to the selected dataset
 }
-

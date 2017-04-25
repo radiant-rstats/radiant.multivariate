@@ -15,4 +15,3 @@ Toothpaste attitudes
 Attitudinal data on toothpaste for 60 consumers. Description provided in attr(toothpaste,"description")
 }
 \keyword{datasets}
-

@@ -37,4 +37,3 @@ See \url{http://radiant-rstats.github.io/docs/model/conjoint.html} for an exampl
 
 \code{\link{plot.conjoint}} to plot results
 }
-

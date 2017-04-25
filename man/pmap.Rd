@@ -37,4 +37,3 @@ result <- pmap("computer","brand","high_end:business")
 
 \code{\link{plot.pmap}} to plot results
 }
-

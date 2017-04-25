@@ -31,4 +31,3 @@ result <- pre_factor("diamonds",c("price","carat","table"))
 
 \code{\link{plot.pre_factor}} to plot results
 }
-

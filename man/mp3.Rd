@@ -15,4 +15,3 @@ Conjoint data for MP3 players
 Ratings reflect the evaluation of 18 alternative MP3 players by one respondent. Description provided in attr(mp3,"description")
 }
 \keyword{datasets}
-

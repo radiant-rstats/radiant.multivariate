@@ -41,4 +41,3 @@ result <- mp3 \%>\% conjoint(rvar = "Rating", evar = "Memory:Shape")
 
 \code{\link{plot.conjoint}} to plot results
 }
-

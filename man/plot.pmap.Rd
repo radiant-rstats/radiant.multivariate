@@ -39,4 +39,3 @@ plot(result, plots = c("brand", "attr", "pref"))
 
 \code{\link{summary.pmap}} to plot results
 }
-

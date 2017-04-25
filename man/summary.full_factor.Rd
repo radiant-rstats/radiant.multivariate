@@ -39,4 +39,3 @@ diamonds \%>\% full_factor(c("price","carat","depth","table","x")) \%>\% summary
 
 \code{\link{plot.full_factor}} to plot results
 }
-

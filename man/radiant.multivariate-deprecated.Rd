@@ -2,12 +2,12 @@
 % Please edit documentation in R/deprecated.R
 \docType{package}
 \name{radiant.multivariate-deprecated}
-\alias{hier_clus}
-\alias{kmeans_clus}
 \alias{radiant.multivariate-deprecated}
-\alias{radiant.multivariate-deprecated-package}
 \alias{save_factors}
 \alias{save_membership}
+\alias{kmeans_clus}
+\alias{hier_clus}
+\alias{radiant.multivariate-deprecated-package}
 \title{Deprecated function(s) in the radiant.multivariate package}
 \usage{
 save_factors(...)

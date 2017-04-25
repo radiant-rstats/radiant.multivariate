@@ -39,4 +39,3 @@ plot(result, plots = "iw")
 
 \code{\link{summary.conjoint}} to summarize results
 }
-

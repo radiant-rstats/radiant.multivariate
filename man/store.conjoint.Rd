@@ -24,4 +24,3 @@ Store method for the Multivariate > Conjoint tab
 \details{
 Store data frame with PWs or IWs in Radiant r_data list if available
 }
-

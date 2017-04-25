@@ -65,6 +65,13 @@ output$ui_hclus <- renderUI({
 	)
 })
 
+## reset 
+observeEvent(input$hc_plots, {
+  if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots)
+    updateSelectInput(session = session, inputId = "hc_plots", selected = "dendro")
+})
+
+
 hc_plot <- reactive({
   plots <- input$hc_plots
 	ph <- plots %>% { if (length(.) == 1 && . == "dendro") 800 else 400 }
@@ -102,7 +109,10 @@ output$hclus <- renderUI({
 })
 
 .hclus <- eventReactive(input$hc_run, {
-  withProgress(message = 'Estimating cluster solution', value = 1,
+
+  # if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return()
+
+  withProgress(message = "Estimating cluster solution", value = 1,
 	  do.call(hclus, hc_inputs())
   )
 })
@@ -119,6 +129,9 @@ output$hclus <- renderUI({
 .plot_hclus <- reactive({
   if (not_available(input$hc_vars) || not_pressed(input$hc_run))
 		return(invisible())
+
+  ## wait until hc_plots is updated 
+  if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return(invisible())
 
   capture_plot( plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff) )
 })

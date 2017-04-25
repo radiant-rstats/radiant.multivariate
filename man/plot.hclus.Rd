@@ -38,4 +38,3 @@ shopping \%>\% hclus(vars = c("v1:v6")) \%>\% plot
 
 \code{\link{summary.hclus}} to summarize results
 }
-

@@ -22,4 +22,3 @@ Store method for the Multivariate > Conjoint > Predict
 \details{
 Store data frame with predictions in Radiant r_data list if available
 }
-

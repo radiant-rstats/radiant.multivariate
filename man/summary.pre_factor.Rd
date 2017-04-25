@@ -32,4 +32,3 @@ summary(result)
 
 \code{\link{plot.pre_factor}} to plot results
 }
-

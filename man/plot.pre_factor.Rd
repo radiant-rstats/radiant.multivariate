@@ -37,4 +37,3 @@ plot(result, plots = c("change", "scree"), cutoff = .05)
 
 \code{\link{summary.pre_factor}} to summarize results
 }
-

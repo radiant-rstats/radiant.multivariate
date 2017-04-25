@@ -15,4 +15,3 @@ Conjoint data for Movie theaters
 Rankings reflect the evaluation of 18 alternative movie theaters by one respondent. Description provided in attr(movie,"description")
 }
 \keyword{datasets}
-

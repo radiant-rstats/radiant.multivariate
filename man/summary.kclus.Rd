@@ -32,4 +32,3 @@ shopping \%>\% kclus(vars = c("v1:v6"), nr_clus = 3) \%>\% summary
 
 \code{\link{store.kclus}} to add cluster membership to the selected dataset
 }
-

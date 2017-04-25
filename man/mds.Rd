@@ -45,4 +45,3 @@ summary(result)
 
 \code{\link{plot.mds}} to plot results
 }
-

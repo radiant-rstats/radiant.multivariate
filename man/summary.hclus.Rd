@@ -27,4 +27,3 @@ summary(result)
 
 \code{\link{plot.hclus}} to plot results
 }
-

@@ -4,6 +4,7 @@
 \name{radiant.multivariate}
 \alias{radiant.multivariate}
 \alias{radiant.multivariate-package}
+\alias{radiant.multivariate}
 \title{radiant.multivariate}
 \usage{
 radiant.multivariate()
@@ -16,4 +17,3 @@ Launch Radiant in the default browser
 \details{
 See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 }
-

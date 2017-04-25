@@ -15,4 +15,3 @@ Perceptions of retailers
 Consumer evaluations for a set of retailers in the Chicago area on 7 attributes. The dataset is used to illustrate perceptual maps. Description provided in attr(retailers,"description")
 }
 \keyword{datasets}
-

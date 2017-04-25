@@ -31,4 +31,3 @@ the_table(tidy(result$model_list[[1]][["model"]]), result$dat, result$evar)
 
 \code{\link{plot.conjoint}} to plot results
 }
-
