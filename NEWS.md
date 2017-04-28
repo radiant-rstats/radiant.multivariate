@@ -1,6 +1,7 @@
-# CHANGES IN radiant.multivariate VERSION 0.7.5
+# CHANGES IN radiant.multivariate VERSION 0.8.0
 
 ## NEW FEATURES
+
 - Added k-medians, from the Gmedians package, as an option in _Multivariate > K-clustering_
 - Added additional rotation options in _Multivariate > Factor_
 - Added predict tab for conjoint
@@ -12,8 +13,11 @@
 - Use ALT-enter to put code into R > Report
 
 ## BUG FIXES
+
 - Import from `GPArotation`
 
 ## DEPRECATED
+
 - kmeans_clus was replaced by kclus
 - hier_clus was replaced by hclus
+- Use of *_each is deprecated

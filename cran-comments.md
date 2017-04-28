@@ -1,10 +1,28 @@
 ## Resubmission
 
+This is a resubmission (0.8.0). In this version I have fixed several bugs and added 
+several new features (see NEWS.md for details).
+
+Please note that this version addresses the reverse dependency check warnings from radiant.data for radiant.multivariate. Deprecating the `*_each` commands used in the 0.6.0 versions of the `radiant.*` packages is related to the deprecation of the `*_each` functions in dplyr. I will update the remaining `radiant` package asap after radiant.multivariate is available on CRAN.
+
+## Test environments
+
+* local OS X install, R 3.4
+* local Windows install, R 3.4
+* ubuntu 14.04 (on travis-ci), R 3.3.3 and R-dev
+* win-builder (release)
+
+## R CMD check results
+
+There were no ERRORs or WARNINGs. There was one NOTE about a possibly mis-spelled word ("Analytics"). The spelling is correct however. Could this word be added to the spell check database perhaps?
+
+## Previous cran-comments
+
+## Resubmission
+
 This is a resubmission. In this version I have:
 
 * Fixed an invalid URL README.md (i.e., https://www.r-project.org.org to  https://www.r-project.org
-
-## Previous cran-comments
 
 ## Resubmission
 
