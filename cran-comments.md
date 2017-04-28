@@ -14,7 +14,7 @@ Please note that this version addresses the reverse dependency check warnings fr
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs. There was one NOTE about a possibly mis-spelled word ("Analytics"). The spelling is correct however. Could this word be added to the spell check database perhaps?
+There were no ERRORs or WARNINGs. There was one NOTE about a possibly mis-spelled word ("Analytics"). The spelling is correct however.
 
 ## Previous cran-comments
 
