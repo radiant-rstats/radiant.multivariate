@@ -26,7 +26,7 @@
 Predict method for the conjoint function
 }
 \details{
-See \url{http://radiant-rstats.github.io/docs/model/conjoint.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/model/conjoint.html} for an example in Radiant
 }
 \examples{
 result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
