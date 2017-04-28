@@ -28,7 +28,7 @@ predict_conjoint_by(object, pfun, pred_data = "", pred_cmd = "",
 Predict method for the conjoint function when a by variables is used
 }
 \details{
-See \url{https://radiant-rstats.github.io/docs/model/conjoint.html} for an example in Radiant
+See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
 \seealso{
 \code{\link{conjoint}} to generate the result

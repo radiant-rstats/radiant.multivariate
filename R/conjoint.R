@@ -187,7 +187,7 @@ summary.conjoint <- function(object,
 
 #' Predict method for the conjoint function
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/model/conjoint.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{conjoint}}
 #' @param pred_data Name of the dataset to use for prediction
@@ -248,7 +248,7 @@ predict.conjoint <- function(object,
 
 #' Predict method for the conjoint function when a by variables is used
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/model/conjoint.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{conjoint}}
 #' @param pfun Function to use for prediction
