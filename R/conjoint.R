@@ -72,7 +72,7 @@ conjoint <- function(dataset, rvar, evar,
 
 	    rm(j, isFct)
 	  }
-	  coeff$`  ` %<>% format(justify = "left")
+	  # coeff$`  ` %<>% format(justify = "left")
 
     model_list[[levs[i]]] <- list(model = model, coeff = coeff, tab = tab)
   }
@@ -124,16 +124,15 @@ summary.conjoint <- function(object,
   if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list))
   	show <- names(object$model_list)[1]
 
-	object$model_list[[show]]$tab %>%
-	{ cat("Conjoint part-worths:\n")
-		print(formatdf(.$PW, dec), row.names = FALSE)
-		cat("\nConjoint importance weights:\n")
-		print(formatdf(.$IW, dec), row.names = FALSE)
-	}
-
+	tab <- object$model_list[[show]]$tab
+	cat("Conjoint part-worths:\n")
+	print(formatdf(tab$PW, dec), row.names = FALSE)
+	cat("\nConjoint importance weights:\n")
+	print(formatdf(tab$IW, dec), row.names = FALSE)
 	cat("\nConjoint regression results:\n\n")
 
 	coeff <- object$model_list[[show]]$coeff
+  coeff$`  ` %<>% format(justify = "left")
   if (!additional) {
 	  coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
 	  print(coeff[,1:2], row.names=FALSE)
