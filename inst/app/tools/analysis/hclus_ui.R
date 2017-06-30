@@ -97,7 +97,7 @@ output$hclus <- renderUI({
 		hc_output_panels <- tagList(
 	     tabPanel("Summary", verbatimTextOutput("summary_hclus")),
 	     tabPanel("Plot",
-                plot_downloader("hclus", height = hc_plot_height()),
+                plot_downloader("hclus", height = hc_plot_height),
                 plotOutput("plot_hclus", height = "100%"))
 	  )
 

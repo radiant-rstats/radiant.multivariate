@@ -309,14 +309,14 @@ output$conjoint <- renderUI({
 	      verbatimTextOutput("summary_conjoint")),
       tabPanel("Predict",
         conditionalPanel("input.ca_pred_plot == true",
-          plot_downloader("conjoint", height = ca_pred_plot_height(), po = "dlp_", pre = ".predict_plot_"),
+          plot_downloader("conjoint", height = ca_pred_plot_height, po = "dlp_", pre = ".predict_plot_"),
           plotOutput("predict_plot_conjoint", width = "100%", height = "100%")
         ),
         downloadLink("dl_ca_pred", "", class = "fa fa-download alignright"), br(),
         verbatimTextOutput("predict_conjoint")
       ),
 	    tabPanel("Plot",
-               plot_downloader("conjoint", height = ca_plot_height()),
+               plot_downloader("conjoint", height = ca_plot_height),
 	             plotOutput("plot_conjoint", width = "100%", height = "100%"))
 	  )
 

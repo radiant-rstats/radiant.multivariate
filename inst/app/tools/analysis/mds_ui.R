@@ -111,7 +111,7 @@ output$mds <- renderUI({
 	    id = "tabs_mds",
 	    tabPanel("Summary", verbatimTextOutput("summary_mds")),
 	    tabPanel("Plot",
-               plot_downloader("mds", height = mds_plot_height()),
+               plot_downloader("mds", height = mds_plot_height),
                plotOutput("plot_mds", height = "100%"))
 	  )
 

@@ -72,7 +72,7 @@ output$pre_factor <- renderUI({
      id = "tabs_pre_factor",
      tabPanel("Summary", verbatimTextOutput("summary_pre_factor")),
      tabPanel("Plot",
-              plot_downloader("pre_factor", height = pf_plot_height()),
+              plot_downloader("pre_factor", height = pf_plot_height),
               plotOutput("plot_pre_factor", height = "100%"))
   )
 

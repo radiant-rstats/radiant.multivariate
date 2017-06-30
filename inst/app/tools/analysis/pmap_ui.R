@@ -125,7 +125,7 @@ output$pmap <- renderUI({
         downloadLink("dl_pm_loadings", "", class = "fa fa-download alignright"), br(),
 	      verbatimTextOutput("summary_pmap")),
 	    tabPanel("Plot",
-        plot_downloader("pmap", height = pm_plot_height()),
+        plot_downloader("pmap", height = pm_plot_height),
         plotOutput("plot_pmap", height = "100%"))
 	  )
 

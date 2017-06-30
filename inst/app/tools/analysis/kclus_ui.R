@@ -106,7 +106,7 @@ output$kclus <- renderUI({
         downloadLink("dl_km_means", "", class = "fa fa-download alignright"), br(),
         verbatimTextOutput("summary_kclus")),
 	    tabPanel("Plot",
-        plot_downloader("kclus", height = km_plot_height()),
+        plot_downloader("kclus", height = km_plot_height),
         plotOutput("plot_kclus", height = "100%"))
 	  )
 

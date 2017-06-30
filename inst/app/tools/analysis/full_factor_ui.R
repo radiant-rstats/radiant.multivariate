@@ -93,7 +93,7 @@ output$full_factor <- renderUI({
         downloadLink("dl_ff_loadings", "", class = "fa fa-download alignright"), br(),
         verbatimTextOutput("summary_full_factor")),
 	    tabPanel("Plot",
-        plot_downloader("full_factor", height = ff_plot_height()),
+        plot_downloader("full_factor", height = ff_plot_height),
         plotOutput("plot_full_factor", height = "100%"))
 	  )
 
