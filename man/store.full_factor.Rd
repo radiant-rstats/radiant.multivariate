@@ -21,8 +21,8 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} fo
 }
 \examples{
  full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%
-  store \%>\%
-  head
+   store \%>\%
+   head
 
 }
 \seealso{
