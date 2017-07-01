@@ -20,33 +20,33 @@
 pre_factor <- function(dataset, vars,
                        data_filter = "") {
 
-	dat <- getdata(dataset, vars, filt = data_filter)
-	nrObs <- nrow(dat)
+  dat <- getdata(dataset, vars, filt = data_filter)
+  nrObs <- nrow(dat)
 
-	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
-	if (nrObs <= ncol(dat)) {
-		return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
-		       add_class("pre_factor"))
-	}
+  if (nrObs <= ncol(dat)) {
+    return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
+           add_class("pre_factor"))
+  }
 
   cmat <- cor(dat)
-	btest <- psych::cortest.bartlett(cmat, nrow(dat))
-	pre_kmo <- psych::KMO(cmat)
-	pre_eigen <- eigen(cmat)$values
+  btest <- psych::cortest.bartlett(cmat, nrow(dat))
+  pre_kmo <- psych::KMO(cmat)
+  pre_eigen <- eigen(cmat)$values
 
   err_mess <- "The selected variables are perfectly collinear. Please check the correlations\nand remove any variable with a correlation of 1 or -1 from the analysis"
   if (det(cmat) > 0) {
     scmat <- try(solve(cmat), silent = TRUE)
     if (is(scmat, 'try-error')) {
-    	pre_r2 <- err_mess
+      pre_r2 <- err_mess
     } else {
-    	pre_r2 <- {1 - (1 / diag(scmat))} %>%
-    							data.frame %>%
-    							set_colnames('Rsq')
-    }
+      pre_r2 <- {1 - (1 / diag(scmat))} %>%
+        data.frame %>%
+        set_colnames("Rsq")
+  }
   } else {
-  	pre_r2 <- err_mess
+    pre_r2 <- err_mess
   }
 
   rm(dat)
@@ -75,44 +75,51 @@ pre_factor <- function(dataset, vars,
 #' @export
 summary.pre_factor <- function(object, dec = 2, ...) {
 
-	if (is.character(object)) return(cat(object))
+  if (is.character(object)) return(cat(object))
 
-	if (is.character(object$pre_r2)) {
-		cat(object$pre_r2)
-		return(invisible())
-	}
+  if (is.character(object$pre_r2)) {
+    cat(object$pre_r2)
+    return(invisible())
+  }
 
-	cat("Pre-factor analysis diagnostics\n")
-	cat("Data        :", object$dataset, "\n")
-	if (object$data_filter %>% gsub("\\s","",.) != "")
-		cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
-	cat("Variables   :", paste0(object$vars, collapse=", "), "\n")
-	cat("Observations:", object$nrObs, "\n")
+  cat("Pre-factor analysis diagnostics\n")
+  cat("Data        :", object$dataset, "\n")
+  if (object$data_filter %>% gsub("\\s","",.) != "")
+    cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
+  cat("Variables   :", paste0(object$vars, collapse=", "), "\n")
+  cat("Observations:", formatnr(object$nrObs, dec = 0), "\n")
 
-	btest <- object$btest
-	cat("\nBartlett test\n")
-	cat("Null hyp.: variables are not correlated\n")
-	cat("Alt. hyp.: variables are correlated\n")
-	bt <- object$btest$p.value %>% { if (. < .001) "< .001" else round(.,dec + 1) }
-	cat(paste0("Chi-square: ", round(object$btest$chisq,2), " df(",
-	    object$btest$df, "), p.value ", bt, "\n"))
+  btest <- object$btest
+  cat("\nBartlett test\n")
+  cat("Null hyp. : variables are not correlated\n")
+  cat("Alt. hyp. : variables are correlated\n")
+  bt <- object$btest$p.value %>% { if (. < .001) "< .001" else round(.,dec + 1) }
+  cat(paste0("Chi-square: ", round(object$btest$chisq,2), " df(",
+      object$btest$df, "), p.value ", bt, "\n"))
 
-	cat("\nKMO test: ", round(object$pre_kmo$MSA, dec), "\n")
-	# cat("\nMeasures of sampling adequacy:\n")
-	# print(object$pre_kmo$MSAi, digits = dec)
+  cat("\nKMO test: ", round(object$pre_kmo$MSA, dec), "\n")
+  # cat("\nMeasures of sampling adequacy:\n")
+  # print(object$pre_kmo$MSAi, digits = dec)
 
   cat("\nVariable collinearity:\n")
-  print(round(object$pre_r2, dec), digits = dec)
+  data.frame(Rsq = object$pre_r2, KMO = object$pre_kmo$MSAi) %>%
+    formatdf(dec = dec) %>%
+    set_rownames(rownames(object$pre_r2)) %>%
+    print
 
-	cat("\n")
-	object$pre_eigen %>%
-	  { data.frame(Factor = 1:length(.),
-							   Eigenvalues = round(., dec),
-							   `Variance %` = ./sum(.),
-							   `Cumulative %` = cumsum(./sum(.)),
-							   check.names = FALSE) } %>%
-	  round(dec) %>%
-	  print(., row.names = FALSE)
+  ## fit measures,  using transposed format because there could be many factors
+  cat("\nFit measures:\n")
+  object$pre_eigen %>%
+    {data.frame(
+      ` ` = paste0("PC", 1:length(.)),
+      Eigenvalues = .,
+      `Variance %` = ./sum(.),
+      `Cumulative %` = cumsum(. / sum(.)),
+      check.names = FALSE
+    )} %>%
+    as.data.frame %>%
+    formatdf(dec = dec) %>%
+    print(row.names = FALSE)
 }
 
 #' Plot method for the pre_factor function
@@ -135,44 +142,45 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #'
 #' @export
 plot.pre_factor <- function(x, plots = c("scree","change"),
-                           	cutoff = 0.2,
-                           	shiny = FALSE,
-                           	custom = FALSE,
+                            cutoff = 0.2,
+                            shiny = FALSE,
+                            custom = FALSE,
                             ...) {
 
-	object <- x; rm(x)
-	if (is.character(object) || is.character(object$pre_r2) ||
-	    length(plots) == 0) return(invisible())
+  object <- x; rm(x)
+  if (is.character(object) || is.character(object$pre_r2) ||
+      length(plots) == 0) return(invisible())
 
-	cutoff <- ifelse(is_not(cutoff), .2, cutoff)
+  cutoff <- ifelse(is_not(cutoff), .2, cutoff)
 
-	pre_eigen <- with(object, pre_eigen[pre_eigen > cutoff])
-	dat <- data.frame(y = pre_eigen, x = 1:length(pre_eigen))
+  pre_eigen <- with(object, pre_eigen[pre_eigen > cutoff])
+  dat <- data.frame(y = pre_eigen, x = as.integer(1:length(pre_eigen)))
 
-	plot_list <- list()
-	if ("scree" %in% plots) {
-		plot_list[[which("scree" == plots)]] <- ggplot(dat, aes(x=x, y=y, group = 1)) +
-		    geom_line(colour="blue", linetype = 'dotdash', size=.7) +
-		    geom_point(colour="blue", size=4, shape=21, fill="white") +
-				geom_hline(yintercept = 1, color = 'black', linetype = 'solid', size = 1) +
-			  labs(list(title = "Screeplot", x = "# factors", y = "Eigenvalues"))
-	}
+  plot_list <- list()
+  if ("scree" %in% plots) {
+    plot_list[[which("scree" == plots)]] <- ggplot(dat, aes(x = x, y = y, group = 1)) +
+      geom_line(colour = "blue", linetype = "dotdash", size = .7) +
+      geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
+      geom_hline(yintercept = 1, color = "black", linetype = "solid", size = .5) +
+      labs(list(title = "Screeplot", x = "# factors", y = "Eigenvalues")) +
+      scale_x_continuous(breaks = dat[["x"]])
+  }
 
-	if ("change" %in% plots) {
-		plot_list[[which("change" == plots)]] <- pre_eigen %>%
-			{(. - lag(.)) / lag(.)} %>%
-			{. / min(., na.rm = TRUE)} %>%
-				data.frame(bump = ., nr_fact = paste0(0:(length(.)-1), "-", 1:length(.))) %>%
-				na.omit() %>%
-				ggplot(aes(x=factor(nr_fact, levels = nr_fact), y=bump)) +
-					geom_bar(stat = "identity", alpha = .5) +
-					labs(list(title = paste("Change in Eigenvalues"),
-					     x = "# factors", y = "Rate of change index"))
-	}
+  if ("change" %in% plots) {
+    plot_list[[which("change" == plots)]] <- pre_eigen %>%
+      {(. - lag(.)) / lag(.)} %>%
+      {. / min(., na.rm = TRUE)} %>%
+        data.frame(bump = ., nr_fact = paste0(0:(length(.) - 1), "-", 1:length(.))) %>%
+        na.omit() %>%
+        ggplot(aes(x = factor(nr_fact, levels = nr_fact), y = bump)) +
+          geom_bar(stat = "identity", alpha = .5, fill = "blue") +
+          labs(list(title = paste("Change in Eigenvalues"),
+               x = "# factors", y = "Rate of change index"))
+  }
 
   if (custom)
     if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
 
-	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
-	 	{if (shiny) . else print(.)}
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+     {if (shiny) . else print(.)}
 }
