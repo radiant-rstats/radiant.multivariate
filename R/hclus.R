@@ -24,22 +24,22 @@ hclus <- function(dataset, vars,
                   max_cases = 5000,
                   data_filter = "") {
 
-	dat <- getdata(dataset, vars, filt = data_filter)
-	if (nrow(dat) > max_cases)
-	  return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
-	         add_class("hclus"))
+  dat <- getdata(dataset, vars, filt = data_filter)
+  if (nrow(dat) > max_cases)
+    return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
+           add_class("hclus"))
 
-	dat %>%
-	  scale %>%
-	  { if (distance == "sq.euclidian") {
-				dist(., method = "euclidean")^2
-			} else {
-				dist(., method = distance)
-			}
-		} %>% hclust(d = ., method = method) -> hc_out
+  dat %>%
+    scale %>%
+    {if (distance == "sq.euclidian") {
+        dist(., method = "euclidean")^2
+      } else {
+        dist(., method = distance)
+      }
+    } %>% hclust(d = ., method = method) -> hc_out
 
-	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE) 
-	as.list(environment()) %>% add_class("hclus")
+  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  as.list(environment()) %>% add_class("hclus")
 }
 
 #' Summary method for the hclus function
@@ -61,14 +61,14 @@ summary.hclus <- function(object, ...) {
 
   if (is.character(object)) return(object)
 
-	cat("Hierarchical cluster analysis\n")
-	cat("Data        :", object$dataset, "\n")
-	if (object$data_filter %>% gsub("\\s","",.) != "")
-		cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
-	cat("Variables   :", paste0(object$vars, collapse=", "), "\n")
-	cat("Method      :", object$method, "\n")
-	cat("Distance    :", object$distance, "\n")
-	cat("Observations:", length(object$hc_out$order), "\n")
+  cat("Hierarchical cluster analysis\n")
+  cat("Data        :", object$dataset, "\n")
+  if (object$data_filter %>% gsub("\\s","",.) != "")
+    cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
+  cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
+  cat("Method      :", object$method, "\n")
+  cat("Distance    :", object$distance, "\n")
+  cat("Observations:", formatnr(length(object$hc_out$order), dec = 0), "\n")
 }
 
 #' Plot method for the hclus function
@@ -98,59 +98,65 @@ plot.hclus <- function(x, plots = c("scree","change"),
                        custom = FALSE,
                        ...) {
 
-	object <- x; rm(x)
+  object <- x; rm(x)
   if (is.character(object)) return(invisible())
   if (is_not(cutoff)) cutoff <- 0
-	object$hc_out$height %<>% { . / max(.) }
+  object$hc_out$height %<>% { . / max(.) }
 
-	plot_list <- list()
-	if ("scree" %in% plots) {
-		plot_list[["scree"]] <-
-			object$hc_out$height[object$hc_out$height > cutoff] %>%
-			data.frame(height = ., nr_clus = length(.):1) %>%
-			ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = height, group = 1)) +
-					  geom_line(colour = "blue", linetype = 'dotdash', size = .7) +
-		  		  geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
-			 		  scale_y_continuous(labels = scales::percent) +
-			  	  labs(list(title = paste("Scree plot"), x = "# clusters",
-			  	       y = "Within-cluster heterogeneity"))
-	}
+  plot_list <- list()
+  if ("scree" %in% plots) {
+    plot_list[["scree"]] <-
+      object$hc_out$height[object$hc_out$height > cutoff] %>%
+      data.frame(height = ., nr_clus = as.integer(length(.):1)) %>%
+      ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = height, group = 1)) +
+        geom_line(colour = "blue", linetype = "dotdash", size = .7) +
+        geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
+        scale_y_continuous(labels = scales::percent) +
+        labs(
+          title = "Scree plot",
+          x = "# clusters",
+          y = "Within-cluster heterogeneity"
+        )
+  }
 
-	if ("change" %in% plots) {
-		plot_list[["change"]] <-
-			object$hc_out$height[object$hc_out$height > cutoff] %>%
-				{ (. - lag(.)) / lag(.) } %>%
-				data.frame(bump = ., nr_clus = paste0((length(.)+1):2, "-", length(.):1)) %>%
-				na.omit %>%
-				ggplot(aes(x=factor(nr_clus, levels = nr_clus), y=bump)) +
-					geom_bar(stat = "identity", alpha = .5) +
-		 		  scale_y_continuous(labels = scales::percent) +
-					labs(list(title = paste("Change in within-cluster heterogeneity"),
-					     x = "# clusters", y = "Change in within-cluster heterogeneity"))
-	}
+  if ("change" %in% plots) {
+    plot_list[["change"]] <-
+      object$hc_out$height[object$hc_out$height > cutoff] %>%
+        { (. - lag(.)) / lag(.) } %>%
+        data.frame(bump = ., nr_clus = paste0((length(.)+1):2, "-", length(.):1)) %>%
+        na.omit %>%
+        ggplot(aes(x=factor(nr_clus, levels = nr_clus), y = bump)) +
+          geom_bar(stat = "identity", alpha = .5, fill = "blue") +
+          scale_y_continuous(labels = scales::percent) +
+          labs(
+            title = "Change in within-cluster heterogeneity",
+            x = "# clusters",
+            y = "Change in within-cluster heterogeneity"
+          )
+  }
 
-	if ("dendro" %in% plots) {
-		hc <- as.dendrogram(object$hc_out)
-		xlab <- ""
-		if (length(plots) > 1)
-			xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in R > Report to view different plot types."
+  if ("dendro" %in% plots) {
+    hc <- as.dendrogram(object$hc_out)
+    xlab <- ""
+    if (length(plots) > 1)
+      xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in R > Report to view different plot types."
 
-		## can't combine base graphics with grid graphics
-		## https://cran.r-project.org/web/packages/gridExtra/vignettes/grid.arrange.html
-		## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
+    ## can't combine base graphics with grid graphics
+    ## https://cran.r-project.org/web/packages/gridExtra/vignettes/grid.arrange.html
+    ## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
 
-		if (cutoff == 0) {
-			plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
-		} else {
-			plot(hc, ylim = c(cutoff,1), leaflab = "none",
-			     main = "Cutoff dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
-		}
-		return(invisible())
-	}
+    if (cutoff == 0) {
+      plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
+    } else {
+      plot(hc, ylim = c(cutoff,1), leaflab = "none",
+           main = "Cutoff dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
+    }
+    return(invisible())
+  }
 
   if (custom)
     if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
 
-	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
-	 	{if (shiny) . else print(.)}
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+     {if (shiny) . else print(.)}
 }
