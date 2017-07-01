@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate 0.8.1
+# CHANGES IN radiant.multivariate 0.8.2
 
 * Updated output formatting code to make coefficient information more easily accessible
 * Add KMO measures for individual variables to _Factor > Pre-factor_
