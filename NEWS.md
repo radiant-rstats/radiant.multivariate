@@ -1,6 +1,12 @@
 # CHANGES IN radiant.multivariate 0.8.1
 
-* Moved coefficient formatting summary.regress and logist.regress to make result$coeff more easily accessible
+* Updated output formatting code to make coefficient information more easily accessible
+* Add KMO measures for individual variables to _Factor > Pre-factor_
+* Code cleanup
+
+## BUG FIXES
+
+* Pass plot sizing function to plot_downloader to ensure proper display
 
 # CHANGES IN radiant.multivariate VERSION 0.8.0
 
