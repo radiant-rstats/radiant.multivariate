@@ -1,8 +1,8 @@
 hc_method <- list("Ward's" = "ward.D", "Single" = "single", "Complete" = "complete", "Average" = "average",
-	"McQuitty" =  "mcquitty", "Median" = "median", "Centroid" = "centroid")
+  "McQuitty" =  "mcquitty", "Median" = "median", "Centroid" = "centroid")
 
 hc_distance <- c("Squared euclidean" = "sq.euclidian", "Euclidian" = "euclidean",
-	"Maximum" = "maximum", "Manhattan" = "manhattan", "Canberra" = "canberra", "Binary" = "binary", "Minkowski" = "minkowski")
+  "Maximum" = "maximum", "Manhattan" = "manhattan", "Canberra" = "canberra", "Binary" = "binary", "Minkowski" = "minkowski")
 
 hc_plots <- c("Scree" = "scree", "Change" = "change", "Dendrogram" = "dendro")
 
@@ -24,11 +24,11 @@ hc_inputs <- reactive({
 ###############################################################
 output$ui_hc_vars <- renderUI({
 
-	isNum <- "numeric" == .getclass() | "integer" == .getclass()
-	vars <- varnames()[isNum]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
   selectInput(inputId = "hc_vars", label = "Variables:", choices = vars,
-   	selected = state_multiple("hc_vars", vars),
-	  multiple = TRUE, size = min(8, length(vars)), selectize = FALSE)
+    selected = state_multiple("hc_vars", vars),
+    multiple = TRUE, size = min(8, length(vars)), selectize = FALSE)
 })
 
 output$ui_hclus <- renderUI({
@@ -37,14 +37,14 @@ output$ui_hclus <- renderUI({
     wellPanel(
       actionButton("hc_run", "Estimate", width = "100%")
     ),
-  	wellPanel(
-	    uiOutput("ui_hc_vars"),
-	    selectInput("hc_distance", label = "Distance measure:", choices =hc_distance ,
-	     	selected = state_single("hc_distance",hc_distance , "sq.euclidean"),
-	     	multiple = FALSE),
-	    selectInput("hc_method", label = "Method:", choices = hc_method,
-	     	selected = state_single("hc_method", hc_method, "ward.D"), multiple = FALSE),
- 			selectizeInput("hc_plots", label = "Plot(s):", choices = hc_plots,
+    wellPanel(
+      uiOutput("ui_hc_vars"),
+      selectInput("hc_distance", label = "Distance measure:", choices =hc_distance ,
+        selected = state_single("hc_distance",hc_distance , "sq.euclidean"),
+        multiple = FALSE),
+      selectInput("hc_method", label = "Method:", choices = hc_method,
+        selected = state_single("hc_method", hc_method, "ward.D"), multiple = FALSE),
+      selectizeInput("hc_plots", label = "Plot(s):", choices = hc_plots,
                selected = state_multiple("hc_plots", hc_plots, c("scree","change")),
                multiple = TRUE,
                options = list(placeholder = 'Select plot(s)',
@@ -58,11 +58,11 @@ output$ui_hclus <- renderUI({
              value = state_init('hc_max_cases',5000), step = 10))
         )
       ))
-  	),
-  	help_and_report(modal_title = "Hierarchical cluster analysis",
-  	                fun_name = "hclus",
-  	                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/hclus.md")))
-	)
+    ),
+    help_and_report(modal_title = "Hierarchical cluster analysis",
+                    fun_name = "hclus",
+                    help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/hclus.md")))
+  )
 })
 
 ## reset 
@@ -74,7 +74,7 @@ observeEvent(input$hc_plots, {
 
 hc_plot <- reactive({
   plots <- input$hc_plots
-	ph <- plots %>% { if (length(.) == 1 && . == "dendro") 800 else 400 }
+  ph <- plots %>% { if (length(.) == 1 && . == "dendro") 800 else 400 }
   pw <- if (!is_empty(plots) && plots == "dendro") 900 else 650
   list(plot_width = pw, plot_height = ph * length(plots))
 })
@@ -88,23 +88,23 @@ hc_plot_height <- function()
 ## output is called from the main radiant ui.R
 output$hclus <- renderUI({
 
-		register_print_output("summary_hclus", ".summary_hclus")
-		register_plot_output("plot_hclus", ".plot_hclus",
-                         	width_fun = "hc_plot_width",
-                         	height_fun = "hc_plot_height")
+    register_print_output("summary_hclus", ".summary_hclus")
+    register_plot_output("plot_hclus", ".plot_hclus",
+                          width_fun = "hc_plot_width",
+                          height_fun = "hc_plot_height")
 
-		## one output with components stacked
-		hc_output_panels <- tagList(
-	     tabPanel("Summary", verbatimTextOutput("summary_hclus")),
-	     tabPanel("Plot",
+    ## one output with components stacked
+    hc_output_panels <- tagList(
+       tabPanel("Summary", verbatimTextOutput("summary_hclus")),
+       tabPanel("Plot",
                 plot_downloader("hclus", height = hc_plot_height),
                 plotOutput("plot_hclus", height = "100%"))
-	  )
+    )
 
-		stat_tab_panel(menu = "Multivariate > Cluster",
-		               tool = "Hierarchical",
-		               tool_ui = "ui_hclus",
-		             	 output_panels = hc_output_panels)
+    stat_tab_panel(menu = "Multivariate > Cluster",
+                   tool = "Hierarchical",
+                   tool_ui = "ui_hclus",
+                   output_panels = hc_output_panels)
 
 })
 
@@ -113,7 +113,7 @@ output$hclus <- renderUI({
   # if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return()
 
   withProgress(message = "Estimating cluster solution", value = 1,
-	  do.call(hclus, hc_inputs())
+    do.call(hclus, hc_inputs())
   )
 })
 
@@ -128,7 +128,7 @@ output$hclus <- renderUI({
 
 .plot_hclus <- reactive({
   if (not_available(input$hc_vars) || not_pressed(input$hc_run))
-		return(invisible())
+    return(invisible())
 
   ## wait until hc_plots is updated 
   if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return(invisible())

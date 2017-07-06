@@ -21,65 +21,65 @@
 #'
 #' @export
 conjoint <- function(dataset, rvar, evar,
-										 int = "",
+                     int = "",
                      by = "none",
                      reverse = FALSE,
                      data_filter = "") {
 
-	vars <- c(rvar, evar)
-	if (by != "none") vars <- c(vars, by)
-	dat <- getdata(dataset, vars, filt = data_filter)
-	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  vars <- c(rvar, evar)
+  if (by != "none") vars <- c(vars, by)
+  dat <- getdata(dataset, vars, filt = data_filter)
+  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
   # vars <- ""
   radiant.model::var_check(evar, colnames(dat)[-1], int) %>%
     { vars <<- .$vars; evar <<- .$ev; int <<- .$intv }
 
-	## in case : was used to select a range of variables
-	# evar <- colnames(dat)[-1]
-	if (by != "none") {
-		evar <- setdiff(evar, by)
-		vars <- setdiff(vars, by)
+  ## in case : was used to select a range of variables
+  # evar <- colnames(dat)[-1]
+  if (by != "none") {
+    evar <- setdiff(evar, by)
+    vars <- setdiff(vars, by)
     levs <- dat[[by]] %>% as_factor %>% levels
     model_list <- vector("list", length(levs)) %>% set_names(levs)
-	} else {
-		levs <- "full"
+  } else {
+    levs <- "full"
     model_list <- list(full = list(model = NA, coeff = NA, tab = NA))
-	}
+  }
 
-	# formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
-	formula <- paste(rvar, "~", paste(vars, collapse = " + ")) %>% as.formula
+  # formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
+  formula <- paste(rvar, "~", paste(vars, collapse = " + ")) %>% as.formula
 
-	for (i in seq_along(levs)) {
-		if (!by == "none")
- 		  cdat <- filter_(dat, paste0(by, " == '", levs[i],"'")) %>% select_(.dots = setdiff(colnames(dat), by))
- 		else
- 			cdat <- dat
+  for (i in seq_along(levs)) {
+    if (!by == "none")
+      cdat <- filter_(dat, paste0(by, " == '", levs[i],"'")) %>% select_(.dots = setdiff(colnames(dat), by))
+    else
+      cdat <- dat
 
-		if (reverse)
-			cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
+    if (reverse)
+      cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
 
-		model <- sshhr(lm(formula, data = cdat))
-		coeff <- tidy(model)
-		tab <- the_table(coeff, cdat, evar)
+    model <- sshhr(lm(formula, data = cdat))
+    coeff <- tidy(model)
+    tab <- the_table(coeff, cdat, evar)
 
-	  coeff$` ` <- sig_stars(coeff$p.value) %>% format(justify = "left")
-	  colnames(coeff) <- c("  ","coefficient","std.error","t.value","p.value"," ")
-	  isFct <- sapply(select(cdat,-1), function(x) is.factor(x) || is.logical(x))
-	  if (sum(isFct) > 0) {
-	    for (j in names(isFct[isFct]))
-	      coeff$`  ` %<>% gsub(j, paste0(j,"|"), .) %>% gsub("\\|\\|","\\|",.)
+    coeff$` ` <- sig_stars(coeff$p.value) %>% format(justify = "left")
+    colnames(coeff) <- c("  ","coefficient","std.error","t.value","p.value"," ")
+    isFct <- sapply(select(cdat,-1), function(x) is.factor(x) || is.logical(x))
+    if (sum(isFct) > 0) {
+      for (j in names(isFct[isFct]))
+        coeff$`  ` %<>% gsub(j, paste0(j,"|"), .) %>% gsub("\\|\\|","\\|",.)
 
-	    rm(j, isFct)
-	  }
-	  # coeff$`  ` %<>% format(justify = "left")
+      rm(j, isFct)
+    }
+    # coeff$`  ` %<>% format(justify = "left")
 
     model_list[[levs[i]]] <- list(model = model, coeff = coeff, tab = tab)
   }
 
   rm(model, coeff, tab)
 
-	as.list(environment()) %>% add_class("conjoint")
+  as.list(environment()) %>% add_class("conjoint")
 }
 
 #' Summary method for the conjoint function
@@ -111,65 +111,65 @@ summary.conjoint <- function(object,
                              dec = 3,
                              ...) {
 
-	cat("Conjoint analysis\n")
+  cat("Conjoint analysis\n")
   cat("Data                 :", object$dataset, "\n")
-	if (object$data_filter %>% gsub("\\s","",.) != "")
-		cat("Filter               :", gsub("\\n","", object$data_filter), "\n")
-	if (object$by != "none")
-		cat("Show                 :", object$by, "==", show, "\n")
-	rvar <- if (object$reverse) paste0(object$rvar, " (reversed)") else object$rvar
+  if (object$data_filter %>% gsub("\\s","",.) != "")
+    cat("Filter               :", gsub("\\n","", object$data_filter), "\n")
+  if (object$by != "none")
+    cat("Show                 :", object$by, "==", show, "\n")
+  rvar <- if (object$reverse) paste0(object$rvar, " (reversed)") else object$rvar
   cat("Response variable    :", rvar, "\n")
   cat("Explanatory variables:", paste0(object$evar, collapse=", "), "\n\n")
 
   if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list))
-  	show <- names(object$model_list)[1]
+    show <- names(object$model_list)[1]
 
-	tab <- object$model_list[[show]]$tab
-	cat("Conjoint part-worths:\n")
-	print(formatdf(tab$PW, dec), row.names = FALSE)
-	cat("\nConjoint importance weights:\n")
-	print(formatdf(tab$IW, dec), row.names = FALSE)
-	cat("\nConjoint regression results:\n\n")
+  tab <- object$model_list[[show]]$tab
+  cat("Conjoint part-worths:\n")
+  print(formatdf(tab$PW, dec), row.names = FALSE)
+  cat("\nConjoint importance weights:\n")
+  print(formatdf(tab$IW, dec), row.names = FALSE)
+  cat("\nConjoint regression results:\n\n")
 
-	coeff <- object$model_list[[show]]$coeff
+  coeff <- object$model_list[[show]]$coeff
   coeff$`  ` %<>% format(justify = "left")
   if (!additional) {
-	  coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
-	  print(coeff[,1:2], row.names=FALSE)
-		cat("\n")
-	} else {
-	  if (all(coeff$p.value == "NaN")) {
-	    coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
-	    print(coeff[,1:2], row.names=FALSE)
-	    cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
-	    return()
-	  } else {
-	    p.small <- coeff$p.value < .001
-	    coeff[,2:5] %<>% formatdf(dec)
-	    coeff$p.value[p.small] <- "< .001"
-	    print(coeff, row.names=FALSE)
-	  }
+    coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
+    print(coeff[,1:2], row.names=FALSE)
+    cat("\n")
+  } else {
+    if (all(coeff$p.value == "NaN")) {
+      coeff[,2] %<>% {sprintf(paste0("%.",dec,"f"),.)}
+      print(coeff[,1:2], row.names=FALSE)
+      cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
+      return()
+    } else {
+      p.small <- coeff$p.value < .001
+      coeff[,2:5] %<>% formatdf(dec)
+      coeff$p.value[p.small] <- "< .001"
+      print(coeff, row.names=FALSE)
+    }
 
-	  model <- object$model_list[[show]]$model
+    model <- object$model_list[[show]]$model
 
-	  if (nrow(model$model) <= (length(object$evar) + 1))
-	    return("\nInsufficient observations to estimate model")
+    if (nrow(model$model) <= (length(object$evar) + 1))
+      return("\nInsufficient observations to estimate model")
 
-	  ## adjusting df for included intercept term
-	  df_int <- if (attr(model$terms, "intercept")) 1L else 0L
+    ## adjusting df for included intercept term
+    df_int <- if (attr(model$terms, "intercept")) 1L else 0L
 
-	  reg_fit <- glance(model) %>% round(dec)
-	  if (reg_fit['p.value'] < .001) reg_fit['p.value'] <- "< .001"
-	  cat("\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
-	  cat("R-squared:", paste0(reg_fit$r.squared, ", "), "Adjusted R-squared:", reg_fit$adj.r.squared, "\n")
-	  cat("F-statistic:", reg_fit$statistic, paste0("df(", reg_fit$df - df_int, ",", reg_fit$df.residual, "), p.value"), reg_fit$p.value)
-	  cat("\nNr obs:", formatnr(reg_fit$df + reg_fit$df.residual, dec = 0), "\n\n")
+    reg_fit <- glance(model) %>% round(dec)
+    if (reg_fit['p.value'] < .001) reg_fit['p.value'] <- "< .001"
+    cat("\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+    cat("R-squared:", paste0(reg_fit$r.squared, ", "), "Adjusted R-squared:", reg_fit$adj.r.squared, "\n")
+    cat("F-statistic:", reg_fit$statistic, paste0("df(", reg_fit$df - df_int, ",", reg_fit$df.residual, "), p.value"), reg_fit$p.value)
+    cat("\nNr obs:", formatnr(reg_fit$df + reg_fit$df.residual, dec = 0), "\n\n")
 
-	  if (anyNA(model$coeff))
-	    cat("The set of explanatory variables exhibit perfect multicollinearity.\nOne or more variables were dropped from the estimation.\n")
-	}
+    if (anyNA(model$coeff))
+      cat("The set of explanatory variables exhibit perfect multicollinearity.\nOne or more variables were dropped from the estimation.\n")
+  }
 
-	if (mc_diag) {
+  if (mc_diag) {
     if (length(object$evar) > 1) {
       cat("Multicollinearity diagnostics:\n")
       car::vif(object$model_list[[show]]$model) %>%
@@ -181,7 +181,7 @@ summary.conjoint <- function(object,
     } else {
       cat("Insufficient number of attributes selected to calculate\nmulticollinearity diagnostics")
     }
-	}
+  }
 }
 
 #' Predict method for the conjoint function
@@ -238,7 +238,7 @@ predict.conjoint <- function(object,
   }
 
   if (object$by == "none") {
-  	object$model <- object$model_list[["full"]]$model
+    object$model <- object$model_list[["full"]]$model
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
   } else {
     predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec)
@@ -276,24 +276,24 @@ predict_conjoint_by <- function(object, pfun,
   if (is.character(object)) return(object)
 
   pred <- list()
-	levs <- object$levs
+  levs <- object$levs
 
-	for (i in seq_along(levs)) {
-		object$model <- object$model_list[[levs[i]]]$model
+  for (i in seq_along(levs)) {
+    object$model <- object$model_list[[levs[i]]]$model
     pred[[i]] <- predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
 
     ## when se is true reordering the columns removes attributes for some reason
     if (i == 1) att <- attributes(pred[[1]])
 
-  	if (is.character(pred[[i]])) return(pred[[i]])
-    pred[[i]]	%<>% {.[[object$by]] <- levs[i]; .} %>%
+    if (is.character(pred[[i]])) return(pred[[i]])
+    pred[[i]] %<>% {.[[object$by]] <- levs[i]; .} %>%
       {.[,c(object$by, head(colnames(.),-1))]}
   }
 
   pred <- bind_rows(pred)
   att$row.names <- 1:nrow(pred)
   att$vars <- att$names <- colnames(pred)
-	if (is_string(object$dataset)) att$dataset <- object$dataset
+  if (is_string(object$dataset)) att$dataset <- object$dataset
   attributes(pred) <- att
   add_class(pred,"conjoint.predict.by")
 }
@@ -339,52 +339,52 @@ plot.conjoint <- function(x, plots = "pw",
                           custom = FALSE,
                           ...) {
 
-	object <- x; rm(x)
+  object <- x; rm(x)
 
   if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list))
-  	show <- names(object$model_list)[1]
+    show <- names(object$model_list)[1]
 
-	the_table <- object$model_list[[show]]$tab
-	plot_ylim <- the_table$plot_ylim
-	plot_list <- list()
+  the_table <- object$model_list[[show]]$tab
+  plot_ylim <- the_table$plot_ylim
+  plot_list <- list()
 
-	if ("pw" %in% plots) {
-		PW.df <- the_table[["PW"]]
+  if ("pw" %in% plots) {
+    PW.df <- the_table[["PW"]]
 
-		lab <- if (object$by == "none") "" else paste0("(", show, ")")
+    lab <- if (object$by == "none") "" else paste0("(", show, ")")
 
-		for (var in object$evar) {
-			PW.var <- PW.df[PW.df[["Attributes"]] == var,]
+    for (var in object$evar) {
+      PW.var <- PW.df[PW.df[["Attributes"]] == var,]
 
-			# setting the levels in the same order as in the_table. Without this
-			# ggplot would change the ordering of the price levels
-			PW.var$Levels <- factor(PW.var$Levels,levels=PW.var$Levels,ordered=FALSE)
+      # setting the levels in the same order as in the_table. Without this
+      # ggplot would change the ordering of the price levels
+      PW.var$Levels <- factor(PW.var$Levels,levels=PW.var$Levels,ordered=FALSE)
 
-			p <- ggplot(PW.var, aes_string(x="Levels", y="PW", group = 1)) +
-				  geom_line(colour="blue", linetype = 'dotdash', size=.7) +
-	  		  geom_point(colour="blue", size=4, shape=21, fill="white") +
-		  	  labs(title = paste("Part-worths for", var, lab), x = "") +
-		  	  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      p <- ggplot(PW.var, aes_string(x="Levels", y="PW", group = 1)) +
+          geom_line(colour="blue", linetype = 'dotdash', size=.7) +
+          geom_point(colour="blue", size=4, shape=21, fill="white") +
+          labs(title = paste("Part-worths for", var, lab), x = "") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-		  if (scale_plot) p <- p + ylim(plot_ylim[var,"Min"],plot_ylim[var,"Max"])
-			plot_list[[var]] <- p
-		}
-	}
+      if (scale_plot) p <- p + ylim(plot_ylim[var,"Min"],plot_ylim[var,"Max"])
+      plot_list[[var]] <- p
+    }
+  }
 
-	if ("iw" %in% plots) {
-		IW.df <- the_table[['IW']]
-		lab <- if (object$by == "none") "" else paste0(" (", show, ")")
-		plot_list[["iw"]] <- ggplot(IW.df, aes_string(x="Attributes", y="IW", fill = "Attributes")) +
-		                   geom_bar(stat = "identity", alpha = .5) +
-		                   theme(legend.position = "none") +
-		                   labs(title = paste0("Importance weights", lab))
-	}
+  if ("iw" %in% plots) {
+    IW.df <- the_table[['IW']]
+    lab <- if (object$by == "none") "" else paste0(" (", show, ")")
+    plot_list[["iw"]] <- ggplot(IW.df, aes_string(x="Attributes", y="IW", fill = "Attributes")) +
+      geom_bar(stat = "identity", alpha = .5) +
+      theme(legend.position = "none") +
+      labs(title = paste0("Importance weights", lab))
+  }
 
   if (custom)
     if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
 
-	sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
-	 	{if (shiny) . else print(.)}
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
+    {if (shiny) . else print(.)}
 }
 
 #' Function to calculate the PW and IW table for conjoint
@@ -405,58 +405,58 @@ plot.conjoint <- function(x, plots = "pw",
 #'
 #' @export
 the_table <- function(model, dat, evar) {
-	if (is.character(model)) return(list("PW" = "No attributes selected."))
+  if (is.character(model)) return(list("PW" = "No attributes selected."))
 
-	attr <- select_(dat, .dots = evar)
-	isFct <- sapply(attr, is.factor)
-	if (sum(isFct) < ncol(attr)) return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
-	levs <- lapply(attr[,isFct, drop = FALSE],levels)
-	vars <- colnames(attr)[isFct]
+  attr <- select_(dat, .dots = evar)
+  isFct <- sapply(attr, is.factor)
+  if (sum(isFct) < ncol(attr)) return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
+  levs <- lapply(attr[,isFct, drop = FALSE],levels)
+  vars <- colnames(attr)[isFct]
 
-	nlevs <- sapply(levs,length)
-	PW.df <- data.frame(rep(vars,nlevs), unlist(levs))
-	colnames(PW.df) <- c("Attributes","Levels")
-	PW.df$PW <- 0
+  nlevs <- sapply(levs,length)
+  PW.df <- data.frame(rep(vars,nlevs), unlist(levs))
+  colnames(PW.df) <- c("Attributes","Levels")
+  PW.df$PW <- 0
 
-	## Calculate PW and IW's when interactions are present
-	## http://www.slideshare.net/SunnyBose/conjoint-analysis-12090511
-	rownames(PW.df) <- paste(PW.df[['Attributes']], PW.df[['Levels']], sep = "")
+  ## Calculate PW and IW's when interactions are present
+  ## http://www.slideshare.net/SunnyBose/conjoint-analysis-12090511
+  rownames(PW.df) <- paste(PW.df[['Attributes']], PW.df[['Levels']], sep = "")
 
-	coeff <- model$estimate
-	PW.df[model$term[-1],'PW'] <- coeff[-1]
+  coeff <- model$estimate
+  PW.df[model$term[-1],'PW'] <- coeff[-1]
 
-	minPW <- PW.df[tapply(1:nrow(PW.df),PW.df$Attributes,function(i) i[which.min(PW.df$PW[i])]),]
-	maxPW <- PW.df[tapply(1:nrow(PW.df),PW.df$Attributes,function(i) i[which.max(PW.df$PW[i])]),]
-	rownames(minPW) <- minPW$Attributes
-	rownames(maxPW) <- maxPW$Attributes
+  minPW <- PW.df[tapply(1:nrow(PW.df),PW.df$Attributes,function(i) i[which.min(PW.df$PW[i])]),]
+  maxPW <- PW.df[tapply(1:nrow(PW.df),PW.df$Attributes,function(i) i[which.max(PW.df$PW[i])]),]
+  rownames(minPW) <- minPW$Attributes
+  rownames(maxPW) <- maxPW$Attributes
 
-	rangePW <- data.frame(cbind(maxPW[vars,'PW'],minPW[vars,'PW']))
-	rangePW$Range <- rangePW[[1]] - rangePW[[2]]
-	colnames(rangePW) <- c("Max","Min","Range")
-	rownames(rangePW) <- vars
+  rangePW <- data.frame(cbind(maxPW[vars,'PW'],minPW[vars,'PW']))
+  rangePW$Range <- rangePW[[1]] - rangePW[[2]]
+  colnames(rangePW) <- c("Max","Min","Range")
+  rownames(rangePW) <- vars
 
-	## for plot range if standardized
-	maxlim <- rangePW[['Max']] > abs(rangePW[['Min']])
-	maxrange <- max(rangePW[['Range']])
-	plot_ylim <- rangePW[c('Min','Max')]
+  ## for plot range if standardized
+  maxlim <- rangePW[['Max']] > abs(rangePW[['Min']])
+  maxrange <- max(rangePW[['Range']])
+  plot_ylim <- rangePW[c('Min','Max')]
 
-	plot_ylim[maxlim,'Max'] <- plot_ylim[maxlim,'Max'] + maxrange - rangePW$Range[maxlim]
-	plot_ylim[!maxlim,'Min'] <- plot_ylim[!maxlim,'Min'] - (maxrange - rangePW$Range[!maxlim])
-	plot_ylim <- plot_ylim * 1.01 		## expanded max to avoid hiding max points in plot
+  plot_ylim[maxlim,'Max'] <- plot_ylim[maxlim,'Max'] + maxrange - rangePW$Range[maxlim]
+  plot_ylim[!maxlim,'Min'] <- plot_ylim[!maxlim,'Min'] - (maxrange - rangePW$Range[!maxlim])
+  plot_ylim <- plot_ylim * 1.01     ## expanded max to avoid hiding max points in plot
 
-	IW <- data.frame(vars)
-	IW$IW <- rangePW$Range / sum(rangePW$Range)
-	colnames(IW) <- c("Attributes","IW")
+  IW <- data.frame(vars)
+  IW$IW <- rangePW$Range / sum(rangePW$Range)
+  colnames(IW) <- c("Attributes","IW")
 
-	PW.df[['Attributes']] <- as.character(PW.df[['Attributes']])
-	PW.df[['Levels']] <- as.character(PW.df[['Levels']])
-	PW.df <- rbind(PW.df, c("Base utility","~",coeff[1]))
-	PW.df[['PW']] <- as.numeric(PW.df[['PW']])
+  PW.df[['Attributes']] <- as.character(PW.df[['Attributes']])
+  PW.df[['Levels']] <- as.character(PW.df[['Levels']])
+  PW.df <- rbind(PW.df, c("Base utility","~",coeff[1]))
+  PW.df[['PW']] <- as.numeric(PW.df[['PW']])
 
-	PW.df[['PW']] <- round(PW.df[['PW']],3)
-	IW[['IW']] <- round(IW[['IW']],3)
+  PW.df[['PW']] <- round(PW.df[['PW']],3)
+  IW[['IW']] <- round(IW[['IW']],3)
 
-	list('PW' = PW.df, 'IW' = IW, 'plot_ylim' = plot_ylim)
+  list('PW' = PW.df, 'IW' = IW, 'plot_ylim' = plot_ylim)
 }
 
 #' Store method for the Multivariate > Conjoint tab
@@ -480,7 +480,7 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
     cn <- tidy(object$model_list[[1]]$model)$term[-1]
 
     for (i in object$evar)
-    	cn %<>% gsub(i, paste0(i, "_"), .) %>% gsub("\\_\\_","\\_",.)
+      cn %<>% gsub(i, paste0(i, "_"), .) %>% gsub("\\_\\_","\\_",.)
 
     cn <- gsub("[^A-z0-9_\\.]", "", cn) %>% c("Intercept", .)
   } else {
@@ -493,13 +493,13 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
   res <- as.data.frame(res)
   res[[object$by]] <- levs
 
-	for (i in seq_along(levs)) {
-		if (type == "IW") {
+  for (i in seq_along(levs)) {
+    if (type == "IW") {
       res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$tab$IW$IW
-		} else {
+    } else {
       res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$coeff$coefficient
-		}
-	}
+    }
+  }
 
   if (exists("r_environment")) {
     env <- r_environment
@@ -513,7 +513,7 @@ store.conjoint <- function(object, name = "PWs", type = "PW", envir = parent.fra
 
   ## use data description from the original if available
   if (is_empty(env$r_data[[paste0(name, "_descr")]])) {
-  	s <- ifelse(type == "PW", "PWs", "IWs")
+    s <- ifelse(type == "PW", "PWs", "IWs")
     attr(res, "description") <- paste0("## Conjoint ", s, "\n\nThis dataset contains ", s, " derived from dataset ", object$dataset)
   } else {
     attr(res, "description") <- env$r_data[[paste0(name, "_descr")]]
@@ -585,15 +585,15 @@ store.conjoint.predict.by <- function(object, name = "predict_by", envir = paren
 
   # ## use data description from the original if available
   if (is_empty(env$r_data[[paste0(name, "_descr")]])) {
-  	if(attr(object, "pred_type") == "data") {
-  		s <- paste("The prediction dataset used was", attr(object, "pred_data"))
-  	} else if(attr(object, "pred_type") == "cmd") {
+    if(attr(object, "pred_type") == "data") {
+      s <- paste("The prediction dataset used was", attr(object, "pred_data"))
+    } else if(attr(object, "pred_type") == "cmd") {
       pred_cmd <- gsub("([\\=\\+\\*-])", " \\1 ", attr(object, "pred_cmd")) %>% gsub("([;,])", "\\1 ", .)
-  		s <- paste("The prediction command used was ", pred_cmd)
-  	} else {
+      s <- paste("The prediction command used was ", pred_cmd)
+    } else {
       pred_cmd <- gsub("([\\=\\+\\*-])", " \\1 ", attr(object, "pred_cmd")) %>% gsub("([;,])", "\\1 ", .)
-  		s <- paste("The prediction dataset used was ", attr(object, "pred_data"), " and the dataset was adapted using the following prediction command:", pred_cmd)
-  	}
+      s <- paste("The prediction dataset used was ", attr(object, "pred_data"), " and the dataset was adapted using the following prediction command:", pred_cmd)
+    }
 
     attr(object, "description") <- paste0("## Conjoint predictions\n\nThis dataset contains predictions from a conjoint analysis on ", attr(object,"dataset"), ". ", s, ". Note that a separate regression model was estimated for each level of ", colnames(object)[1], ".")
   } else {

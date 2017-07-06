@@ -29,36 +29,36 @@ pm_plot_inputs <- reactive({
 })
 
 output$ui_pm_brand <- renderUI({
-	isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .getclass() | "factor" == .getclass()
   vars <- varnames()[isLabel]
- 	selectInput(inputId = "pm_brand", label = "Brand:", choices = vars,
-   	selected = state_single("pm_brand",vars), multiple = FALSE)
+  selectInput(inputId = "pm_brand", label = "Brand:", choices = vars,
+    selected = state_single("pm_brand",vars), multiple = FALSE)
 })
 
 output$ui_pm_attr <- renderUI({
- 	isNum <- "numeric" == .getclass() | "integer" == .getclass()
- 	vars <- varnames()[isNum]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
   selectInput(inputId = "pm_attr", label = "Attributes:", choices = vars,
-   	selected = state_multiple("pm_attr",vars), multiple = TRUE,
-  	size = min(10, length(vars)), selectize = FALSE)
+    selected = state_multiple("pm_attr",vars), multiple = TRUE,
+    size = min(10, length(vars)), selectize = FALSE)
 })
 
 output$ui_pm_pref <- renderUI({
   if (not_available(input$pm_attr)) return()
- 	isNum <- "numeric" == .getclass() | "integer" == .getclass()
- 	vars <- varnames()[isNum]
- 	if (length(vars) > 0) vars <- vars[-which(vars %in% input$pm_attr)]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
+  if (length(vars) > 0) vars <- vars[-which(vars %in% input$pm_attr)]
   selectInput(inputId = "pm_pref", label = "Preferences:", choices = vars,
-   	selected = state_multiple("pm_pref",vars), multiple = TRUE,
-  	size = max(1, min(5, length(vars))), selectize = FALSE)
+    selected = state_multiple("pm_pref",vars), multiple = TRUE,
+    size = max(1, min(5, length(vars))), selectize = FALSE)
 })
 
 output$ui_pm_plots <- renderUI({
-	plot_list <- c("Brands" = "brand", "Attributes" = "attr")
+  plot_list <- c("Brands" = "brand", "Attributes" = "attr")
   if (!is.null(input$pm_pref)) plot_list <- c(plot_list, c("Preferences" = "pref"))
-	checkboxGroupInput("pm_plots", NULL, plot_list,
-   	selected = state_group("pm_plots"),
-   	inline = TRUE)
+  checkboxGroupInput("pm_plots", NULL, plot_list,
+    selected = state_group("pm_plots"),
+    inline = TRUE)
 })
 
 output$ui_pmap <- renderUI({
@@ -67,43 +67,43 @@ output$ui_pmap <- renderUI({
     wellPanel(
       actionButton("pm_run", "Estimate", width = "100%")
     ),
-  	wellPanel(
-	  	uiOutput("ui_pm_brand"),
-	  	uiOutput("ui_pm_attr"),
-	  	uiOutput("ui_pm_pref"),
-		  radioButtons(inputId = "pm_nr_dim", label = NULL, pm_nr_dim,
-		   	selected = state_init("pm_nr_dim",2),
-		   	inline = TRUE),
-	 	 	conditionalPanel(condition = "input.tabs_pmap == 'Plot'",
-		  	uiOutput("ui_pm_plots"),
+    wellPanel(
+      uiOutput("ui_pm_brand"),
+      uiOutput("ui_pm_attr"),
+      uiOutput("ui_pm_pref"),
+      radioButtons(inputId = "pm_nr_dim", label = NULL, pm_nr_dim,
+        selected = state_init("pm_nr_dim",2),
+        inline = TRUE),
+      conditionalPanel(condition = "input.tabs_pmap == 'Plot'",
+        uiOutput("ui_pm_plots"),
         tags$table(
           tags$td(numericInput("pm_scaling", "Arrow scale:", state_init("pm_scaling",2.1), .5, 4, .1, width = "117px")),
           tags$td(numericInput("pm_fontsz", "Font size:", state_init("pm_fontsz",1.3), .5, 4, .1, width = "117px")),
           width = "100%"
         )
-	    ),
-	 	 	conditionalPanel(condition = "input.tabs_pmap == 'Summary'",
-	    	numericInput("pm_cutoff", label = "Loadings cutoff:", min = 0,
-	    	             max = 1, state_init("pm_cutoff",0), step = .05),
-      	conditionalPanel(condition = "input.pm_attr != null",
-		    	# actionButton("pm_save_scores", "Save scores")
-	        tags$table(
-	          tags$td(textInput("pm_store_name", "Store scores:", state_init("pm_store_name","factor"))),
-	          tags$td(actionButton("pm_store", "Store"), style="padding-top:30px;")
-	        )
-		    )
-		  )
- 		),
-		help_and_report(modal_title = "Attribute based brand maps",
-		                fun_name = "pmap",
-		                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/pmap.md")))
-	)
+      ),
+      conditionalPanel(condition = "input.tabs_pmap == 'Summary'",
+        numericInput("pm_cutoff", label = "Loadings cutoff:", min = 0,
+                     max = 1, state_init("pm_cutoff",0), step = .05),
+        conditionalPanel(condition = "input.pm_attr != null",
+          # actionButton("pm_save_scores", "Save scores")
+          tags$table(
+            tags$td(textInput("pm_store_name", "Store scores:", state_init("pm_store_name","factor"))),
+            tags$td(actionButton("pm_store", "Store"), style="padding-top:30px;")
+          )
+        )
+      )
+    ),
+    help_and_report(modal_title = "Attribute based brand maps",
+                    fun_name = "pmap",
+                    help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/pmap.md")))
+  )
 })
 
 pm_plot <- eventReactive(input$pm_run, {
-	req(input$pm_nr_dim)
-	nrDim <- as.numeric(input$pm_nr_dim)
-	nrPlots <- (nrDim * (nrDim - 1)) / 2
+  req(input$pm_nr_dim)
+  nrDim <- as.numeric(input$pm_nr_dim)
+  nrPlots <- (nrDim * (nrDim - 1)) / 2
   list(plot_width = 650, plot_height = 650 * nrPlots)
 })
 
@@ -114,34 +114,34 @@ pm_plot_height <- function()
   pm_plot() %>% { if (is.list(.)) .$plot_height else 650 }
 
 output$pmap <- renderUI({
-		register_print_output("summary_pmap", ".summary_pmap")
-		register_plot_output("plot_pmap", ".plot_pmap",
-                         	width_fun = "pm_plot_width",
-                         	height_fun = "pm_plot_height")
+    register_print_output("summary_pmap", ".summary_pmap")
+    register_plot_output("plot_pmap", ".plot_pmap",
+                          width_fun = "pm_plot_width",
+                          height_fun = "pm_plot_height")
 
-	  pm_output_panels <- tabsetPanel(
-	    id = "tabs_pmap",
-	    tabPanel("Summary",
+    pm_output_panels <- tabsetPanel(
+      id = "tabs_pmap",
+      tabPanel("Summary",
         downloadLink("dl_pm_loadings", "", class = "fa fa-download alignright"), br(),
-	      verbatimTextOutput("summary_pmap")),
-	    tabPanel("Plot",
+        verbatimTextOutput("summary_pmap")),
+      tabPanel("Plot",
         plot_downloader("pmap", height = pm_plot_height),
         plotOutput("plot_pmap", height = "100%"))
-	  )
+    )
 
-		stat_tab_panel(menu = "Multivariate > Maps",
-		              tool = "Attributes",
-		              tool_ui = "ui_pmap",
-		             	output_panels = pm_output_panels)
+    stat_tab_panel(menu = "Multivariate > Maps",
+                  tool = "Attributes",
+                  tool_ui = "ui_pmap",
+                  output_panels = pm_output_panels)
 })
 
 .pmap_available <- reactive({
-	if (not_available(input$pm_brand) || not_available(input$pm_attr))
-		return("This analysis requires a brand variable of type factor or character and multiple attribute variables\nof type numeric or integer. If these variables are not available please select another dataset.\n\n" %>% suggest_data("retailers"))
-	brand <- .getdata()[[input$pm_brand]]
-	if (length(unique(brand)) < length(brand))
-		return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>% suggest_data("retailers"))
-	if (length(input$pm_attr) < 2) return("Please select two or more attribute variables")
+  if (not_available(input$pm_brand) || not_available(input$pm_attr))
+    return("This analysis requires a brand variable of type factor or character and multiple attribute variables\nof type numeric or integer. If these variables are not available please select another dataset.\n\n" %>% suggest_data("retailers"))
+  brand <- .getdata()[[input$pm_brand]]
+  if (length(unique(brand)) < length(brand))
+    return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>% suggest_data("retailers"))
+  if (length(input$pm_attr) < 2) return("Please select two or more attribute variables")
 
   if (not_pressed(input$pm_run)) return("** Press the Estimate button to generate perceptual maps **")
 
@@ -151,8 +151,8 @@ output$pmap <- renderUI({
 
 .pmap <- eventReactive(input$pm_run, {
   withProgress(message = 'Generating perceptual map', value = 1,
-	  do.call(pmap, pm_inputs())
-	)
+    do.call(pmap, pm_inputs())
+  )
 })
 
 .summary_pmap <- reactive({

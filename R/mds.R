@@ -32,55 +32,55 @@ mds <- function(dataset, id1, id2, dis,
                 data_filter = "") {
 
 
-	nr_dim <- as.numeric(nr_dim)
-	dat <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
-	if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  nr_dim <- as.numeric(nr_dim)
+  dat <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
+  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
-	d <- dat[,dis]
-	id1_dat <- dat[ ,id1] %>% as.character
-	id2_dat <- dat[ ,id2] %>% as.character
-	rm(dat)
+  d <- dat[,dis]
+  id1_dat <- dat[ ,id1] %>% as.character
+  id2_dat <- dat[ ,id2] %>% as.character
+  rm(dat)
 
-	## ids
-	lab <- unique(c(id1_dat, id2_dat))
-	nrLev <- length(lab)
+  ## ids
+  lab <- unique(c(id1_dat, id2_dat))
+  nrLev <- length(lab)
 
-	lower <- (nrLev * (nrLev - 1)) / 2
-	nrObs <- length(d)
+  lower <- (nrLev * (nrLev - 1)) / 2
+  nrObs <- length(d)
 
-	## setup the distance matrix
-	mds_dis_mat <- diag(nrLev)
-	if (lower == nrObs) {
-		mds_dis_mat[lower.tri(mds_dis_mat, diag = FALSE)] <- d
-	} else if ((lower + nrLev) == nrObs) {
-		mds_dis_mat[lower.tri(mds_dis_mat, diag = TRUE)] <- d
-	} else {
-		return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
-		       add_class("mds"))
-	}
+  ## setup the distance matrix
+  mds_dis_mat <- diag(nrLev)
+  if (lower == nrObs) {
+    mds_dis_mat[lower.tri(mds_dis_mat, diag = FALSE)] <- d
+  } else if ((lower + nrLev) == nrObs) {
+    mds_dis_mat[lower.tri(mds_dis_mat, diag = TRUE)] <- d
+  } else {
+    return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
+           add_class("mds"))
+  }
 
-	mds_dis_mat %<>% set_rownames(lab) %>%
-		set_colnames(lab) %>%
-		as.dist
+  mds_dis_mat %<>% set_rownames(lab) %>%
+    set_colnames(lab) %>%
+    as.dist
 
-	## Alternative method, metaMDS - requires vegan
-	# res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
-	# if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
+  ## Alternative method, metaMDS - requires vegan
+  # res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
+  # if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
 
   seed %>% gsub("[^0-9]","",.) %>% { if (!is_empty(.)) set.seed(seed) }
-	res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
-	res$stress <- res$stress / 100
+  res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
+  res$stress <- res$stress / 100
 
-	if (method == "metric") {
-		res$points <- cmdscale(mds_dis_mat, k = nr_dim)
-		## Using R^2
-		# res$stress <- sqrt(1 - cor(dist(res$points),mds_dis_mat)^2) * 100
-		# Using standard Kruskal formula for metric MDS
-		res$stress	<- { sum((dist(res$points) - mds_dis_mat)^2) / sum(mds_dis_mat^2) } %>%
-											 sqrt
-	}
+  if (method == "metric") {
+    res$points <- cmdscale(mds_dis_mat, k = nr_dim)
+    ## Using R^2
+    # res$stress <- sqrt(1 - cor(dist(res$points),mds_dis_mat)^2) * 100
+    # Using standard Kruskal formula for metric MDS
+    res$stress  <- { sum((dist(res$points) - mds_dis_mat)^2) / sum(mds_dis_mat^2) } %>%
+                       sqrt
+  }
 
-	as.list(environment()) %>% add_class("mds")
+  as.list(environment()) %>% add_class("mds")
 }
 
 #' Summary method for the mds function
@@ -103,30 +103,30 @@ mds <- function(dataset, id1, id2, dis,
 #' @export
 summary.mds <- function(object, dec = 2, ...) {
 
-	if (is.character(object)) return(cat(object))
+  if (is.character(object)) return(cat(object))
 
-	cat("(Dis)similarity based brand map (MDS)\n")
-	cat("Data        :", object$dataset, "\n")
-	if (object$data_filter %>% gsub("\\s","",.) != "")
-		cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
-	cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")
-	cat("# dimensions:", object$nr_dim, "\n")
-	meth <- if (object$method == "non-metric") "Non-metric" else "Metric"
-	cat("Method      :", meth, "\n")
-	cat("Observations:", object$nrObs, "\n")
+  cat("(Dis)similarity based brand map (MDS)\n")
+  cat("Data        :", object$dataset, "\n")
+  if (object$data_filter %>% gsub("\\s","",.) != "")
+    cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
+  cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")
+  cat("# dimensions:", object$nr_dim, "\n")
+  meth <- if (object$method == "non-metric") "Non-metric" else "Metric"
+  cat("Method      :", meth, "\n")
+  cat("Observations:", object$nrObs, "\n")
 
-	cat("\nOriginal distance data:\n")
-	object$mds_dis_mat %>% round(dec) %>% print
+  cat("\nOriginal distance data:\n")
+  object$mds_dis_mat %>% round(dec) %>% print
 
-	cat("\nRecovered distance data:\n")
-	object$res$points %>% dist %>% round(dec) %>% print
+  cat("\nRecovered distance data:\n")
+  object$res$points %>% dist %>% round(dec) %>% print
 
-	cat("\nCoordinates:\n")
-	object$res$points %>% round(dec) %>%
-	 set_colnames({paste("Dimension ", 1:ncol(.))}) %>%
-	 print
+  cat("\nCoordinates:\n")
+  object$res$points %>% round(dec) %>%
+   set_colnames({paste("Dimension ", 1:ncol(.))}) %>%
+   print
 
-	cat("\nStress:", round(object$res$stress, dec + 1))
+  cat("\nStress:", round(object$res$stress, dec + 1))
 }
 
 #' Plot method for the mds function
@@ -155,40 +155,40 @@ plot.mds <- function(x,
                      fontsz = 1.3,
                      ...) {
 
-	object <- x; rm(x)
+  object <- x; rm(x)
 
-	## set extremes for plot
-	lim <- max(abs(object$res$points))
+  ## set extremes for plot
+  lim <- max(abs(object$res$points))
 
-	## set plot space
-	if (object$nr_dim == 3 && ncol(object$res$points) == 3) {
-		op <- par(mfrow = c(3, 1))
-		fontsz <- fontsz + .6
-	} else {
-		op <- par(mfrow = c(1, 1))
-	}
+  ## set plot space
+  if (object$nr_dim == 3 && ncol(object$res$points) == 3) {
+    op <- par(mfrow = c(3, 1))
+    fontsz <- fontsz + .6
+  } else {
+    op <- par(mfrow = c(1, 1))
+  }
 
-	## reverse selected dimensions
-	if (!is.null(rev_dim) && rev_dim != "") {
-		as.numeric(rev_dim) %>%
-			{ object$res$points[,.] <<- -1 * object$res$points[,.] }
-	}
+  ## reverse selected dimensions
+  if (!is.null(rev_dim) && rev_dim != "") {
+    as.numeric(rev_dim) %>%
+      { object$res$points[,.] <<- -1 * object$res$points[,.] }
+  }
 
-	## plot maps
-	for (i in 1:(object$nr_dim - 1)) {
-		for (j in (i + 1):object$nr_dim) {
-			plot(c(-lim, lim), type = "n", xlab = "", ylab = "", axes = FALSE, asp = 1,
-			     yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim, lim))
+  ## plot maps
+  for (i in 1:(object$nr_dim - 1)) {
+    for (j in (i + 1):object$nr_dim) {
+      plot(c(-lim, lim), type = "n", xlab = "", ylab = "", axes = FALSE, asp = 1,
+           yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim, lim))
 
-			if (object$nr_dim > 2)
-				title(main = paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
-			
-			points(object$res$points[ ,i], object$res$points[ ,j], pch = 16, cex = .6)
-			wordcloud::textplot(object$res$points[ ,i], object$res$points[ ,j] +
-			                    (.04 * lim), object$lab, col = rainbow(object$nrLev, start = .6, end = .1),
-			                    cex = fontsz, new = FALSE)
-			abline(v = 0, h = 0)
-		}
-	}
-	par(op)
+      if (object$nr_dim > 2)
+        title(main = paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
+      
+      points(object$res$points[ ,i], object$res$points[ ,j], pch = 16, cex = .6)
+      wordcloud::textplot(object$res$points[ ,i], object$res$points[ ,j] +
+                          (.04 * lim), object$lab, col = rainbow(object$nrLev, start = .6, end = .1),
+                          cex = fontsz, new = FALSE)
+      abline(v = 0, h = 0)
+    }
+  }
+  par(op)
 }

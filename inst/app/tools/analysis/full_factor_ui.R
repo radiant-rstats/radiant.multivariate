@@ -21,28 +21,28 @@ ff_inputs <- reactive({
 ###############################
 output$ui_ff_vars <- renderUI({
 
- 	isNum <- "numeric" == .getclass() | "integer" == .getclass()
- 	vars <- varnames()[isNum]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
   selectInput(inputId = "ff_vars", label = "Variables:", choices = vars,
-  	selected = state_multiple("ff_vars", vars, input$pf_vars),
-  	multiple = TRUE, size = min(10, length(vars)), selectize = FALSE)
+    selected = state_multiple("ff_vars", vars, input$pf_vars),
+    multiple = TRUE, size = min(10, length(vars)), selectize = FALSE)
 })
 
 output$ui_full_factor <- renderUI({
   req(input$dataset)
-	tagList(
+  tagList(
     wellPanel(
       actionButton("ff_run", "Estimate", width = "100%")
     ),
     wellPanel(
       uiOutput("ui_ff_vars"),
       selectInput("ff_method", label = "Method:", choices = ff_method,
-      	selected = state_single("ff_method", ff_method, "PCA")),
+        selected = state_single("ff_method", ff_method, "PCA")),
       tags$table(
         tags$td(numericInput("ff_nr_fact", label = "Nr. of factors:", min = 1, value = state_init('ff_nr_fact',1))),
         tags$td(numericInput("ff_cutoff", label = "Cutt-off", min = 0, max = 1, value = state_init('ff_cutoff',0), step = .05, width = "117px"))
       ),
-  	  conditionalPanel(condition = "input.tabs_full_factor == 'Summary'",
+      conditionalPanel(condition = "input.tabs_full_factor == 'Summary'",
         checkboxInput("ff_fsort", "Sort", value = state_init("ff_fsort",FALSE))
       ),
       selectInput("ff_rotation", label = "rotation:", ff_rotation,
@@ -53,23 +53,23 @@ output$ui_full_factor <- renderUI({
           tags$td(actionButton("ff_store", "Store"), style="padding-top:30px;")
         )
       )
-  	),
-		help_and_report(modal_title = "Factor",
-		                fun_name = "full_factor",
-		                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/full_factor.md")))
-	)
+    ),
+    help_and_report(modal_title = "Factor",
+                    fun_name = "full_factor",
+                    help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/full_factor.md")))
+  )
 })
 
 ff_plot <- reactive({
   nrFact <- min(input$ff_nr_fact, length(input$ff_vars))
- 	nrPlots <- (nrFact * (nrFact - 1)) / 2
+  nrPlots <- (nrFact * (nrFact - 1)) / 2
 
-	plot_height <- plot_width <- 350
-	if (nrPlots > 2)
-		plot_height <- 350 * ceiling(nrPlots/2)
+  plot_height <- plot_width <- 350
+  if (nrPlots > 2)
+    plot_height <- 350 * ceiling(nrPlots/2)
 
-	if (nrPlots > 1)
-		plot_width <- 700
+  if (nrPlots > 1)
+    plot_width <- 700
 
   list(plot_width = plot_width, plot_height = plot_height)
 })
@@ -82,25 +82,25 @@ ff_plot_height <- function()
 
 output$full_factor <- renderUI({
 
-		register_print_output("summary_full_factor", ".summary_full_factor")
-		register_plot_output("plot_full_factor", ".plot_full_factor",
-                         	width_fun = "ff_plot_width",
-                         	height_fun = "ff_plot_height")
+    register_print_output("summary_full_factor", ".summary_full_factor")
+    register_plot_output("plot_full_factor", ".plot_full_factor",
+                          width_fun = "ff_plot_width",
+                          height_fun = "ff_plot_height")
 
-	  ff_output_panels <- tabsetPanel(
-	    id = "tabs_full_factor",
-	    tabPanel("Summary",
+    ff_output_panels <- tabsetPanel(
+      id = "tabs_full_factor",
+      tabPanel("Summary",
         downloadLink("dl_ff_loadings", "", class = "fa fa-download alignright"), br(),
         verbatimTextOutput("summary_full_factor")),
-	    tabPanel("Plot",
+      tabPanel("Plot",
         plot_downloader("full_factor", height = ff_plot_height),
         plotOutput("plot_full_factor", height = "100%"))
-	  )
+    )
 
-		stat_tab_panel(menu = "Multivariate > Factor",
-  	               tool = "Factor",
-		               tool_ui = "ui_full_factor",
-		             	 output_panels = ff_output_panels)
+    stat_tab_panel(menu = "Multivariate > Factor",
+                   tool = "Factor",
+                   tool_ui = "ui_full_factor",
+                   output_panels = ff_output_panels)
 })
 
 .ff_available <- reactive({
@@ -114,13 +114,13 @@ output$full_factor <- renderUI({
 
 .full_factor <- eventReactive(input$ff_run, {
   withProgress(message = 'Estimating factor solution', value = 1,
-	  do.call(full_factor, ff_inputs())
+    do.call(full_factor, ff_inputs())
   )
 })
 
 .summary_full_factor <- reactive({
   if (.ff_available() != "available") return(.ff_available())
-	if (is_not(input$ff_nr_fact)) return("Number of factors should be >= 1.")
+  if (is_not(input$ff_nr_fact)) return("Number of factors should be >= 1.")
   summary(.full_factor(), cutoff = input$ff_cutoff, fsort = input$ff_fsort)
 })
 

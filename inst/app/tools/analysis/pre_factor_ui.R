@@ -18,11 +18,11 @@ pf_inputs <- reactive({
 })
 
 output$ui_pf_vars <- renderUI({
-	isNum <- "numeric" == .getclass() | "integer" == .getclass()
- 	vars <- varnames()[isNum]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
   selectInput(inputId = "pf_vars", label = "Variables:", choices = vars,
-  	selected = state_multiple("pf_vars",vars),
-  	multiple = TRUE, size = min(15, length(vars)), selectize = FALSE)
+    selected = state_multiple("pf_vars",vars),
+    multiple = TRUE, size = min(15, length(vars)), selectize = FALSE)
 })
 
 output$ui_pre_factor <- renderUI({
@@ -41,13 +41,13 @@ output$ui_pre_factor <- renderUI({
         numericInput("pf_cutoff", "Plot cutoff:", min = 0, max = 2, value = state_init("pf_cutoff",0.1), step = .05)
       )
     ),
-  	wellPanel(
-	  	uiOutput("ui_pf_vars")
+    wellPanel(
+      uiOutput("ui_pf_vars")
     ),
     help_and_report(modal_title = "Pre-factor analysis",
                     fun_name = "pre_factor",
                     help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/pre_factor.md")))
- 	)
+  )
 })
 
 pf_plot <- reactive({
@@ -62,12 +62,12 @@ pf_plot_height <- function()
 
 output$pre_factor <- renderUI({
 
-	register_print_output("summary_pre_factor", ".summary_pre_factor")
-	register_plot_output("plot_pre_factor", ".plot_pre_factor",
-                       	width_fun = "pf_plot_width",
-                       	height_fun = "pf_plot_height")
+  register_print_output("summary_pre_factor", ".summary_pre_factor")
+  register_plot_output("plot_pre_factor", ".plot_pre_factor",
+                        width_fun = "pf_plot_width",
+                        height_fun = "pf_plot_height")
 
-	## two outputs in a summary and plot tab
+  ## two outputs in a summary and plot tab
   pf_output_panels <- tabsetPanel(
      id = "tabs_pre_factor",
      tabPanel("Summary", verbatimTextOutput("summary_pre_factor")),
@@ -76,10 +76,10 @@ output$pre_factor <- renderUI({
               plotOutput("plot_pre_factor", height = "100%"))
   )
 
-	stat_tab_panel(menu = "Multivariate > Factor",
-	              tool = "Pre-factor",
-	              tool_ui = "ui_pre_factor",
-	             	output_panels = pf_output_panels)
+  stat_tab_panel(menu = "Multivariate > Factor",
+                tool = "Pre-factor",
+                tool_ui = "ui_pre_factor",
+                output_panels = pf_output_panels)
 })
 
 .pre_factor <- eventReactive(input$pf_run, {
@@ -89,9 +89,9 @@ output$pre_factor <- renderUI({
 })
 
 .summary_pre_factor <- reactive({
-	if (not_available(input$pf_vars))
-		return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
-	if (length(input$pf_vars) < 2) return("Please select two or more numeric variables")
+  if (not_available(input$pf_vars))
+    return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+  if (length(input$pf_vars) < 2) return("Please select two or more numeric variables")
   if (not_pressed(input$pf_run)) return("** Press the Estimate button to generate factor analysis diagnostics **")
 
   summary(.pre_factor())

@@ -31,8 +31,8 @@ output$ui_km_vars <- renderUI({
   }
 
   selectInput(inputId = "km_vars", label = "Variables:", choices = vars,
-	  selected = state_multiple("km_vars", vars, input$hc_vars),
-	  multiple = TRUE, size = min(8, length(vars)), selectize = FALSE)
+    selected = state_multiple("km_vars", vars, input$hc_vars),
+    multiple = TRUE, size = min(8, length(vars)), selectize = FALSE)
 })
 
 output$ui_kclus <- renderUI({
@@ -49,37 +49,37 @@ output$ui_kclus <- renderUI({
                    multiple = FALSE)
       )
     ),
-  	wellPanel(
+    wellPanel(
       selectInput("km_fun", label = "Algorithm:", choices = km_algorithm,
         selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE),
-	    uiOutput("ui_km_vars"),
-		  checkboxInput(inputId = "km_hc_init", label = "Initial centers from HC",
-      	value = state_init('km_hc_init',FALSE)),
-	  	conditionalPanel(condition = "input.km_hc_init == true",
-	  		wellPanel(
-		  		selectInput("km_distance", label = "Distance measure:", choices = hc_distance,
-			     	selected = state_single("km_distance", hc_distance, "sq.euclidian"), multiple = FALSE),
-	  			selectInput("km_method", label = "Method:", choices = hc_method,
-			     	selected = state_single("km_method", hc_method, "ward.D"), multiple = FALSE)
-	  		)
-	  	),
-	  	conditionalPanel(condition = "input.km_hc_init == false",
-		    numericInput("km_seed", "Set random seed:", min = 0,
-		    	value = state_init('km_seed',1234))
-		  ),
-	    numericInput("km_nr_clus", "Number of clusters:", min = 2,
-	    	value = state_init('km_nr_clus',2)),
+      uiOutput("ui_km_vars"),
+      checkboxInput(inputId = "km_hc_init", label = "Initial centers from HC",
+        value = state_init('km_hc_init',FALSE)),
+      conditionalPanel(condition = "input.km_hc_init == true",
+        wellPanel(
+          selectInput("km_distance", label = "Distance measure:", choices = hc_distance,
+            selected = state_single("km_distance", hc_distance, "sq.euclidian"), multiple = FALSE),
+          selectInput("km_method", label = "Method:", choices = hc_method,
+            selected = state_single("km_method", hc_method, "ward.D"), multiple = FALSE)
+        )
+      ),
+      conditionalPanel(condition = "input.km_hc_init == false",
+        numericInput("km_seed", "Set random seed:", min = 0,
+          value = state_init('km_seed',1234))
+      ),
+      numericInput("km_nr_clus", "Number of clusters:", min = 2,
+        value = state_init('km_nr_clus',2)),
       conditionalPanel(condition = "input.km_vars != null",
         tags$table(
           tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name","kclus"))),
           tags$td(actionButton("km_store", "Store"), style="padding-top:30px;")
         )
-		  )
-  	),
-  	help_and_report(modal_title = "K-clustering",
-  	                fun_name = "kclus",
-  	                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/kclus.md")))
-	)
+      )
+    ),
+    help_and_report(modal_title = "K-clustering",
+                    fun_name = "kclus",
+                    help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/kclus.md")))
+  )
 })
 
 km_plot <- reactive({
@@ -95,25 +95,25 @@ km_plot_height <- function()
 # output is called from the main radiant ui.R
 output$kclus <- renderUI({
 
-		register_print_output("summary_kclus", ".summary_kclus")
-		register_plot_output("plot_kclus", ".plot_kclus",
-                         	width_fun = "km_plot_width",
-                         	height_fun = "km_plot_height")
+    register_print_output("summary_kclus", ".summary_kclus")
+    register_plot_output("plot_kclus", ".plot_kclus",
+                          width_fun = "km_plot_width",
+                          height_fun = "km_plot_height")
 
-	  km_output_panels <- tabsetPanel(
-	    id = "tabs_kclus",
-	    tabPanel("Summary",
+    km_output_panels <- tabsetPanel(
+      id = "tabs_kclus",
+      tabPanel("Summary",
         downloadLink("dl_km_means", "", class = "fa fa-download alignright"), br(),
         verbatimTextOutput("summary_kclus")),
-	    tabPanel("Plot",
+      tabPanel("Plot",
         plot_downloader("kclus", height = km_plot_height),
         plotOutput("plot_kclus", height = "100%"))
-	  )
+    )
 
-		stat_tab_panel(menu = "Multivariate > Cluster",
-		               tool = "K-clustering",
-		               tool_ui = "ui_kclus",
-		             	 output_panels = km_output_panels)
+    stat_tab_panel(menu = "Multivariate > Cluster",
+                   tool = "K-clustering",
+                   tool_ui = "ui_kclus",
+                   output_panels = km_output_panels)
 })
 
 .km_available <- reactive({

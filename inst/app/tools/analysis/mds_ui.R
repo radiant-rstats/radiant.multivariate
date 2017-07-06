@@ -30,35 +30,35 @@ mds_plot_inputs <- reactive({
 })
 
 output$ui_mds_id1 <- renderUI({
-	isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .getclass() | "factor" == .getclass()
   vars <- varnames()[isLabel]
   selectInput(inputId = "mds_id1", label = "ID 1:", choices = vars,
-   	selected = state_single("mds_id1",vars), multiple = FALSE)
+    selected = state_single("mds_id1",vars), multiple = FALSE)
 })
 
 output$ui_mds_id2 <- renderUI({
   # if (not_available(input$mds_id1)) return()
-	isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .getclass() | "factor" == .getclass()
   vars <- varnames()[isLabel]
   if (length(vars) > 0) vars <- vars[-which(vars == input$mds_id1)]
   selectInput(inputId = "mds_id2", label = "ID 2:", choices = vars,
-   	selected = state_single("mds_id2",vars), multiple = FALSE)
+    selected = state_single("mds_id2",vars), multiple = FALSE)
 })
 
 output$ui_mds_dis <- renderUI({
   # if (not_available(input$mds_id2)) return()
- 	isNum <- "numeric" == .getclass() | "integer" == .getclass()
- 	vars <- varnames()[isNum]
+  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  vars <- varnames()[isNum]
   selectInput(inputId = "mds_dis", label = "Dissimilarity:", choices = vars,
-   	selected = state_single("mds_dis",vars), multiple = FALSE)
+    selected = state_single("mds_dis",vars), multiple = FALSE)
 })
 
 output$ui_mds_rev_dim <- renderUI({
-	rev_list <- list()
-	rev_list[paste("dimension",1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
-	checkboxGroupInput("mds_rev_dim", "Reverse:", rev_list,
-   	selected = state_group("mds_rev_dim", ""),
-   	inline = TRUE)
+  rev_list <- list()
+  rev_list[paste("dimension",1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
+  checkboxGroupInput("mds_rev_dim", "Reverse:", rev_list,
+    selected = state_group("mds_rev_dim", ""),
+    inline = TRUE)
 })
 
 output$ui_mds <- renderUI({
@@ -67,25 +67,25 @@ output$ui_mds <- renderUI({
     wellPanel(
       actionButton("mds_run", "Estimate", width = "100%")
     ),
-  	wellPanel(
-	  	uiOutput("ui_mds_id1"),
-	  	uiOutput("ui_mds_id2"),
-	  	uiOutput("ui_mds_dis"),
-		  radioButtons(inputId = "mds_method", label = NULL, mds_method,
-		   	selected = state_init("mds_method", "metric"),
-		   	inline = TRUE),
-		  radioButtons(inputId = "mds_nr_dim", label = NULL, mds_nr_dim,
-		   	selected = state_init("mds_nr_dim", 2),
-		   	inline = TRUE),
-	 	 	conditionalPanel(condition = "input.tabs_mds == 'Plot'",
-	 	 		numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz",1.3), .5, 4, .1),
-		  	uiOutput("ui_mds_rev_dim")
-	    )
-	  ),
-		help_and_report(modal_title = "(Dis)similarity based brand maps (MDS)",
-		                fun_name = "mds",
-		                help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/mds.md")))
-	)
+    wellPanel(
+      uiOutput("ui_mds_id1"),
+      uiOutput("ui_mds_id2"),
+      uiOutput("ui_mds_dis"),
+      radioButtons(inputId = "mds_method", label = NULL, mds_method,
+        selected = state_init("mds_method", "metric"),
+        inline = TRUE),
+      radioButtons(inputId = "mds_nr_dim", label = NULL, mds_nr_dim,
+        selected = state_init("mds_nr_dim", 2),
+        inline = TRUE),
+      conditionalPanel(condition = "input.tabs_mds == 'Plot'",
+        numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz",1.3), .5, 4, .1),
+        uiOutput("ui_mds_rev_dim")
+      )
+    ),
+    help_and_report(modal_title = "(Dis)similarity based brand maps (MDS)",
+                    fun_name = "mds",
+                    help_file = inclMD(file.path(getOption("radiant.path.multivariate"),"app/tools/help/mds.md")))
+  )
 })
 
 mds_plot <- eventReactive(input$mds_run, {
@@ -102,23 +102,23 @@ mds_plot_height <- function()
   mds_plot() %>% { if (is.list(.)) .$plot_height else 650 }
 
 output$mds <- renderUI({
-		register_print_output("summary_mds", ".summary_mds")
-		register_plot_output("plot_mds", ".plot_mds",
-                         	width_fun = "mds_plot_width",
-                         	height_fun = "mds_plot_height")
+    register_print_output("summary_mds", ".summary_mds")
+    register_plot_output("plot_mds", ".plot_mds",
+                          width_fun = "mds_plot_width",
+                          height_fun = "mds_plot_height")
 
-	  mds_output_panels <- tabsetPanel(
-	    id = "tabs_mds",
-	    tabPanel("Summary", verbatimTextOutput("summary_mds")),
-	    tabPanel("Plot",
+    mds_output_panels <- tabsetPanel(
+      id = "tabs_mds",
+      tabPanel("Summary", verbatimTextOutput("summary_mds")),
+      tabPanel("Plot",
                plot_downloader("mds", height = mds_plot_height),
                plotOutput("plot_mds", height = "100%"))
-	  )
+    )
 
-		stat_tab_panel(menu = "Multivariate > Maps",
-		              tool = "(Dis)similarity",
-		              tool_ui = "ui_mds",
-		             	output_panels = mds_output_panels)
+    stat_tab_panel(menu = "Multivariate > Maps",
+                  tool = "(Dis)similarity",
+                  tool_ui = "ui_mds",
+                  output_panels = mds_output_panels)
 })
 
 .mds_available <- reactive({
@@ -130,7 +130,7 @@ output$mds <- renderUI({
 
 .mds <- eventReactive(input$mds_run, {
   withProgress(message = 'Generating MDS solution', value = 1,
-	  do.call(mds, mds_inputs())
+    do.call(mds, mds_inputs())
   )
 })
 
@@ -142,8 +142,8 @@ output$mds <- renderUI({
 .plot_mds <- reactive({
   if (.mds_available() != "available") return(.mds_available())
   .mds() %>%
-  	{ if (is.character(.)) .
-  	  else capture_plot( do.call(plot, c(list(x = .), mds_plot_inputs())) ) }
+    { if (is.character(.)) .
+      else capture_plot( do.call(plot, c(list(x = .), mds_plot_inputs())) ) }
 })
 
 observeEvent(input$mds_report, {
