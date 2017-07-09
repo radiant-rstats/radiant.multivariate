@@ -1,12 +1,14 @@
 # to avoid 'no visible binding for global variable' NOTE
-globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci","cent","r_environment"))
+globalVariables(c(".","y","nr_clus","nr_fact","height","bump","n","se","ci",
+	                "cent","r_environment"))
 
 #' radiant.multivariate
 #'
 #' @name radiant.multivariate
 #' @docType package
 #' @import radiant.data shiny ggplot2
-#' @importFrom dplyr select select_ filter mutate funs group_by group_by_ lag slice filter_ bind_rows mutate_all summarise_all
+#' @importFrom dplyr select select_at filter mutate mutate_if funs group_by group_by_at lag slice bind_rows mutate_all summarise_all
+#' @importFrom rlang .data
 #' @importFrom magrittr %>% %<>% %T>% set_colnames set_rownames set_names
 #' @importFrom gridExtra grid.arrange
 #' @importFrom scales percent

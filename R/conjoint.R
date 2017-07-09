@@ -47,14 +47,16 @@ conjoint <- function(dataset, rvar, evar,
     model_list <- list(full = list(model = NA, coeff = NA, tab = NA))
   }
 
-  # formula <- paste(rvar, "~", paste(evar, collapse = " + ")) %>% as.formula
   formula <- paste(rvar, "~", paste(vars, collapse = " + ")) %>% as.formula
 
   for (i in seq_along(levs)) {
-    if (!by == "none")
-      cdat <- filter_(dat, paste0(by, " == '", levs[i],"'")) %>% select_(.dots = setdiff(colnames(dat), by))
-    else
+    if (!by == "none") {
+      # cdat <- filter_(dat, paste0(by, " == '", levs[i],"'")) %>% 
+      cdat <- filter(dat, .data[[by]] == levs[i]) %>% 
+       select_at(.vars = setdiff(colnames(dat), by))
+    } else {
       cdat <- dat
+    }
 
     if (reverse)
       cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
@@ -407,7 +409,7 @@ plot.conjoint <- function(x, plots = "pw",
 the_table <- function(model, dat, evar) {
   if (is.character(model)) return(list("PW" = "No attributes selected."))
 
-  attr <- select_(dat, .dots = evar)
+  attr <- select_at(dat, .vars = evar)
   isFct <- sapply(attr, is.factor)
   if (sum(isFct) < ncol(attr)) return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
   levs <- lapply(attr[,isFct, drop = FALSE],levels)
@@ -415,7 +417,7 @@ the_table <- function(model, dat, evar) {
 
   nlevs <- sapply(levs,length)
   PW.df <- data.frame(rep(vars,nlevs), unlist(levs))
-  colnames(PW.df) <- c("Attributes","Levels")
+  colnames(PW.df) <- c("Attributes", "Levels")
   PW.df$PW <- 0
 
   ## Calculate PW and IW's when interactions are present

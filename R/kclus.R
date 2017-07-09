@@ -39,9 +39,9 @@ kclus <- function(dataset, vars,
   if (fun == "median" && length(vars) < 2)
     stop("K-medians requires at least two variables as input")
 
-  # converting factors to integer with first level = 1
+  ## converting factors to integer with first level = 1
   convert <- function(x) as.integer(x == levels(x)[1])
-  dat <- mutate_if_tmp(dat, is.factor, convert)
+  dat <- mutate_if(dat, is.factor, convert)
 
   if (hc_init) {
     init <- hclus(dat, vars, distance = distance, method = method, max_cases = Inf)
@@ -215,8 +215,8 @@ plot.kclus <- function(x, plots = "density",
     for (var in vars) {
 
       dat_summary <-
-        select_(x$dat, .dots = c(var, "Cluster"))  %>%
-        group_by_("Cluster") %>%
+        select_at(x$dat, .vars = c(var, "Cluster"))  %>%
+        group_by_at(.vars = "Cluster") %>%
         summarise_all(
           funs(
             cent = fun(.),

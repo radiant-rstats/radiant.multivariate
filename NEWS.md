@@ -1,3 +1,7 @@
+# CHANGES IN radiant.basics 0.8.7
+
+* Upgraded dplyr dependency to 0.7.1
+
 # CHANGES IN radiant.multivariate 0.8.2
 
 * Updated output formatting code to make coefficient information more easily accessible
