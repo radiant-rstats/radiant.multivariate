@@ -277,6 +277,10 @@ predict_conjoint_by <- function(object, pfun,
 
   if (is.character(object)) return(object)
 
+  ## ensure you have a name for the prediction dataset
+  if (!is.character(pred_data)) 
+    attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
+
   pred <- list()
   levs <- object$levs
 
@@ -309,9 +313,8 @@ predict_conjoint_by <- function(object, pfun,
 #' @importFrom radiant.model print_predict_model
 #'
 #' @export
-print.conjoint.predict <- function(x, ..., n = 50) {
+print.conjoint.predict <- function(x, ..., n = 50) 
   print_predict_model(x, ..., n = n, header = "Conjoint Analysis")
-}
 
 #' Plot method for the conjoint function
 #'
@@ -334,7 +337,8 @@ print.conjoint.predict <- function(x, ..., n = 50) {
 #' @seealso \code{\link{summary.conjoint}} to summarize results
 #'
 #' @export
-plot.conjoint <- function(x, plots = "pw",
+plot.conjoint <- function(x, 
+                          plots = "pw",
                           show = "",
                           scale_plot = FALSE,
                           shiny = FALSE,
