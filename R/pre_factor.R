@@ -44,7 +44,7 @@ pre_factor <- function(dataset, vars,
       pre_r2 <- {1 - (1 / diag(scmat))} %>%
         data.frame %>%
         set_colnames("Rsq")
-  }
+    }
   } else {
     pre_r2 <- err_mess
   }
