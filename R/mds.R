@@ -36,9 +36,9 @@ mds <- function(dataset, id1, id2, dis,
   dat <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
   if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
-  d <- dat[,dis]
-  id1_dat <- dat[ ,id1] %>% as.character
-  id2_dat <- dat[ ,id2] %>% as.character
+  d <- dat[[dis]]
+  id1_dat <- dat[[id1]] %>% as.character
+  id2_dat <- dat[[id2]] %>% as.character
   rm(dat)
 
   ## ids

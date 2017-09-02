@@ -26,11 +26,11 @@ pmap <- function(dataset, brand, attr,
                  data_filter = "") {
 
   nr_dim <- as.numeric(nr_dim)
-  vars <- c(brand,attr)
+  vars <- c(brand, attr)
   dat <- getdata(dataset, vars, filt = data_filter)
 
-  brands <- dat[,1] %>% as.character %>% gsub("^\\s+|\\s+$", "", .)
-  f_data <- dat[,-1]
+  brands <- dat[[1]] %>% as.character %>% gsub("^\\s+|\\s+$", "", .)
+  f_data <- dat[, -1, drop = FALSE]
   nrObs <- nrow(dat)
 
   # in case : is used
