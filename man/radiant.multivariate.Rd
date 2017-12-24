@@ -7,13 +7,23 @@
 \alias{radiant.multivariate}
 \title{radiant.multivariate}
 \usage{
-radiant.multivariate()
+radiant.multivariate(run = "browser")
+}
+\arguments{
+\item{run}{Run radiant.multivariate in an external browser ("browser") or in the Rstudio viewer ("viewer")}
 }
 \description{
 radiant.multivariate
 
-Launch Radiant in the default browser
+Launch radiant.multivariate in default browser or Rstudio Viewer
 }
 \details{
 See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+}
+\examples{
+\dontrun{
+radiant.multivariate::radiant.multivariate()
+radiant.multivariate::radiant.multivariate("viewer")
+}
+
 }
