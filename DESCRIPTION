@@ -11,10 +11,10 @@ Depends:
     R (>= 3.3.0),
     radiant.data (>= 0.8.9)
 Imports:
-    radiant.model (>= 0.8.7.4),
+    radiant.model (>= 0.8.9),
     shiny (>= 1.0.5),
     dplyr (>= 0.7.4),
-    rlang (>= 0.1.1),
+    rlang (>= 0.1.6),
     ggplot2 (>= 2.2.1),
     gridExtra (>= 2.0.0),
     scales (>= 0.4.0),
@@ -27,6 +27,7 @@ Imports:
     import (>= 1.1.0),
     Gmedian (>= 1.2.3),
     pryr (>= 0.1.2),
+    rstudioapi (>= 0.7),
     methods
 Suggests:
     testthat (>= 2.0.0)
