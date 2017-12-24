@@ -28,7 +28,6 @@ full_factor <- function(dataset, vars,
                         nr_fact = 1,
                         rotation = "varimax",
                         data_filter = "") {
-
   dat <- getdata(dataset, vars, filt = data_filter)
   if (!is_string(dataset)) {
     dataset <- deparse(substitute(dataset)) %>%
@@ -41,28 +40,34 @@ full_factor <- function(dataset, vars,
       add_class("full_factor"))
   }
 
-  nrFac <- max(1,as.numeric(nr_fact))
+  nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dat)) {
     cat("The number of factors cannot exceed the number of variables.\n")
     nrFac <- ncol(dat)
   }
 
   if (method == "PCA") {
-    fres <- psych::principal(dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
-                             oblique.scores = FALSE)
+    fres <- psych::principal(
+      dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      oblique.scores = FALSE
+    )
   } else {
-    fres <- psych::fa(dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
-                      oblique.scores = FALSE, fm = "ml")
+    fres <- psych::fa(
+      dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      oblique.scores = FALSE, fm = "ml"
+    )
   }
 
   ## convert loadings object to data.frame
   floadings <-
     fres$loadings %>%
-     {dn <- dimnames(.)
+    {
+      dn <- dimnames(.)
       matrix(., nrow = length(dn[[1]])) %>%
-      set_colnames(., dn[[2]]) %>%
-      set_rownames(., dn[[1]]) %>%
-      data.frame}
+        set_colnames(., dn[[2]]) %>%
+        set_rownames(., dn[[1]]) %>%
+        data.frame()
+    }
 
   as.list(environment()) %>% add_class("full_factor")
 }
@@ -97,13 +102,13 @@ summary.full_factor <- function(object,
                                 fsort = FALSE,
                                 dec = 2,
                                 ...) {
-
   if (is.character(object)) return(cat(object))
 
   cat("Factor analysis\n")
   cat("Data        :", object$dataset, "\n")
-  if (object$data_filter %>% gsub("\\s","",.) != "")
-    cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
+  if (object$data_filter %>% gsub("\\s", "", .) != "") {
+    cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
+  }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
   cat("# factors   :", object$nr_fact, "\n")
   cat("Method      :", object$method, "\n")
@@ -113,32 +118,32 @@ summary.full_factor <- function(object,
   cat("\nFactor loadings:\n")
 
   ## show only the loadings > cutoff
-  with(object, clean_loadings(floadings, cutoff, fsort, dec)) %>% print
+  with(object, clean_loadings(floadings, cutoff, fsort, dec)) %>% print()
 
   ## fit measures
   cat("\nFit measures:\n")
-  colSums(object$floadings^2) %>%
+  colSums(object$floadings ^ 2) %>%
     rbind(., . / nrow(object$floadings)) %>%
-    rbind(., cumsum(.[2,])) %>%
-    as.data.frame %>%
+    rbind(., cumsum(.[2, ])) %>%
+    as.data.frame() %>%
     formatdf(dec = dec) %>%
-    set_rownames(c("Eigenvalues","Variance %","Cumulative %")) %>%
-    print
+    set_rownames(c("Eigenvalues", "Variance %", "Cumulative %")) %>%
+    print()
 
   # results from psych - uncomment to validate results
   # object$fres$loadings %>%
-    # { if (fsort) psych::fa.sort(.) else . } %>%
-    # print(cutoff = cutoff, digits = 2)
+  # { if (fsort) psych::fa.sort(.) else . } %>%
+  # print(cutoff = cutoff, digits = 2)
 
   cat("\nAttribute communalities:")
-  data.frame(1 - object$fres$uniqueness) %>%
+  data.frame(1 - object$fres$uniqueness, stringsAsFactors = FALSE) %>%
     formatdf(dec = dec, perc = TRUE) %>%
     set_rownames(object$vars) %>%
     set_colnames("") %>%
-    print
+    print()
 
   cat("\nFactor scores (max 10 shown):\n")
-  as.data.frame(object$fres$scores) %>%
+  as.data.frame(object$fres$scores, stringsAsFactors = FALSE) %>%
     .[1:min(nrow(.), 10), , drop = FALSE] %>%
     formatdf(dec = dec) %>%
     print(row.names = FALSE)
@@ -164,16 +169,17 @@ summary.full_factor <- function(object,
 #'
 #' @export
 plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
-
-  object <- x; rm(x)
+  object <- x
+  rm(x)
 
   ## when no analysis was conducted (e.g., no variables selected)
-  if (is.character(object))
-    return(plot(x = 1, type = 'n', main = object, axes = FALSE, xlab = "", ylab = ""))
+  if (is.character(object)) {
+    return(plot(x = 1, type = "n", main = object, axes = FALSE, xlab = "", ylab = ""))
+  }
 
   if (object$fres$factors < 2) {
     object <- "Plots require two or more factors"
-    return(plot(x = 1, type = 'n', main = object, axes = FALSE, xlab = "", ylab = ""))
+    return(plot(x = 1, type = "n", main = object, axes = FALSE, xlab = "", ylab = ""))
   }
 
   df <- object$floadings
@@ -181,26 +187,33 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
   cnames <- colnames(df)
   plot_list <- list()
   pnr <- 1
-  ab_df <- data.frame(a = c(0,0), b = c(1, 0))
+  ab_df <- data.frame(a = c(0, 0), b = c(1, 0))
   for (i in 1:(length(cnames) - 1)) {
     for (j in (i + 1):length(cnames)) {
-      i_name <- cnames[i]; j_name <- cnames[j]
-      df2 <- cbind(df[, c(i_name,j_name)],rnames)
-      plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = 'rnames', label = 'rnames')) +
+      i_name <- cnames[i]
+      j_name <- cnames[j]
+      df2 <- cbind(df[, c(i_name, j_name)], rnames)
+      plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
         geom_text() +
         theme(legend.position = "none") +
-        xlim(-1,1) + ylim(-1,1) +
+        xlim(-1, 1) + ylim(-1, 1) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
       pnr <- pnr + 1
     }
   }
 
-  if (custom)
-    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+  if (custom) {
+    if (length(plot_list) == 1) {
+      return(plot_list[[1]])
+    } else {
+      return(plot_list)
+    }
+  }
 
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list),2))) %>%
-    {if (shiny) . else print(.)}
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>% {
+    if (shiny) . else print(.)
+  }
 }
 
 #' Store factor scores to active dataset
@@ -223,15 +236,15 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
 #' @export
 store.full_factor <- function(object, ..., name = "") {
   ## membership variable name
-  fscores <- as.data.frame(object$fres$scores)
+  fscores <- as.data.frame(object$fres$scores, stringsAsFactors = FALSE)
   if (is_empty(name)) name <- "factor"
 
   dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
   indr <- indexr(dat, object$vars, object$data_filter)
-  fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)))
+  fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)), stringsAsFactors = FALSE)
   fs[indr$ind, ] <- fscores
 
-  changedata(dat, vars = fs, var_names = paste0(name,1:ncol(fscores)))
+  changedata(dat, vars = fs, var_names = paste0(name, 1:ncol(fscores)))
 }
 
 #' Sort and clean loadings
@@ -254,9 +267,9 @@ clean_loadings <- function(floadings,
                            cutoff = 0,
                            fsort = FALSE,
                            dec = 8) {
-
-  floadings %<>%
-    {if (fsort) select(psych::fa.sort(.), -order) else .}
+  floadings %<>% {
+    if (fsort) select(psych::fa.sort(.), -order) else .
+  }
 
   if (cutoff == 0) {
     floadings %<>% round(dec)

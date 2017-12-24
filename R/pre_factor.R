@@ -19,7 +19,6 @@
 #' @export
 pre_factor <- function(dataset, vars,
                        data_filter = "") {
-
   dat <- getdata(dataset, vars, filt = data_filter)
   nrObs <- nrow(dat)
 
@@ -27,7 +26,7 @@ pre_factor <- function(dataset, vars,
 
   if (nrObs <= ncol(dat)) {
     return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
-           add_class("pre_factor"))
+      add_class("pre_factor"))
   }
 
   cmat <- cor(dat)
@@ -38,11 +37,13 @@ pre_factor <- function(dataset, vars,
   err_mess <- "The selected variables are perfectly collinear. Please check the correlations\nand remove any variable with a correlation of 1 or -1 from the analysis"
   if (det(cmat) > 0) {
     scmat <- try(solve(cmat), silent = TRUE)
-    if (is(scmat, 'try-error')) {
+    if (is(scmat, "try-error")) {
       pre_r2 <- err_mess
     } else {
-      pre_r2 <- {1 - (1 / diag(scmat))} %>%
-        data.frame %>%
+      pre_r2 <- {
+        1 - (1 / diag(scmat))
+      } %>%
+        data.frame() %>%
         set_colnames("Rsq")
     }
   } else {
@@ -74,7 +75,6 @@ pre_factor <- function(dataset, vars,
 #'
 #' @export
 summary.pre_factor <- function(object, dec = 2, ...) {
-
   if (is.character(object)) return(cat(object))
 
   if (is.character(object$pre_r2)) {
@@ -84,18 +84,23 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 
   cat("Pre-factor analysis diagnostics\n")
   cat("Data        :", object$dataset, "\n")
-  if (object$data_filter %>% gsub("\\s","",.) != "")
-    cat("Filter      :", gsub("\\n","", object$data_filter), "\n")
-  cat("Variables   :", paste0(object$vars, collapse=", "), "\n")
+  if (object$data_filter %>% gsub("\\s", "", .) != "") {
+    cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
+  }
+  cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
   cat("Observations:", formatnr(object$nrObs, dec = 0), "\n")
 
   btest <- object$btest
   cat("\nBartlett test\n")
   cat("Null hyp. : variables are not correlated\n")
   cat("Alt. hyp. : variables are correlated\n")
-  bt <- object$btest$p.value %>% { if (. < .001) "< .001" else round(.,dec + 1) }
-  cat(paste0("Chi-square: ", round(object$btest$chisq,2), " df(",
-      object$btest$df, "), p.value ", bt, "\n"))
+  bt <- object$btest$p.value %>% {
+    if (. < .001) "< .001" else round(., dec + 1)
+  }
+  cat(paste0(
+    "Chi-square: ", round(object$btest$chisq, 2), " df(",
+    object$btest$df, "), p.value ", bt, "\n"
+  ))
 
   cat("\nKMO test: ", round(object$pre_kmo$MSA, dec), "\n")
   # cat("\nMeasures of sampling adequacy:\n")
@@ -105,19 +110,21 @@ summary.pre_factor <- function(object, dec = 2, ...) {
   data.frame(Rsq = object$pre_r2, KMO = object$pre_kmo$MSAi) %>%
     formatdf(dec = dec) %>%
     set_rownames(rownames(object$pre_r2)) %>%
-    print
+    print()
 
   ## fit measures,  using transposed format because there could be many factors
   cat("\nFit measures:\n")
   object$pre_eigen %>%
-    {data.frame(
-      ` ` = paste0("PC", 1:length(.)),
-      Eigenvalues = .,
-      `Variance %` = ./sum(.),
-      `Cumulative %` = cumsum(. / sum(.)),
-      check.names = FALSE
-    )} %>%
-    as.data.frame %>%
+    {
+      data.frame(
+        ` ` = paste0("PC", 1:length(.)),
+        Eigenvalues = .,
+        `Variance %` = . / sum(.),
+        `Cumulative %` = cumsum(. / sum(.)),
+        check.names = FALSE
+      )
+    } %>%
+    as.data.frame() %>%
     formatdf(dec = dec) %>%
     print(row.names = FALSE)
 }
@@ -141,15 +148,17 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #'
 #' @export
-plot.pre_factor <- function(x, plots = c("scree","change"),
+plot.pre_factor <- function(x, plots = c("scree", "change"),
                             cutoff = 0.2,
                             shiny = FALSE,
                             custom = FALSE,
                             ...) {
-
-  object <- x; rm(x)
+  object <- x
+  rm(x)
   if (is.character(object) || is.character(object$pre_r2) ||
-      length(plots) == 0) return(invisible())
+    length(plots) == 0) {
+    return(invisible())
+  }
 
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
 
@@ -168,19 +177,35 @@ plot.pre_factor <- function(x, plots = c("scree","change"),
 
   if ("change" %in% plots) {
     plot_list[[which("change" == plots)]] <- pre_eigen %>%
-      {(. - lag(.)) / lag(.)} %>%
-      {. / min(., na.rm = TRUE)} %>%
-        data.frame(bump = ., nr_fact = paste0(0:(length(.) - 1), "-", 1:length(.))) %>%
-        na.omit() %>%
-        ggplot(aes(x = factor(nr_fact, levels = nr_fact), y = bump)) +
-          geom_bar(stat = "identity", alpha = .5, fill = "blue") +
-          labs(list(title = paste("Change in Eigenvalues"),
-               x = "# factors", y = "Rate of change index"))
+      {
+        (. - lag(.)) / lag(.)
+      } %>%
+      {
+        . / min(., na.rm = TRUE)
+      } %>%
+      data.frame(
+        bump = .,
+        nr_fact = paste0(0:(length(.) - 1), "-", 1:length(.)),
+        stringsAsFactors = FALSE
+      ) %>%
+      na.omit() %>%
+      ggplot(aes(x = factor(nr_fact, levels = nr_fact), y = bump)) +
+      geom_bar(stat = "identity", alpha = .5, fill = "blue") +
+      labs(list(
+        title = paste("Change in Eigenvalues"),
+        x = "# factors", y = "Rate of change index"
+      ))
   }
 
-  if (custom)
-    if (length(plot_list) == 1) return(plot_list[[1]]) else return(plot_list)
+  if (custom) {
+    if (length(plot_list) == 1) {
+      return(plot_list[[1]]) 
+    } else {
+      return(plot_list)
+    }
+  }
 
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
-     {if (shiny) . else print(.)}
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>% {
+    if (shiny) . else print(.)
+  }
 }
