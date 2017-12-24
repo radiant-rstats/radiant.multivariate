@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate 0.8.7.4
+# CHANGES IN radiant.multivariate 0.8.9
 
 * Upgraded tidyr dependency to 0.7
 * Fix for `pmap` and `mds` when a tibble is passed  
