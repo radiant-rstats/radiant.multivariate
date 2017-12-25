@@ -164,6 +164,7 @@ observeEvent(input$full_factor_report, {
     inp_main = clean_args(ff_inputs(), ff_args),
     fun_name = "full_factor",
     inp_out = inp_out,
+    wrap = TRUE,
     fig.width = ff_plot_width(),
     fig.height = ff_plot_height(),
     xcmd = xcmd

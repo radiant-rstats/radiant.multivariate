@@ -137,8 +137,11 @@ observeEvent(input$pre_factor_report, {
   }
   update_report(
     inp_main = clean_args(pf_inputs(), pf_args),
-    fun_name = "pre_factor", inp_out = inp_out,
-    outputs = outputs, figs = figs,
+    fun_name = "pre_factor", 
+    inp_out = inp_out,
+    outputs = outputs, 
+    wrap = TRUE,
+    figs = figs,
     fig.width = pf_plot_width(),
     fig.height = pf_plot_height()
   )

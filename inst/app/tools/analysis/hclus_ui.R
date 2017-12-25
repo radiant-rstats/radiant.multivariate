@@ -188,6 +188,7 @@ observeEvent(input$hclus_report, {
     fun_name = "hclus",
     inp_out = inp_out,
     outputs = outputs,
+    wrap = TRUE,
     figs = figs,
     fig.width = hc_plot_width(),
     fig.height = hc_plot_height()

@@ -499,8 +499,11 @@ observeEvent(input$conjoint_report, {
   }
   update_report(
     inp_main = clean_args(ca_inputs(), ca_args),
-    fun_name = "conjoint", inp_out = inp_out,
-    outputs = outputs, figs = figs,
+    fun_name = "conjoint", 
+    inp_out = inp_out,
+    outputs = outputs, 
+    wrap = TRUE,
+    figs = figs,
     fig.width = ca_plot_width(),
     fig.height = ca_plot_height(),
     xcmd = xcmd

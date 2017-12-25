@@ -191,8 +191,11 @@ observeEvent(input$kclus_report, {
   }
   update_report(
     inp_main = clean_args(km_inputs(), km_args),
-    fun_name = "kclus", inp_out = inp_out,
-    outputs = outputs, figs = figs,
+    fun_name = "kclus", 
+    inp_out = inp_out,
+    outputs = outputs, 
+    wrap = TRUE,
+    figs = figs,
     fig.width = km_plot_width(),
     fig.height = km_plot_height(),
     xcmd = paste0("# store(result, name = \"", input$km_store_name, "\")\n# write.csv(result$clus_means, file = \"~/kclus.csv\")")
@@ -205,9 +208,8 @@ output$dl_km_means <- downloadHandler(
   },
   content = function(file) {
     if (pressed(input$km_run)) {
-      .kclus() %>% {
-        if (is.list(.)) write.csv(.$clus_means, file = file)
-      }
+      .kclus() %>% 
+        {if (is.list(.)) write.csv(.$clus_means, file = file)}
     } else {
       cat("No output available. Press the Estimate button to generate the cluster solution", file = file)
     }
@@ -217,8 +219,7 @@ output$dl_km_means <- downloadHandler(
 ## store cluster membership
 observeEvent(input$km_store, {
   if (pressed(input$km_run)) {
-    .kclus() %>% {
-      if (is.list(.)) store(., name = input$km_store_name)
-    }
+    .kclus() %>% 
+      {if (is.list(.)) store(., name = input$km_store_name)}
   }
 })

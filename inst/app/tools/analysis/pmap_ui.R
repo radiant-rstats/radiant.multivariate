@@ -204,9 +204,13 @@ observeEvent(input$pmap_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$pm_cutoff, dec = 2), "")
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
+  inp <- clean_args(pm_inputs(), pm_args)
+  if (!is_empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
   update_report(
-    inp_main = clean_args(pm_inputs(), pm_args),
-    fun_name = "pmap", inp_out = inp_out,
+    inp_main = inp,
+    fun_name = "pmap", 
+    inp_out = inp_out,
+    wrap = TRUE,
     fig.width = pm_plot_width(),
     fig.height = pm_plot_height(),
     xcmd = paste0("# store(result, name = '", input$pm_store_name, "')")

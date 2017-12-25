@@ -2,6 +2,7 @@
 
 * Upgraded tidyr dependency to 0.7
 * Fix for `pmap` and `mds` when a tibble is passed  
+* Long lines of code generated for _R > Report_ will be wrapped to enhance readability 
 
 # CHANGES IN radiant.multivariate 0.8.7.1
 
