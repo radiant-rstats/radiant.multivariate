@@ -1,4 +1,9 @@
-Name: Radiant - Multivariate
-Description: Start Radiant - Multivariate
+Name: radiant.multivariate (viewer)
+Description: Start radiant.multivariate in rstudio viewer
+Binding: radiant.multivariate_viewer
+Interactive: true
+
+Name: radiant.multivariate (browser)
+Description: Start radiant.multivariate in default browser
 Binding: radiant.multivariate
 Interactive: true

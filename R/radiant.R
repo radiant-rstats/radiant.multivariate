@@ -1,32 +1,25 @@
-#' Launch radiant.multivariate in default browser or Rstudio Viewer
+#' Launch radiant.multivariate in default browser
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
-#' @param run Run radiant.multivariate in an external browser ("browser") or in the Rstudio viewer ("viewer")
-#'
-#' @importFrom rstudioapi viewer
+#' @importFrom radiant.data launch
 #'
 #' @examples
 #' \dontrun{
-#' radiant.multivariate::radiant.multivariate()
-#' radiant.multivariate::radiant.multivariate("viewer")
+#' radiant.multivariate()
 #' }
-#'
 #' @export
-radiant.multivariate <- function(run = "browser") {
-  if (!"package:radiant.multivariate" %in% search()) {
-    if (!sshhr(require(radiant.multivariate))) {
-      stop("\nCalling radiant.multivariate start function but radiant.multivariate is not installed.")
-    }
-  }
-  run <- if (run == "viewer") {
-    message("\nStarting radiant.multivariate in Rstudio Viewer ...")
-    rstudioapi::viewer
-  } else {
-    message("\nStarting radiant.multivariate in default browser ...\n\nUse radiant.multivariate::radiant.multivariate(\"viewer\") to open radiant.multivariate in Rstudio Viewer")
-    TRUE
-  }
-  suppressPackageStartupMessages(
-    shiny::runApp(system.file("app", package = "radiant.multivariate"), launch.browser = run)
-  )
-}
+radiant.multivariate <- function() radiant.data::launch(package = "radiant.multivariate", run = "browser")
+
+#' Launch radiant.multivariate in the Rstudio viewer
+#'
+#' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#'
+#' @importFrom radiant.data launch
+#'
+#' @examples
+#' \dontrun{
+#' radiant.multivariate_viewer()
+#' }
+#' @export
+radiant.multivariate_viewer <- function() radiant.data::launch(package = "radiant.multivariate", run = "viewer")
