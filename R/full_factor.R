@@ -66,7 +66,7 @@ full_factor <- function(dataset, vars,
       matrix(., nrow = length(dn[[1]])) %>%
         set_colnames(., dn[[2]]) %>%
         set_rownames(., dn[[1]]) %>%
-        data.frame()
+        data.frame(stringsAsFactors = FALSE)
     }
 
   as.list(environment()) %>% add_class("full_factor")
@@ -125,7 +125,7 @@ summary.full_factor <- function(object,
   colSums(object$floadings ^ 2) %>%
     rbind(., . / nrow(object$floadings)) %>%
     rbind(., cumsum(.[2, ])) %>%
-    as.data.frame() %>%
+    as.data.frame(stringsAsFactors = FALSE) %>%
     formatdf(dec = dec) %>%
     set_rownames(c("Eigenvalues", "Variance %", "Cumulative %")) %>%
     print()
@@ -187,7 +187,7 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
   cnames <- colnames(df)
   plot_list <- list()
   pnr <- 1
-  ab_df <- data.frame(a = c(0, 0), b = c(1, 0))
+  ab_df <- data.frame(a = c(0, 0), b = c(1, 0), stringsAsFactors = FALSE)
   for (i in 1:(length(cnames) - 1)) {
     for (j in (i + 1):length(cnames)) {
       i_name <- cnames[i]

@@ -107,7 +107,7 @@ kclus <- function(dataset, vars,
     group_by(clus_var) %>%
     summarise_all(funs(mean(.))) %>%
     select(-clus_var) %>%
-    as.data.frame() %>%
+    as.data.frame(stringsAsFactors = FALSE) %>%
     set_rownames(clus_names)
 
   nr_obs <- length(km_out$cluster)
@@ -156,7 +156,7 @@ summary.kclus <- function(object, dec = 2, ...) {
 
   ## percentage of within cluster heterogeneity accounted for by each cluster
   cat("\nPercentage of within cluster heterogeneity accounted for by each cluster:\n")
-  data.frame(wcv = object$km_out$withinss / object$km_out$tot.withinss) %>%
+  data.frame(wcv = object$km_out$withinss / object$km_out$tot.withinss, stringsAsFactors = FALSE) %>%
     formatdf(perc = TRUE, dec = dec) %>%
     set_rownames(object$clus_names) %>%
     set_colnames("") %>%

@@ -43,7 +43,7 @@ pre_factor <- function(dataset, vars,
       pre_r2 <- {
         1 - (1 / diag(scmat))
       } %>%
-        data.frame() %>%
+        data.frame(stringsAsFactors = FALSE) %>%
         set_colnames("Rsq")
     }
   } else {
@@ -107,7 +107,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
   # print(object$pre_kmo$MSAi, digits = dec)
 
   cat("\nVariable collinearity:\n")
-  data.frame(Rsq = object$pre_r2, KMO = object$pre_kmo$MSAi) %>%
+  data.frame(Rsq = object$pre_r2, KMO = object$pre_kmo$MSAi, stringsAsFactors = FALSE) %>%
     formatdf(dec = dec) %>%
     set_rownames(rownames(object$pre_r2)) %>%
     print()
@@ -121,10 +121,10 @@ summary.pre_factor <- function(object, dec = 2, ...) {
         Eigenvalues = .,
         `Variance %` = . / sum(.),
         `Cumulative %` = cumsum(. / sum(.)),
-        check.names = FALSE
+        check.names = FALSE,
+        stringsAsFactors = FALSE
       )
     } %>%
-    as.data.frame() %>%
     formatdf(dec = dec) %>%
     print(row.names = FALSE)
 }
@@ -163,7 +163,7 @@ plot.pre_factor <- function(x, plots = c("scree", "change"),
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
 
   pre_eigen <- with(object, pre_eigen[pre_eigen > cutoff])
-  dat <- data.frame(y = pre_eigen, x = as.integer(1:length(pre_eigen)))
+  dat <- data.frame(y = pre_eigen, x = as.integer(1:length(pre_eigen)), stringsAsFactors = FALSE)
 
   plot_list <- list()
   if ("scree" %in% plots) {

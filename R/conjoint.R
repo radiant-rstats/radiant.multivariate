@@ -252,11 +252,11 @@ predict.conjoint <- function(object,
 
     if (!is(pred_val, "try-error")) {
       if (se) {
-        pred_val %<>% data.frame %>% mutate(diff = .[, 3] - .[, 1])
+        pred_val %<>% data.frame(stringsAsFactors = FALSE) %>% mutate(diff = .[, 3] - .[, 1])
         ci_perc <- ci_label(cl = conf_lev)
         colnames(pred_val) <- c("Prediction", ci_perc[1], ci_perc[2], "+/-")
       } else {
-        pred_val %<>% data.frame %>% select(1)
+        pred_val %<>% data.frame(stringsAsFactors = FALSE) %>% select(1)
         colnames(pred_val) <- "Prediction"
       }
     }

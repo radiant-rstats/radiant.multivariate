@@ -42,7 +42,6 @@ pmap <- function(dataset, brand, attr,
     rotate = "varimax", scores = FALSE, oblique.scores = FALSE
   ))
 
-  # m <- as.data.frame(fres$loadings[,colnames(fres$loadings)]) %>% as.matrix
   m <- fres$loadings[, colnames(fres$loadings)]
   cscm <- m %*% solve(crossprod(m))
   # store in fres so you can re-use save_factors
@@ -53,7 +52,7 @@ pmap <- function(dataset, brand, attr,
     vars <- c(vars, pref)
     pref_cor <- sshhr(getdata(dataset, pref, filt = data_filter)) %>%
       cor(fres$scores) %>%
-      data.frame()
+      data.frame(stringsAsFactors = FALSE)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
   }
 
@@ -114,7 +113,7 @@ summary.pmap <- function(object,
   lds %<>% matrix(nrow = length(dn[[1]])) %>%
     set_colnames(dn[[2]]) %>%
     set_rownames(dn[[1]]) %>%
-    data.frame()
+    data.frame(stringsAsFactors = FALSE)
 
   ## show only the loadings > ff_cutoff
   ind <- abs(lds) < cutoff
@@ -137,7 +136,7 @@ summary.pmap <- function(object,
     print()
 
   cat("\nAttribute communalities:")
-  data.frame(1 - object$fres$uniqueness) %>%
+  data.frame(1 - object$fres$uniqueness, stringsAsFactors = FALSE) %>%
     set_colnames("") %>%
     round(dec) %>%
     print()
@@ -190,7 +189,7 @@ plot.pmap <- function(x,
   # the wordcloud with wordlayout package may be an option but it does not seem to produce the
   # desired effect
   # wctemp <- wordcloud::wordlayout(mtcars$wt, mtcars$mpg, rownames(mtcars), cex = 3)[,1:2] %>%
-  #             data.frame %>%
+  #             data.frame(stringsAsFactors = FALSE) %>%
   #             set_colnames(c("wt","mpg"))
   # use geom_text and geom_points
   # http://sape.inf.usi.ch/quick-reference/ggplot2/geom_segment
