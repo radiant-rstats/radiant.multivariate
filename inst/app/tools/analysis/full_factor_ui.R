@@ -35,7 +35,7 @@ output$ui_full_factor <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("ff_run", "Estimate", width = "100%")
+      actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
       uiOutput("ui_ff_vars"),
@@ -164,7 +164,6 @@ observeEvent(input$full_factor_report, {
     inp_main = clean_args(ff_inputs(), ff_args),
     fun_name = "full_factor",
     inp_out = inp_out,
-    wrap = TRUE,
     fig.width = ff_plot_width(),
     fig.height = ff_plot_height(),
     xcmd = xcmd

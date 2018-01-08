@@ -45,7 +45,7 @@ output$ui_kclus <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("km_run", "Estimate", width = "100%")
+      actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
 
     conditionalPanel(
@@ -194,7 +194,6 @@ observeEvent(input$kclus_report, {
     fun_name = "kclus", 
     inp_out = inp_out,
     outputs = outputs, 
-    wrap = TRUE,
     figs = figs,
     fig.width = km_plot_width(),
     fig.height = km_plot_height(),

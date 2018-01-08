@@ -76,7 +76,7 @@ output$ui_mds <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("mds_run", "Estimate", width = "100%")
+      actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
       uiOutput("ui_mds_id1"),

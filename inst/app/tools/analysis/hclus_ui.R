@@ -40,7 +40,7 @@ output$ui_hclus <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("hc_run", "Estimate", width = "100%")
+      actionButton("hc_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
       uiOutput("ui_hc_vars"),
@@ -188,7 +188,6 @@ observeEvent(input$hclus_report, {
     fun_name = "hclus",
     inp_out = inp_out,
     outputs = outputs,
-    wrap = TRUE,
     figs = figs,
     fig.width = hc_plot_width(),
     fig.height = hc_plot_height()

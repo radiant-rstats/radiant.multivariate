@@ -76,7 +76,7 @@ output$ui_pmap <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("pm_run", "Estimate", width = "100%")
+      actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
       uiOutput("ui_pm_brand"),
@@ -210,7 +210,6 @@ observeEvent(input$pmap_report, {
     inp_main = inp,
     fun_name = "pmap", 
     inp_out = inp_out,
-    wrap = TRUE,
     fig.width = pm_plot_width(),
     fig.height = pm_plot_height(),
     xcmd = paste0("# store(result, name = '", input$pm_store_name, "')")

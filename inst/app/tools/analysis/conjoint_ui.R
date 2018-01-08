@@ -221,7 +221,7 @@ output$ui_conjoint <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("ca_run", "Estimate", width = "100%")
+      actionButton("ca_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     conditionalPanel(
       condition = "input.tabs_conjoint == 'Predict'",
@@ -502,7 +502,6 @@ observeEvent(input$conjoint_report, {
     fun_name = "conjoint", 
     inp_out = inp_out,
     outputs = outputs, 
-    wrap = TRUE,
     figs = figs,
     fig.width = ca_plot_width(),
     fig.height = ca_plot_height(),

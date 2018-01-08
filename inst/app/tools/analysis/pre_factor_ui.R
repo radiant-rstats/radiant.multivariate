@@ -31,7 +31,7 @@ output$ui_pre_factor <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("pf_run", "Estimate", width = "100%")
+      actionButton("pf_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     conditionalPanel(
       condition = "input.tabs_pre_factor == 'Plot'",
@@ -140,7 +140,6 @@ observeEvent(input$pre_factor_report, {
     fun_name = "pre_factor", 
     inp_out = inp_out,
     outputs = outputs, 
-    wrap = TRUE,
     figs = figs,
     fig.width = pf_plot_width(),
     fig.height = pf_plot_height()
