@@ -40,9 +40,7 @@ pre_factor <- function(dataset, vars,
     if (is(scmat, "try-error")) {
       pre_r2 <- err_mess
     } else {
-      pre_r2 <- {
-        1 - (1 / diag(scmat))
-      } %>%
+      pre_r2 <- {1 - (1 / diag(scmat))} %>%
         data.frame(stringsAsFactors = FALSE) %>%
         set_colnames("Rsq")
     }
@@ -54,6 +52,15 @@ pre_factor <- function(dataset, vars,
 
   as.list(environment()) %>% add_class("pre_factor")
 }
+
+## Notes:
+# KMO is a measure of the relative size of (1) correlations between variables
+# and (2) the partial correlations between those variables. This makes sense
+# if you are interested in factors that have links to > 2 variables.
+# But what if your factors are based on 2 indicators/variables? In that case
+# your KMO would be horrible but a simple factor analysis would still cut the
+# dimensionality of your data in halve. Use VIF or tolerance to indicate if
+# factor analysis makes sense?
 
 #' Summary method for the pre_factor function
 #'
@@ -199,7 +206,7 @@ plot.pre_factor <- function(x, plots = c("scree", "change"),
 
   if (custom) {
     if (length(plot_list) == 1) {
-      return(plot_list[[1]]) 
+      return(plot_list[[1]])
     } else {
       return(plot_list)
     }

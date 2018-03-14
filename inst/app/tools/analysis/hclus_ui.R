@@ -94,22 +94,17 @@ observeEvent(input$hc_plots, {
 
 hc_plot <- reactive({
   plots <- input$hc_plots
-  ph <- plots %>% {
-    if (length(.) == 1 && . == "dendro") 800 else 400
-  }
+  ph <- plots %>% 
+    {if (length(.) == 1 && . == "dendro") 800 else 400}
   pw <- if (!is_empty(plots) && plots == "dendro") 900 else 650
   list(plot_width = pw, plot_height = ph * length(plots))
 })
 
 hc_plot_width <- function()
-  hc_plot() %>% {
-    if (is.list(.)) .$plot_width else 650
-  }
+  hc_plot() %>% {if (is.list(.)) .$plot_width else 650}
 
 hc_plot_height <- function()
-  hc_plot() %>% {
-    if (is.list(.)) .$plot_height else 400
-  }
+  hc_plot() %>% {if (is.list(.)) .$plot_height else 400}
 
 ## output is called from the main radiant ui.R
 output$hclus <- renderUI({
@@ -139,9 +134,6 @@ output$hclus <- renderUI({
 })
 
 .hclus <- eventReactive(input$hc_run, {
-
-  # if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return()
-
   withProgress(
     message = "Estimating cluster solution", value = 1,
     do.call(hclus, hc_inputs())

@@ -1,10 +1,10 @@
-# CHANGES IN radiant.multivariate 0.9.0
+# CHANGES IN radiant.multivariate 0.9.0.1
 
 * Enhanced keyboard shortcuts
 * `Estimate` buttons indicate when models should be re-estimated based on changes in user input
 * Upgraded tidyr dependency to 0.7
 * Fix for `pmap` and `mds` when a tibble is passed  
-* Long lines of code generated for _R > Report_ will be wrapped to enhance readability 
+* Long lines of code generated for _Report > Rmd_ or _Report > R_ will be wrapped to enhance readability 
 
 # CHANGES IN radiant.multivariate 0.8.7.1
 
@@ -32,7 +32,7 @@
 - Derive and store predictions based on conjoint analysis for multiple respondents
 - Show dataset name in output if dataframe passed directly to analysis function
 - As an alternative to using the Estimate button to run a model you can now also use CTRL-enter or CMD-enter
-- Use ALT-enter to put code into R > Report
+- Use ALT-enter to put code into _Report > Rmd_ or _Report > R_
 
 ## BUG FIXES
 

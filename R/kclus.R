@@ -32,6 +32,7 @@ kclus <- function(dataset, vars,
                   seed = 1234,
                   nr_clus = 2,
                   data_filter = "") {
+  
   dat <- getdata(dataset, vars, filt = data_filter)
   if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 

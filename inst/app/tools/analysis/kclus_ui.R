@@ -2,7 +2,7 @@
 # K-clustering
 ###############################################################
 
-km_plots <- c("Density" = "density", "Bar" = "bar", "Scatter" = "scatter")
+km_plots <- c("None" = "none", "Density" = "density", "Bar" = "bar", "Scatter" = "scatter")
 km_algorithm <- c("K-means" = "mean", "K-medians" = "median")
 
 # list of function arguments
@@ -23,11 +23,9 @@ output$ui_km_vars <- renderUI({
   dum <- two_level_vars()
   if (length(dum) > 0) {
     isVars <- .getclass() %in% c("integer", "numeric", "factor")
-    isFct <- {
-      .getclass() == "factor"
-    } %>% {
-      names(.[.])
-    } %>% setdiff(., dum)
+    isFct <- {.getclass() == "factor"} %>% 
+      {names(.[.])} %>% 
+      setdiff(., dum)
     vars <- varnames()[isVars] %>% .[!. %in% isFct]
   } else {
     isVars <- .getclass() %in% c("integer", "numeric")
@@ -41,19 +39,23 @@ output$ui_km_vars <- renderUI({
   )
 })
 
+observeEvent(input$dataset, {
+  updateSelectInput(session = session, inputId = "km_plots", selected = "none")
+})
+
+
 output$ui_kclus <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
       actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
-
     conditionalPanel(
       condition = "input.tabs_kclus == 'Plot'",
       wellPanel(
         selectInput(
           "km_plots", label = "Plot(s):", choices = km_plots,
-          selected = state_multiple("km_plots", km_plots, "density"),
+          selected = state_multiple("km_plots", km_plots, "none"),
           multiple = FALSE
         )
       )
@@ -108,19 +110,22 @@ output$ui_kclus <- renderUI({
   )
 })
 
-km_plot <- reactive({
+# km_plot <- reactive({
+km_plot <- eventReactive(input$km_run, {
+  if (.km_available() != "available") return()
+  if (is_empty(input$km_plots, "none")) return()
   list(plot_width = 750, plot_height = 300 * length(input$km_vars) / 2)
 })
 
-km_plot_width <- function()
-  km_plot() %>% {
-    if (is.list(.)) .$plot_width else 650
-  }
+km_plot_width <- function() {
+  km_plot() %>% 
+    {if (is.list(.)) .$plot_width else 650}
+}
 
-km_plot_height <- function()
-  km_plot() %>% {
-    if (is.list(.)) .$plot_height else 400
-  }
+km_plot_height <- function() {
+  km_plot() %>% 
+    {if (is.list(.)) .$plot_height else 400}
+}
 
 # output is called from the main radiant ui.R
 output$kclus <- renderUI({
@@ -141,7 +146,7 @@ output$kclus <- renderUI({
     tabPanel(
       "Plot",
       plot_downloader("kclus", height = km_plot_height),
-      plotOutput("plot_kclus", height = "100%")
+      plotOutput("plot_kclus", width = "100%", height = "100%")
     )
   )
 
@@ -170,18 +175,25 @@ output$kclus <- renderUI({
 })
 
 .summary_kclus <- reactive({
+# .summary_kclus <- eventReactive(input$km_run, {
   if (.km_available() != "available") return(.km_available())
   summary(.kclus())
 })
 
+# .plot_kclus <- eventReactive(input$km_run, {
 .plot_kclus <- reactive({
   if (.km_available() != "available") return(.km_available())
-  plot(.kclus(), plots = input$km_plots, shiny = TRUE)
+  if (is_empty(input$km_plots, "none")) return("Please select a plot type from the drop-down menu")
+  # if (not_pressed(input$km_run)) return("** Press the Estimate button to generate the cluster solution **")
+  withProgress(message = "Generating plots", value = 1, {
+    plot(.kclus(), plots = input$km_plots, shiny = TRUE)
+  })
 })
 
 observeEvent(input$kclus_report, {
   inp_out <- list(list(dec = 2), "")
-  if (length(input$km_plots) > 0) {
+  # if (length(input$km_plots) > 0) {
+  if (!is_empty(input$km_plots)) {
     figs <- TRUE
     outputs <- c("summary", "plot")
     inp_out[[2]] <- list(plots = input$km_plots, custom = FALSE)
@@ -189,6 +201,9 @@ observeEvent(input$kclus_report, {
     outputs <- c("summary")
     figs <- FALSE
   }
+  xcmd <- paste0("# store(result, name = \"", input$km_store_name, "\")")
+  # xcmd <- paste0(xcmd, "\n# write.csv(result$clus_means, file = \"~/kclus.csv\")")
+
   update_report(
     inp_main = clean_args(km_inputs(), km_args),
     fun_name = "kclus", 
@@ -197,7 +212,7 @@ observeEvent(input$kclus_report, {
     figs = figs,
     fig.width = km_plot_width(),
     fig.height = km_plot_height(),
-    xcmd = paste0("# store(result, name = \"", input$km_store_name, "\")\n# write.csv(result$clus_means, file = \"~/kclus.csv\")")
+    xcmd = 
   )
 })
 

@@ -61,11 +61,15 @@ ca_pred_inputs <- reactive({
 
   ca_pred_args$pred_cmd <- ca_pred_args$pred_data <- ""
   if (input$ca_predict == "cmd") {
-    ca_pred_args$pred_cmd <- gsub("\\s", "", input$ca_pred_cmd) %>% gsub("\"", "\'", .)
+    ca_pred_args$pred_cmd <- gsub("\\s{2,}", " ", input$ca_pred_cmd) %>% 
+      gsub(";\\s+", ";", .) %>%
+      gsub("\"", "\'", .)
   } else if (input$ca_predict == "data") {
     ca_pred_args$pred_data <- input$ca_pred_data
   } else if (input$ca_predict == "datacmd") {
-    ca_pred_args$pred_cmd <- gsub("\\s", "", input$ca_pred_cmd) %>% gsub("\"", "\'", .)
+    ca_pred_args$pred_cmd <- gsub("\\s{2,}", " ", input$ca_pred_cmd) %>% 
+      gsub(";\\s+", ";", .) %>%
+      gsub("\"", "\'", .)
     ca_pred_args$pred_data <- input$ca_pred_data
   }
   ca_pred_args
@@ -95,8 +99,10 @@ output$ui_ca_rvar <- renderUI({
 })
 
 output$ui_ca_evar <- renderUI({
-  isFct <- "factor" == .getclass()
-  vars <- varnames()[isFct]
+  # isFct <- "factor" == .getclass()
+  # vars <- varnames()[isFct]
+  hasLevs <- .getclass() %in% c("factor", "logical", "character")
+  vars <- varnames()[hasLevs]
   selectInput(
     inputId = "ca_evar", label = "Attributes:", choices = vars,
     selected = state_multiple("ca_evar", vars), multiple = TRUE,
@@ -479,15 +485,18 @@ observeEvent(input$conjoint_report, {
   if (!is_empty(input$ca_predict, "none") &&
     (!is_empty(input$ca_pred_data) || !is_empty(input$ca_pred_cmd))) {
     pred_args <- clean_args(ca_pred_inputs(), ca_pred_args[-1])
+    if (!is_empty(pred_args[["pred_cmd"]])) {
+      pred_args[["pred_cmd"]] <- strsplit(pred_args[["pred_cmd"]], ";")[[1]]
+    }
     inp_out[[2 + figs]] <- pred_args
     outputs <- c(outputs, "pred <- predict")
 
     xcmd <- paste0(xcmd, "print(pred, n = 10)")
     if (input$ca_predict %in% c("data", "datacmd") || input$ca_by != "none") {
       xcmd <- paste0(xcmd, "\n# store(pred, data = \"", input$ca_pred_data, "\", name = \"", input$ca_store_pred_name, "\")")
-      xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/", input$ca_store_pred_name, ".csv\", row.names = FALSE)")
+      # xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/", input$ca_store_pred_name, ".csv\", row.names = FALSE)")
     } else {
-      xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/ca_predictions.csv\", row.names = FALSE)")
+      # xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/ca_predictions.csv\", row.names = FALSE)")
     }
 
     if (input$ca_pred_plot && !is_empty(input$ca_xvar)) {

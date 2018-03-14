@@ -174,8 +174,7 @@ plot.pmap <- function(x,
                       fontsz = 1.3,
                       ...) {
   scaling <- as.numeric(scaling)
-  object <- x
-  rm(x)
+  object <- x; rm(x)
 
   std_pc <- scaling * object$pref_cor
   std_m <- scaling * object$fres$loadings

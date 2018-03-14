@@ -153,7 +153,7 @@ plot.hclus <- function(x, plots = c("scree", "change"),
     hc <- as.dendrogram(object$hc_out)
     xlab <- ""
     if (length(plots) > 1) {
-      xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in R > Report to view different plot types."
+      xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in Report > Rmd to view different plot types."
     }
 
     ## can't combine base graphics with grid graphics

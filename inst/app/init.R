@@ -29,7 +29,7 @@ options(
       navbarMenu(
         "Multivariate",
         tags$head(
-          tags$script(src = "www_multivariate/js/run_return.js")
+          tags$script(src = "www_multivariate/js/store.js")
         ),
         "Maps",
         tabPanel("(Dis)similarity", uiOutput("mds")),
