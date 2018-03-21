@@ -1,4 +1,4 @@
-# CHANGES IN radiant.multivariate 0.9.0.1
+# CHANGES IN radiant.multivariate 0.9.1
 
 * Enhanced keyboard shortcuts
 * `Estimate` buttons indicate when models should be re-estimated based on changes in user input
