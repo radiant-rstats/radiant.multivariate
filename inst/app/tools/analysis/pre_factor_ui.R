@@ -27,15 +27,39 @@ output$ui_pf_vars <- renderUI({
   )
 })
 
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(pf_args)), function(x) input[[paste0("pf_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+  if (pressed(input$pf_run)) {
+    if (is.null(input$pf_vars)) { 
+      updateTabsetPanel(session, "tabs_pre_factor", selected = "Summary")
+      updateActionButton(session, "pf_run", "Estimate model", icon = icon("play"))
+    } else if (isTRUE(attr(pf_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "pf_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "pf_run", "Estimate model", icon = icon("play"))
+    }
+  }
+})
+
 output$ui_pre_factor <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
       actionButton("pf_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
-    conditionalPanel(
-      condition = "input.tabs_pre_factor == 'Plot'",
-      wellPanel(
+    wellPanel(
+      conditionalPanel(
+        condition = "input.tabs_pre_factor == 'Summary'",
+        uiOutput("ui_pf_vars")
+      ),
+      conditionalPanel(
+        condition = "input.tabs_pre_factor == 'Plot'",
         selectizeInput(
           "pf_plots", label = "Plot(s):", choices = pf_plots,
           selected = state_multiple("pf_plots", pf_plots, c("scree", "change")),
@@ -47,9 +71,6 @@ output$ui_pre_factor <- renderUI({
         ),
         numericInput("pf_cutoff", "Plot cutoff:", min = 0, max = 2, value = state_init("pf_cutoff", 0.1), step = .05)
       )
-    ),
-    wellPanel(
-      uiOutput("ui_pf_vars")
     ),
     help_and_report(
       modal_title = "Pre-factor analysis",
@@ -64,14 +85,10 @@ pf_plot <- reactive({
 })
 
 pf_plot_width <- function()
-  pf_plot() %>% {
-    if (is.list(.)) .$plot_width else 600
-  }
+  pf_plot() %>% {if (is.list(.)) .$plot_width else 600}
 
 pf_plot_height <- function()
-  pf_plot() %>% {
-    if (is.list(.)) .$plot_height else 400
-  }
+  pf_plot() %>% {if (is.list(.)) .$plot_height else 400}
 
 output$pre_factor <- renderUI({
   register_print_output("summary_pre_factor", ".summary_pre_factor")
@@ -87,7 +104,7 @@ output$pre_factor <- renderUI({
     tabPanel("Summary", verbatimTextOutput("summary_pre_factor")),
     tabPanel(
       "Plot",
-      plot_downloader("pre_factor", height = pf_plot_height),
+      download_link("dlp_pre_factor"),
       plotOutput("plot_pre_factor", height = "100%")
     )
   )
@@ -108,21 +125,29 @@ output$pre_factor <- renderUI({
 })
 
 .summary_pre_factor <- reactive({
-  if (not_available(input$pf_vars)) {
-    return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
-  }
-  if (length(input$pf_vars) < 2) return("Please select two or more numeric variables")
   if (not_pressed(input$pf_run)) return("** Press the Estimate button to generate factor analysis diagnostics **")
-
+  isolate({
+    if (not_available(input$pf_vars)) {
+      return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+    } else if (length(input$pf_vars) < 2) {
+      return("Please select two or more numeric variables")
+    }
+  })
   summary(.pre_factor())
 })
 
 .plot_pre_factor <- reactive({
-  if (not_available(input$pf_vars) || length(input$pf_vars) < 2 || not_pressed(input$pf_run)) {
-    return(invisible())
-  }
-
-  plot(.pre_factor(), plots = input$pf_plots, cutoff = input$pf_cutoff, shiny = TRUE)
+  if (not_pressed(input$pf_run)) return("** Press the Estimate button to generate factor analysis diagnostics **")
+  isolate({
+    if (not_available(input$pf_vars)) {
+      return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+    } else if (length(input$pf_vars) < 2) {
+      return("Please select two or more numeric variables\nin the Summary tab and re-estimate the model")
+    }
+  })
+  withProgress(message = "Generating factor plots", value = 1, {
+    plot(.pre_factor(), plots = input$pf_plots, cutoff = input$pf_cutoff, shiny = TRUE)
+  })
 })
 
 observeEvent(input$pre_factor_report, {
@@ -145,3 +170,13 @@ observeEvent(input$pre_factor_report, {
     fig.height = pf_plot_height()
   )
 })
+
+download_handler(
+  id = "dlp_pre_factor", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_pre_factor.png"),
+  caption = "Download pre-factor plot",
+  plot = .plot_pre_factor,
+  width = pf_plot_width,
+  height = pf_plot_height
+)

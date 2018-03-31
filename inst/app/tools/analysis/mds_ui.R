@@ -1,7 +1,6 @@
 ###############################
 # Multidimensional scaling
 ###############################
-
 mds_nr_dim <- c("2 dimensions" = 2, "3 dimensions" = 3)
 mds_method <- c("metric" = "metric", "non-metric" = "non-metric")
 
@@ -42,7 +41,6 @@ output$ui_mds_id1 <- renderUI({
 })
 
 output$ui_mds_id2 <- renderUI({
-  # if (not_available(input$mds_id1)) return()
   isLabel <- "character" == .getclass() | "factor" == .getclass()
   vars <- varnames()[isLabel]
   if (length(vars) > 0) vars <- vars[-which(vars == input$mds_id1)]
@@ -53,7 +51,6 @@ output$ui_mds_id2 <- renderUI({
 })
 
 output$ui_mds_dis <- renderUI({
-  # if (not_available(input$mds_id2)) return()
   isNum <- "numeric" == .getclass() | "integer" == .getclass()
   vars <- varnames()[isNum]
   selectInput(
@@ -64,12 +61,36 @@ output$ui_mds_dis <- renderUI({
 
 output$ui_mds_rev_dim <- renderUI({
   rev_list <- list()
+  # nr_dim <- ncol(.getdata())
   rev_list[paste("dimension", 1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
+  # rev_list[paste("dimension", 1:nr_dim)] <- 1:nr_dim
   checkboxGroupInput(
     "mds_rev_dim", "Reverse:", rev_list,
     selected = state_group("mds_rev_dim", ""),
     inline = TRUE
   )
+})
+
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(mds_args)), function(x) input[[paste0("mds_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+
+  # if (pressed(input$mds_run) && (!is.null(input$mds_id1) || !is.character(.mds()))) {
+  if (pressed(input$mds_run)) {
+    if (is.null(input$mds_id1)) { 
+      updateTabsetPanel(session, "tabs_mds", selected = "Summary")
+      updateActionButton(session, "mds_run", "Estimate model", icon = icon("play"))
+    } else if (isTRUE(attr(mds_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "mds_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "mds_run", "Estimate model", icon = icon("play"))
+    }
+  }
 })
 
 output$ui_mds <- renderUI({
@@ -79,18 +100,21 @@ output$ui_mds <- renderUI({
       actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
-      uiOutput("ui_mds_id1"),
-      uiOutput("ui_mds_id2"),
-      uiOutput("ui_mds_dis"),
-      radioButtons(
-        inputId = "mds_method", label = NULL, mds_method,
-        selected = state_init("mds_method", "metric"),
-        inline = TRUE
-      ),
-      radioButtons(
-        inputId = "mds_nr_dim", label = NULL, mds_nr_dim,
-        selected = state_init("mds_nr_dim", 2),
-        inline = TRUE
+      conditionalPanel(
+        condition = "input.tabs_mds == 'Summary'",
+        uiOutput("ui_mds_id1"),
+        uiOutput("ui_mds_id2"),
+        uiOutput("ui_mds_dis"),
+        radioButtons(
+          inputId = "mds_method", label = NULL, mds_method,
+          selected = state_init("mds_method", "metric"),
+          inline = TRUE
+        ),
+        radioButtons(
+          inputId = "mds_nr_dim", label = NULL, mds_nr_dim,
+          selected = state_init("mds_nr_dim", 2),
+          inline = TRUE
+        )
       ),
       conditionalPanel(
         condition = "input.tabs_mds == 'Plot'",
@@ -108,20 +132,17 @@ output$ui_mds <- renderUI({
 
 mds_plot <- eventReactive(input$mds_run, {
   req(input$mds_nr_dim)
-  nrDim <- as.numeric(input$mds_nr_dim)
+  nrDim <- .mds() %>%
+    {if (is.list(.)) ncol(.mds()$res$points) else as.numeric(input$mds_nr_dim)}
   nrPlots <- (nrDim * (nrDim - 1)) / 2
   list(plot_width = 650, plot_height = 650 * nrPlots)
 })
 
 mds_plot_width <- function()
-  mds_plot() %>% {
-    if (is.list(.)) .$plot_width else 650
-  }
+  mds_plot() %>% {if (is.list(.)) .$plot_width else 650}
 
 mds_plot_height <- function()
-  mds_plot() %>% {
-    if (is.list(.)) .$plot_height else 650
-  }
+  mds_plot() %>% {if (is.list(.)) .$plot_height else 650}
 
 output$mds <- renderUI({
   register_print_output("summary_mds", ".summary_mds")
@@ -133,10 +154,14 @@ output$mds <- renderUI({
 
   mds_output_panels <- tabsetPanel(
     id = "tabs_mds",
-    tabPanel("Summary", verbatimTextOutput("summary_mds")),
+    tabPanel(
+      "Summary", 
+      download_link("dl_mds_coord"), br(),
+      verbatimTextOutput("summary_mds")
+    ),
     tabPanel(
       "Plot",
-      plot_downloader("mds", height = mds_plot_height),
+      download_link("dlp_mds"),
       plotOutput("plot_mds", height = "100%")
     )
   )
@@ -150,14 +175,17 @@ output$mds <- renderUI({
 })
 
 .mds_available <- reactive({
-  if (not_available(input$mds_id2) || not_available(input$mds_dis)) {
+  if (not_pressed(input$mds_run)) {
+    return("** Press the Estimate button to generate maps **")
+  }
+  if (not_available(input$mds_id1) || not_available(input$mds_id2) || not_available(input$mds_dis)) {
     return("This analysis requires two id-variables of type character or factor and a measure\nof dissimilarity of type numeric or interval. Please select another dataset\n\n" %>% suggest_data("city"))
   }
-  if (not_pressed(input$mds_run)) return("** Press the Estimate button to generate maps **")
   "available"
 })
 
 .mds <- eventReactive(input$mds_run, {
+  req(input$mds_id1)
   withProgress(
     message = "Generating MDS solution", value = 1,
     do.call(mds, mds_inputs())
@@ -166,20 +194,13 @@ output$mds <- renderUI({
 
 .summary_mds <- reactive({
   if (.mds_available() != "available") return(.mds_available())
-  .mds() %>% {
-    if (is.character(.)) . else summary(., dec = 2)
-  }
+  .mds() %>% {if (is.character(.)) . else summary(., dec = 2)}
 })
 
 .plot_mds <- reactive({
   if (.mds_available() != "available") return(.mds_available())
-  .mds() %>% {
-    if (is.character(.)) {
-      .
-    } else {
-      capture_plot(do.call(plot, c(list(x = .), mds_plot_inputs())))
-    }
-  }
+  .mds() %>% 
+    {if (is.character(.)) . else capture_plot(do.call(plot, c(list(x = .), mds_plot_inputs())))}
 })
 
 observeEvent(input$mds_report, {
@@ -193,3 +214,31 @@ observeEvent(input$mds_report, {
     fig.height = mds_plot_height()
   )
 })
+
+dl_mds_coord <- function(path) {
+  if (pressed(input$mds_run)) {
+    .mds()$res$points %>%
+      {set_colnames(., paste0("Dimension", 1:ncol(.)))} %>%
+      write.csv(file = path, row.names = FALSE)
+  } else {
+    cat("No output available. Press the Estimate button to generate results", file = path)
+  }
+}
+
+download_handler(
+  id = "dl_mds_coord", 
+  fun = dl_mds_coord, 
+  fn = paste0(input$dataset, "_mds_coordinates.csv"),
+  caption = "Download MDS coordinates"
+)
+
+download_handler(
+  id = "dlp_mds", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_mds.png"),
+  caption = "Download MDS plot",
+  plot = .plot_mds,
+  width = mds_plot_width,
+  height = mds_plot_height
+)
+

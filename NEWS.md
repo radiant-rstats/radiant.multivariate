@@ -1,10 +1,13 @@
-# CHANGES IN radiant.multivariate 0.9.1
+# CHANGES IN radiant.multivariate 0.9.2
 
-* Enhanced keyboard shortcuts
+* Renamed `pmap` function for perceptual maps to `prmap` to avoid conflict with `purrr::pmap`
 * `Estimate` buttons indicate when models should be re-estimated based on changes in user input
-* Upgraded tidyr dependency to 0.7
+* Addins option to start app in Rstudio window
+* Upload and download data using the Rstudio file browser. Allows using relative paths to files (e.g., data or images inside an Rstudio project)
 * Fix for `pmap` and `mds` when a tibble is passed  
 * Long lines of code generated for _Report > Rmd_ or _Report > R_ will be wrapped to enhance readability 
+* Enhanced keyboard shortcuts
+* Upgraded tidyr dependency to 0.7
 
 # CHANGES IN radiant.multivariate 0.8.7.1
 

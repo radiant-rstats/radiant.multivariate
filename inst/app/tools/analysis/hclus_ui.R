@@ -36,6 +36,23 @@ output$ui_hc_vars <- renderUI({
   )
 })
 
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(hc_args)), function(x) input[[paste0("hc_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+  if (pressed(input$hc_run)) {
+    if (isTRUE(attr(hc_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "hc_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "hc_run", "Estimate model", icon = icon("play"))
+    }
+  }
+})
+
 output$ui_hclus <- renderUI({
   req(input$dataset)
   tagList(
@@ -120,7 +137,7 @@ output$hclus <- renderUI({
     tabPanel("Summary", verbatimTextOutput("summary_hclus")),
     tabPanel(
       "Plot",
-      plot_downloader("hclus", height = hc_plot_height),
+      download_link("dlp_hclus"),
       plotOutput("plot_hclus", height = "100%")
     )
   )
@@ -185,3 +202,13 @@ observeEvent(input$hclus_report, {
     fig.height = hc_plot_height()
   )
 })
+
+download_handler(
+  id = "dlp_hclus", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_hclustering.png"),
+  caption = "Download hierarchical cluster plots",
+  plot = .plot_hclus,
+  width = hc_plot_width,
+  height = hc_plot_height
+)

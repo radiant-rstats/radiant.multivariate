@@ -43,6 +43,25 @@ observeEvent(input$dataset, {
   updateSelectInput(session = session, inputId = "km_plots", selected = "none")
 })
 
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(km_args)), function(x) input[[paste0("km_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+  if (pressed(input$km_run)) {
+    if (is.null(input$km_vars)) { 
+      updateTabsetPanel(session, "tabs_kclus ", selected = "Summary")
+      updateActionButton(session, "km_run", "Estimate model", icon = icon("play"))
+    } else if (isTRUE(attr(km_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "km_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "km_run", "Estimate model", icon = icon("play"))
+    }
+  }
+})
 
 output$ui_kclus <- renderUI({
   req(input$dataset)
@@ -50,55 +69,56 @@ output$ui_kclus <- renderUI({
     wellPanel(
       actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
-    conditionalPanel(
-      condition = "input.tabs_kclus == 'Plot'",
-      wellPanel(
-        selectInput(
-          "km_plots", label = "Plot(s):", choices = km_plots,
-          selected = state_multiple("km_plots", km_plots, "none"),
-          multiple = FALSE
-        )
-      )
-    ),
     wellPanel(
-      selectInput(
-        "km_fun", label = "Algorithm:", choices = km_algorithm,
-        selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE
-      ),
-      uiOutput("ui_km_vars"),
-      checkboxInput(
-        inputId = "km_hc_init", label = "Initial centers from HC",
-        value = state_init("km_hc_init", FALSE)
-      ),
       conditionalPanel(
-        condition = "input.km_hc_init == true",
-        wellPanel(
-          selectInput(
-            "km_distance", label = "Distance measure:", choices = hc_distance,
-            selected = state_single("km_distance", hc_distance, "sq.euclidian"), multiple = FALSE
-          ),
-          selectInput(
-            "km_method", label = "Method:", choices = hc_method,
-            selected = state_single("km_method", hc_method, "ward.D"), multiple = FALSE
+        condition = "input.tabs_kclus == 'Summary'",
+        selectInput(
+          "km_fun", label = "Algorithm:", choices = km_algorithm,
+          selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE
+        ),
+        uiOutput("ui_km_vars"),
+        checkboxInput(
+          inputId = "km_hc_init", label = "Initial centers from HC",
+          value = state_init("km_hc_init", FALSE)
+        ),
+        conditionalPanel(
+          condition = "input.km_hc_init == true",
+          wellPanel(
+            selectInput(
+              "km_distance", label = "Distance measure:", choices = hc_distance,
+              selected = state_single("km_distance", hc_distance, "sq.euclidian"), multiple = FALSE
+            ),
+            selectInput(
+              "km_method", label = "Method:", choices = hc_method,
+              selected = state_single("km_method", hc_method, "ward.D"), multiple = FALSE
+            )
+          )
+        ),
+        conditionalPanel(
+          condition = "input.km_hc_init == false",
+          numericInput(
+            "km_seed", "Set random seed:", min = 0,
+            value = state_init("km_seed", 1234)
+          )
+        ),
+        numericInput(
+          "km_nr_clus", "Number of clusters:", min = 2,
+          value = state_init("km_nr_clus", 2)
+        ),
+        conditionalPanel(
+          condition = "input.km_vars != null",
+          tags$table(
+            tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name", "kclus"))),
+            tags$td(actionButton("km_store", "Store"), style = "padding-top:30px;")
           )
         )
       ),
       conditionalPanel(
-        condition = "input.km_hc_init == false",
-        numericInput(
-          "km_seed", "Set random seed:", min = 0,
-          value = state_init("km_seed", 1234)
-        )
-      ),
-      numericInput(
-        "km_nr_clus", "Number of clusters:", min = 2,
-        value = state_init("km_nr_clus", 2)
-      ),
-      conditionalPanel(
-        condition = "input.km_vars != null",
-        tags$table(
-          tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name", "kclus"))),
-          tags$td(actionButton("km_store", "Store"), style = "padding-top:30px;")
+        condition = "input.tabs_kclus == 'Plot'",
+        selectInput(
+          "km_plots", label = "Plot(s):", choices = km_plots,
+          selected = state_multiple("km_plots", km_plots, "none"),
+          multiple = FALSE
         )
       )
     ),
@@ -114,18 +134,14 @@ output$ui_kclus <- renderUI({
 km_plot <- eventReactive(input$km_run, {
   if (.km_available() != "available") return()
   if (is_empty(input$km_plots, "none")) return()
-  list(plot_width = 750, plot_height = 300 * length(input$km_vars) / 2)
+  list(plot_width = 750, plot_height = 300 * ceiling(length(input$km_vars) / 2))
 })
 
-km_plot_width <- function() {
-  km_plot() %>% 
-    {if (is.list(.)) .$plot_width else 650}
-}
+km_plot_width <- function() 
+  km_plot() %>% {if (is.list(.)) .$plot_width else 650}
 
-km_plot_height <- function() {
-  km_plot() %>% 
-    {if (is.list(.)) .$plot_height else 400}
-}
+km_plot_height <- function() 
+  km_plot() %>% {if (is.list(.)) .$plot_height else 400}
 
 # output is called from the main radiant ui.R
 output$kclus <- renderUI({
@@ -140,12 +156,12 @@ output$kclus <- renderUI({
     id = "tabs_kclus",
     tabPanel(
       "Summary",
-      downloadLink("dl_km_means", "", class = "fa fa-download alignright"), br(),
+      download_link("dl_km_means"), br(),
       verbatimTextOutput("summary_kclus")
     ),
     tabPanel(
       "Plot",
-      plot_downloader("kclus", height = km_plot_height),
+      download_link("dlp_kclus"),
       plotOutput("plot_kclus", width = "100%", height = "100%")
     )
   )
@@ -159,12 +175,14 @@ output$kclus <- renderUI({
 })
 
 .km_available <- reactive({
-  if (not_available(input$km_vars)) {
-    return("This analysis requires one or more variables of type numeric or integer.\nIf these variable types are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+  if (not_pressed(input$km_run)) {
+    "** Press the Estimate button to generate the cluster solution **"
+  } else if (not_available(input$km_vars)) {
+    "This analysis requires one or more variables of type numeric or integer.\nIf these variable types are not available please select another dataset.\n\n" %>% 
+      suggest_data("toothpaste")
+  } else {
+    "available"
   }
-  if (not_pressed(input$km_run)) return("** Press the Estimate button to generate the cluster solution **")
-
-  "available"
 })
 
 .kclus <- eventReactive(input$km_run, {
@@ -175,19 +193,22 @@ output$kclus <- renderUI({
 })
 
 .summary_kclus <- reactive({
-# .summary_kclus <- eventReactive(input$km_run, {
   if (.km_available() != "available") return(.km_available())
   summary(.kclus())
 })
 
-# .plot_kclus <- eventReactive(input$km_run, {
-.plot_kclus <- reactive({
-  if (.km_available() != "available") return(.km_available())
-  if (is_empty(input$km_plots, "none")) return("Please select a plot type from the drop-down menu")
+.plot_kclus <- eventReactive(c(input$km_run, input$km_plots), {
+# .plot_kclus <- reactive({
   # if (not_pressed(input$km_run)) return("** Press the Estimate button to generate the cluster solution **")
-  withProgress(message = "Generating plots", value = 1, {
-    plot(.kclus(), plots = input$km_plots, shiny = TRUE)
-  })
+  if (.km_available() != "available") {
+    .km_available()
+  } else if (is_empty(input$km_plots, "none")) {
+    "Please select a plot type from the drop-down menu"
+  } else {
+    withProgress(message = "Generating plots", value = 1, {
+      plot(.kclus(), plots = input$km_plots, shiny = TRUE)
+    })
+  }
 })
 
 observeEvent(input$kclus_report, {
@@ -216,20 +237,6 @@ observeEvent(input$kclus_report, {
   )
 })
 
-output$dl_km_means <- downloadHandler(
-  filename = function() {
-    "kclus.csv"
-  },
-  content = function(file) {
-    if (pressed(input$km_run)) {
-      .kclus() %>% 
-        {if (is.list(.)) write.csv(.$clus_means, file = file)}
-    } else {
-      cat("No output available. Press the Estimate button to generate the cluster solution", file = file)
-    }
-  }
-)
-
 ## store cluster membership
 observeEvent(input$km_store, {
   if (pressed(input$km_run)) {
@@ -237,3 +244,29 @@ observeEvent(input$km_store, {
       {if (is.list(.)) store(., name = input$km_store_name)}
   }
 })
+
+dl_km_means <- function(path) {
+  if (pressed(input$km_run)) {
+    .kclus() %>% 
+      {if (is.list(.)) write.csv(.$clus_means, file = path)}
+  } else {
+    cat("No output available. Press the Estimate button to generate the cluster solution", file = path)
+  }
+}
+
+download_handler(
+  id = "dl_km_means", 
+  fun = dl_km_means, 
+  fn = paste0(input$dataset, "_kclus.csv"),
+  caption = "Download clustering results "
+)
+
+download_handler(
+  id = "dlp_kclus", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_kclustering.png"),
+  caption = "Download k-cluster plots",
+  plot = .plot_kclus,
+  width = km_plot_width,
+  height = km_plot_height
+)

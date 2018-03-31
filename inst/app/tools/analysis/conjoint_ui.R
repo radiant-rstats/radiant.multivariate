@@ -1,10 +1,9 @@
 ################################################################
-# Conjoint regression - UI
+# Conjoint 
 ################################################################
-
 ca_show_interactions <- c("None" = "", "2-way" = 2, "3-way" = 3)
 ca_predict <- c("None" = "none", "Data" = "data", "Command" = "cmd", "Data & Command" = "datacmd")
-ca_plots <- list("Part-worths" = "pw", "Importance-weights" = "iw")
+ca_plots <- list("None" = "none", "Part-worths" = "pw", "Importance-weights" = "iw")
 
 # list of function arguments
 ca_args <- as.list(formals(conjoint))
@@ -99,8 +98,6 @@ output$ui_ca_rvar <- renderUI({
 })
 
 output$ui_ca_evar <- renderUI({
-  # isFct <- "factor" == .getclass()
-  # vars <- varnames()[isFct]
   hasLevs <- .getclass() %in% c("factor", "logical", "character")
   vars <- varnames()[hasLevs]
   selectInput(
@@ -162,6 +159,33 @@ output$ui_ca_show <- renderUI({
 ## reset ca_show if needed
 observeEvent(input$ca_by == "none" && !is_empty(input$ca_show), {
   updateSelectInput(session = session, inputId = "ca_show", selected = NULL)
+
+})
+
+## reset prediction and plot settings when the dataset changes
+observeEvent(input$dataset, {
+  updateSelectInput(session = session, inputId = "ca_predict", selected = "none")
+  updateSelectInput(session = session, inputId = "ca_plots", selected = "none")
+})
+
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(ca_args)), function(x) input[[paste0("ca_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+  if (pressed(input$ca_run)) {
+    if (is.null(input$ca_evar)) { 
+      updateTabsetPanel(session, "tabs_conjoint ", selected = "Summary")
+      updateActionButton(session, "ca_run", "Estimate model", icon = icon("play"))
+    } else if (isTRUE(attr(ca_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "ca_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "ca_run", "Estimate model", icon = icon("play"))
+    }
+  }
 })
 
 output$ui_ca_store <- renderUI({
@@ -199,13 +223,6 @@ output$ui_ca_store_pred <- renderUI({
   )
 })
 
-## reset prediction settings when the dataset changes
-observeEvent(input$dataset, {
-  if (input$nav_radiant != "Conjoint") {
-    updateSelectInput(session = session, inputId = "ca_predict", selected = "none")
-  }
-})
-
 output$ui_ca_predict_plot <- renderUI({
   req(input$ca_by)
   if (input$ca_by != "none") {
@@ -217,7 +234,7 @@ output$ui_ca_predict_plot <- renderUI({
 
 output$ui_ca_pred_data <- renderUI({
   selectizeInput(
-    inputId = "ca_pred_data", label = "Predict for profiles:",
+    inputId = "ca_pred_data", label = "Prediction data:",
     choices = c("None" = "", r_data$datasetlist),
     selected = state_single("ca_pred_data", c("None" = "", r_data$datasetlist)), multiple = FALSE
   )
@@ -229,11 +246,47 @@ output$ui_conjoint <- renderUI({
     wellPanel(
       actionButton("ca_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
-    conditionalPanel(
-      condition = "input.tabs_conjoint == 'Predict'",
-      wellPanel(
+    wellPanel(
+      conditionalPanel(
+        condition = "input.tabs_conjoint == 'Summary'",
+        uiOutput("ui_ca_rvar"),
+        uiOutput("ui_ca_evar"),
+        # uiOutput("ui_ca_show_interactions"),
+        # conditionalPanel(condition = "input.ca_show_interactions != ''",
+        #   uiOutput("ui_ca_int")
+        # ),
+        uiOutput("ui_ca_by"),
+        conditionalPanel(
+          condition = "input.tabs_conjoint != 'Predict' & input.ca_by != 'none'",
+          uiOutput("ui_ca_show")
+        ),
+        conditionalPanel(
+          condition = "input.tabs_conjoint == 'Summary'",
+          uiOutput("ui_ca_store")
+        ),
+        conditionalPanel(
+          condition = "input.ca_evar != null",
+          checkboxInput(
+            "ca_reverse", label = "Reverse evaluation scores",
+            value = state_init("ca_reverse", FALSE)
+          ),
+          conditionalPanel(
+            condition = "input.tabs_conjoint == 'Summary'",
+            checkboxInput(
+              inputId = "ca_additional", label = "Additional regression output",
+              value = state_init("ca_additional", FALSE)
+            ),
+            checkboxInput(
+              inputId = "ca_mc_diag", label = "VIF",
+              value = state_init("ca_mc_diag", FALSE)
+            )
+          )
+        )
+      ),
+      conditionalPanel(
+        condition = "input.tabs_conjoint == 'Predict'",
         selectInput(
-          "ca_predict", label = "Prediction input:", ca_predict,
+          "ca_predict", label = "Prediction input type:", ca_predict,
           selected = state_single("ca_predict", ca_predict, "none")
         ),
         conditionalPanel(
@@ -260,11 +313,9 @@ output$ui_conjoint <- renderUI({
           "input.ca_predict == 'data' | input.ca_predict == 'datacmd' | input.ca_by != 'none'",
           uiOutput("ui_ca_store_pred")
         )
-      )
-    ),
-    conditionalPanel(
-      condition = "input.tabs_conjoint == 'Plot'",
-      wellPanel(
+      ),
+      conditionalPanel(
+        condition = "input.tabs_conjoint == 'Plot'",
         selectInput(
           "ca_plots", "Conjoint plots:", choices = ca_plots,
           selected = state_single("ca_plots", ca_plots, "pw")
@@ -278,41 +329,6 @@ output$ui_conjoint <- renderUI({
         )
       )
     ),
-    wellPanel(
-      uiOutput("ui_ca_rvar"),
-      uiOutput("ui_ca_evar"),
-      # uiOutput("ui_ca_show_interactions"),
-      # conditionalPanel(condition = "input.ca_show_interactions != ''",
-      #   uiOutput("ui_ca_int")
-      # ),
-      uiOutput("ui_ca_by"),
-      conditionalPanel(
-        condition = "input.tabs_conjoint != 'Predict' & input.ca_by != 'none'",
-        uiOutput("ui_ca_show")
-      ),
-      conditionalPanel(
-        condition = "input.tabs_conjoint == 'Summary'",
-        uiOutput("ui_ca_store")
-      ),
-      conditionalPanel(
-        condition = "input.ca_evar != null",
-        checkboxInput(
-          "ca_reverse", label = "Reverse evaluation scores",
-          value = state_init("ca_reverse", FALSE)
-        ),
-        conditionalPanel(
-          condition = "input.tabs_conjoint == 'Summary'",
-          checkboxInput(
-            inputId = "ca_additional", label = "Additional regression output",
-            value = state_init("ca_additional", FALSE)
-          ),
-          checkboxInput(
-            inputId = "ca_mc_diag", label = "VIF",
-            value = state_init("ca_mc_diag", FALSE)
-          )
-        )
-      )
-    ),
     help_and_report(
       modal_title = "Conjoint",
       fun_name = "conjoint",
@@ -322,43 +338,42 @@ output$ui_conjoint <- renderUI({
 })
 
 ca_available <- reactive({
-  if (not_available(input$ca_rvar)) {
-    return("This analysis requires a response variable of type integer\nor numeric and one or more explanatory variables.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("carpet"))
+  if (not_pressed(input$ca_run)) {
+    "** Press the Estimate button to run the conjoint analysis **"
+  } else if (not_available(input$ca_rvar)) {
+    "This analysis requires a response variable of type integer\nor numeric and one or more explanatory variables.\nIf these variables are not available please select another dataset.\n\n" %>% 
+      suggest_data("carpet")
+  } else if (not_available(input$ca_evar)) {
+    "Please select one or more explanatory variables of type factor.\nIf none are available please choose another dataset\n\n" %>% 
+      suggest_data("carpet")
+  } else {
+    "available"
   }
-
-  if (not_available(input$ca_evar)) {
-    return("Please select one or more explanatory variables of type factor.\nIf none are available please choose another dataset\n\n" %>% suggest_data("carpet"))
-  }
-
-  "available"
 })
 
 ca_plot <- reactive({
+  req(pressed(input$ca_run))
+  if (ca_available() != "available") return()
   req(input$ca_plots)
+
   nrVars <- length(input$ca_evar)
   plot_height <- plot_width <- 500
   if (input$ca_plots == "pw") {
     plot_height <- 325 * (1 + floor((nrVars - 1) / 2))
     plot_width <- 325 * min(nrVars, 2)
   }
-
   list(plot_width = plot_width, plot_height = plot_height)
 })
 
 ca_plot_width <- function()
-  ca_plot() %>% {
-    if (is.list(.)) .$plot_width else 650
-  }
+  ca_plot() %>% {if (is.list(.)) .$plot_width else 650}
 
 ca_plot_height <- function()
-  ca_plot() %>% {
-    if (is.list(.)) .$plot_height else 400
-  }
+  ca_plot() %>% {if (is.list(.)) .$plot_height else 400}
 
 ca_pred_plot_height <- function()
   if (input$ca_pred_plot) 500 else 0
 
-# output is called from the main radiant ui.R
 output$conjoint <- renderUI({
   register_print_output("summary_conjoint", ".summary_conjoint")
   register_print_output("predict_conjoint", ".predict_print_conjoint")
@@ -372,27 +387,27 @@ output$conjoint <- renderUI({
     width_fun = "ca_plot_width"
   )
 
-  # two separate tabs
+  ## three separate tabs
   ca_output_panels <- tabsetPanel(
     id = "tabs_conjoint",
     tabPanel(
       "Summary",
-      downloadLink("dl_ca_PWs", "", class = "fa fa-download alignright"), br(),
+      download_link("dl_ca_PWs"), br(),
       verbatimTextOutput("summary_conjoint")
     ),
     tabPanel(
       "Predict",
       conditionalPanel(
         "input.ca_pred_plot == true",
-        plot_downloader("conjoint", height = ca_pred_plot_height, po = "dlp_", pre = ".predict_plot_"),
+        download_link("dlp_ca_pred"),
         plotOutput("predict_plot_conjoint", width = "100%", height = "100%")
       ),
-      downloadLink("dl_ca_pred", "", class = "fa fa-download alignright"), br(),
+      download_link("dl_ca_pred"), br(),
       verbatimTextOutput("predict_conjoint")
     ),
     tabPanel(
       "Plot",
-      plot_downloader("conjoint", height = ca_plot_height),
+      download_link("dlp_conjoint"),
       plotOutput("plot_conjoint", width = "100%", height = "100%")
     )
   )
@@ -414,14 +429,14 @@ output$conjoint <- renderUI({
 })
 
 .summary_conjoint <- reactive({
-  if (ca_available() != "available") return(ca_available())
   if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
+  if (ca_available() != "available") return(ca_available())
   do.call(summary, c(list(object = .conjoint()), ca_sum_inputs()))
 })
 
 .predict_conjoint <- reactive({
-  if (ca_available() != "available") return(ca_available())
   if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
+  if (ca_available() != "available") return(ca_available())
   if (is_empty(input$ca_predict, "none")) return("** Select prediction input **")
   if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && is_empty(input$ca_pred_data)) {
     return("** Select data for prediction **")
@@ -436,15 +451,14 @@ output$conjoint <- renderUI({
 })
 
 .predict_print_conjoint <- reactive({
-  .predict_conjoint() %>% {
-    if (is.character(.)) cat(., "\n") else print(.)
-  }
+  .predict_conjoint() %>% 
+    {if (is.character(.)) cat(., "\n") else print(.)}
 })
 
 .predict_plot_conjoint <- reactive({
+  if (not_pressed(input$ca_run)) return(invisible())
   if (ca_available() != "available") return(ca_available())
   req(input$ca_pred_plot, available(input$ca_xvar))
-  if (not_pressed(input$ca_run)) return(invisible())
   if (is_empty(input$ca_predict, "none")) return(invisible())
   if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && is_empty(input$ca_pred_data)) {
     return(invisible())
@@ -456,14 +470,19 @@ output$conjoint <- renderUI({
 })
 
 .plot_conjoint <- reactive({
-  if (ca_available() != "available") return(ca_available())
-  if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
-  ca_plot_inputs() %>% {
-    .$shiny <- TRUE
-    .
-  } %>% {
-    do.call(plot, c(list(x = .conjoint()), .))
-  }
+  if (not_pressed(input$ca_run)) {
+    return("** Press the Estimate button to estimate the model **")
+  } else if (is_empty(input$ca_plots, "none")) {
+    return("Please select a conjoint plot from the drop-down menu")
+  } 
+  input$ca_scale_plot
+  input$ca_plots
+  isolate({
+    if (ca_available() != "available") return(ca_available())
+    withProgress(message = "Generating plots", value = 1, {
+      do.call(plot, c(list(x = .conjoint()), ca_plot_inputs(), shiny = TRUE))
+    })
+  })
 })
 
 observeEvent(input$conjoint_report, {
@@ -518,19 +537,6 @@ observeEvent(input$conjoint_report, {
   )
 })
 
-output$dl_ca_PWs <- downloadHandler(
-  filename = function() {
-    paste(input$dataset, "_PWs.csv", sep = "")
-  },
-  content = function(file) {
-    if (pressed(input$ca_run)) {
-      .conjoint()$the_table$PW %>% write.csv(file = file, row.names = FALSE)
-    } else {
-      cat("No output available. Press the Estimate button to generate results", file = file)
-    }
-  }
-)
-
 observeEvent(input$ca_store_pw, {
   req(pressed(input$ca_run))
   robj <- .conjoint()
@@ -561,16 +567,52 @@ observeEvent(input$ca_store_pred, {
   )
 })
 
-output$dl_ca_pred <- downloadHandler(
-  filename = function() {
-    "conjoint_predictions.csv"
-  },
-  content = function(file) {
-    if (pressed(input$ca_run)) {
-      .predict_conjoint() %>%
-        write.csv(file = file, row.names = FALSE)
-    } else {
-      cat("No output available. Press the Estimate button to generate results", file = file)
-    }
+dl_ca_PWs <- function(path) {
+  if (pressed(input$ca_run)) {
+    store(.conjoint(), df = TRUE) %>% write.csv(file = path, row.names = FALSE)
+  } else {
+    cat("No output available. Press the Estimate button to generate results", file = path)
   }
+}
+
+download_handler(
+  id = "dl_ca_PWs", 
+  fun = dl_ca_PWs, 
+  fn = paste0(input$dataset, "_PWs.csv"),
+  caption = "Download part worths"
+)
+
+dl_ca_pred <- function(path) {
+  if (pressed(input$ca_run)) {
+    write.csv(.predict_conjoint(), file = path, row.names = FALSE)
+  } else {
+    cat("No output available. Press the Estimate button to generate results", file = path)
+  }
+}
+
+download_handler(
+  id = "dl_ca_pred", 
+  fun = dl_ca_pred, 
+  fn = paste0(input$dataset, "_ca_pred.csv"),
+  caption = "Download predictions"
+)
+
+download_handler(
+  id = "dlp_ca_pred", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_conjoint_pred.png"),
+  caption = "Download conjoint prediction plot",
+  plot = .predict_plot_conjoint,
+  width = plot_width,
+  height = ca_pred_plot_height
+)
+
+download_handler(
+  id = "dlp_conjoint", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_conjoint.png"),
+  caption = "Download conjoint plot",
+  plot = .plot_conjoint,
+  width = ca_plot_width,
+  height = ca_plot_height
 )
