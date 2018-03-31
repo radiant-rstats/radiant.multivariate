@@ -6,14 +6,15 @@
 #' @name radiant.multivariate-deprecated
 #' @param ... Parameters to be passed to the updated functions
 #' @docType package
-#' @export  save_factors save_membership kmeans_clus hier_clus
-#' @aliases save_factors save_membership kmeans_clus hier_clus
+#' @export  save_factors save_membership kmeans_clus hier_clus pmap
+#' @aliases save_factors save_membership kmeans_clus hier_clus pmap
 #' @section Details:
 #' \tabular{rl}{
 #'   \code{save_factors} is now a synonym for \code{\link{store.full_factor}}\cr
 #'   \code{save_membership} is now a synonym for \code{\link{store.kclus}}\cr
 #'   \code{kmeans_clus} is now a synonym for \code{\link{kclus}}\cr
 #'   \code{hier_clus} is now a synonym for \code{\link{hclus}}\cr
+#'   \code{pmap} is now a synonym for \code{\link{prmap}}\cr
 #' }
 #'
 save_factors <- function(...) {
@@ -31,5 +32,9 @@ kmeans_clus <- function(...) {
 hier_clus <- function(...) {
   .Deprecated("hclus", package = "radiant.multivariate")
   hclus(...)
+}
+pmap <- function(...) {
+  .Deprecated("prmap", package = "radiant.multivariate")
+  prmap(...)
 }
 NULL

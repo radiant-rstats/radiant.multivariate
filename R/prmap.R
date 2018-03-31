@@ -1,6 +1,6 @@
 #' Attribute based brand maps
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 #'
 #' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
 #' @param brand A character variable with brand names
@@ -9,21 +9,22 @@
 #' @param nr_dim Number of dimensions
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
-#' @return A list of all variables defined in the function as an object of class pmap
+#' @return A list of all variables defined in the function as an object of class prmap
 #'
 #' @examples
-#' result <- pmap("computer","brand","high_end:business")
+#' result <- prmap("computer","brand","high_end:business")
 #'
-#' @seealso \code{\link{summary.pmap}} to summarize results
-#' @seealso \code{\link{plot.pmap}} to plot results
+#' @seealso \code{\link{summary.prmap}} to summarize results
+#' @seealso \code{\link{plot.prmap}} to plot results
 #'
 #' @importFrom psych principal
 #'
 #' @export
-pmap <- function(dataset, brand, attr,
-                 pref = "",
-                 nr_dim = 2,
-                 data_filter = "") {
+prmap <- function(
+  dataset, brand, attr, pref = "",
+  nr_dim = 2, data_filter = ""
+) {
+
   nr_dim <- as.numeric(nr_dim)
   vars <- c(brand, attr)
   dat <- getdata(dataset, vars, filt = data_filter)
@@ -60,35 +61,32 @@ pmap <- function(dataset, brand, attr,
 
   if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
-  as.list(environment()) %>% add_class(c("pmap", "full_factor"))
+  as.list(environment()) %>% add_class(c("prmap", "full_factor"))
 }
 
-#' Summary method for the pmap function
+#' Summary method for the prmap function
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 #'
-#' @param object Return value from \code{\link{pmap}}
+#' @param object Return value from \code{\link{prmap}}
 #' @param cutoff Show only loadings with (absolute) values above cutoff (default = 0)
 #' @param dec Rounding to use for output
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pmap("computer","brand","high_end:business")
+#' result <- prmap("computer","brand","high_end:business")
 #' summary(result)
 #' summary(result, cutoff = .3)
-#' result <- pmap("computer","brand","high_end:dated", pref = c("innovative","business"))
+#' result <- prmap("computer","brand","high_end:dated", pref = c("innovative","business"))
 #' summary(result)
-#' computer %>% pmap("brand","high_end:dated", pref = c("innovative","business")) %>%
+#' computer %>% prmap("brand","high_end:dated", pref = c("innovative","business")) %>%
 #'   summary
 #'
-#' @seealso \code{\link{pmap}} to calculate results
-#' @seealso \code{\link{plot.pmap}} to plot results
+#' @seealso \code{\link{prmap}} to calculate results
+#' @seealso \code{\link{plot.prmap}} to plot results
 #'
 #' @export
-summary.pmap <- function(object,
-                         cutoff = 0,
-                         dec = 2,
-                         ...) {
+summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   cat("Attribute based brand map\n")
   cat("Data        :", object$dataset, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
@@ -142,33 +140,33 @@ summary.pmap <- function(object,
     print()
 }
 
-#' Plot method for the pmap function
+#' Plot method for the prmap function
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pmap.html} for an example in Radiant
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 #'
-#' @param x Return value from \code{\link{pmap}}
+#' @param x Return value from \code{\link{prmap}}
 #' @param plots Components to include in the plot ("brand", "attr"). If data on preferences is available use "pref" to add preference arrows to the plot
 #' @param scaling Arrow scaling in the brand map
 #' @param fontsz Font size to use in plots
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pmap("computer", "brand", "high_end:business")
+#' result <- prmap("computer", "brand", "high_end:business")
 #' plot(result, plots = "brand")
 #' plot(result, plots = c("brand", "attr"))
 #' plot(result, plots = c("brand", "attr"))
 #' plot(result, scaling = 1, plots = c("brand", "attr"))
-#' result <- pmap("computer", "brand", "high_end:dated",
+#' result <- prmap("computer", "brand", "high_end:dated",
 #'                pref = c("innovative", "business"))
 #' plot(result, plots = c("brand", "attr", "pref"))
 #'
-#' @seealso \code{\link{pmap}} to calculate results
-#' @seealso \code{\link{summary.pmap}} to plot results
+#' @seealso \code{\link{prmap}} to calculate results
+#' @seealso \code{\link{summary.prmap}} to plot results
 #'
 #' @importFrom wordcloud textplot
 #'
 #' @export
-plot.pmap <- function(x,
+plot.prmap <- function(x,
                       plots = "",
                       scaling = 2.1,
                       fontsz = 1.3,

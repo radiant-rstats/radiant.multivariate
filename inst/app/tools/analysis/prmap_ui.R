@@ -5,7 +5,7 @@
 pm_nr_dim <- c("2 dimensions" = 2, "3 dimensions" = 3)
 
 ## list of function arguments
-pm_args <- as.list(formals(pmap))
+pm_args <- as.list(formals(prmap))
 
 ## list of function inputs selected by user
 pm_inputs <- reactive({
@@ -17,10 +17,10 @@ pm_inputs <- reactive({
   pm_args
 })
 
-pm_plot_args <- as.list(if (exists("plot.pmap")) {
-  formals(plot.pmap)
+pm_plot_args <- as.list(if (exists("plot.prmap")) {
+  formals(plot.prmap)
 } else {
-  formals(radiant:::plot.pmap)
+  formals(radiant:::plot.prmap)
 } )
 
 ## list of function inputs selected by user
@@ -72,50 +72,69 @@ output$ui_pm_plots <- renderUI({
   )
 })
 
-output$ui_pmap <- renderUI({
+observe({
+  ## dep on most inputs
+  input$data_filter
+  input$show_filter
+  sapply(r_drop(names(pm_args)), function(x) input[[paste0("pm_", x)]])
+
+  ## notify user when the model needs to be updated
+  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
+  if (pressed(input$pm_run)) {
+    if (is.null(input$pm_attr)) { 
+      updateTabsetPanel(session, "tabs_prmap", selected = "Summary")
+      updateActionButton(session, "pm_run", "Estimate model", icon = icon("play"))
+    } else if (isTRUE(attr(pm_inputs, "observable")$.invalidated)) {
+      updateActionButton(session, "pm_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
+    } else {
+      updateActionButton(session, "pm_run", "Estimate model", icon = icon("play"))
+    }
+  }
+})
+
+output$ui_prmap <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
       actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
-      uiOutput("ui_pm_brand"),
-      uiOutput("ui_pm_attr"),
-      uiOutput("ui_pm_pref"),
-      radioButtons(
-        inputId = "pm_nr_dim", label = NULL, pm_nr_dim,
-        selected = state_init("pm_nr_dim", 2),
-        inline = TRUE
-      ),
       conditionalPanel(
-        condition = "input.tabs_pmap == 'Plot'",
-        uiOutput("ui_pm_plots"),
-        tags$table(
-          tags$td(numericInput("pm_scaling", "Arrow scale:", state_init("pm_scaling", 2.1), .5, 4, .1, width = "117px")),
-          tags$td(numericInput("pm_fontsz", "Font size:", state_init("pm_fontsz", 1.3), .5, 4, .1, width = "117px")),
-          width = "100%"
-        )
-      ),
-      conditionalPanel(
-        condition = "input.tabs_pmap == 'Summary'",
+        condition = "input.tabs_prmap == 'Summary'",
+        uiOutput("ui_pm_brand"),
+        uiOutput("ui_pm_attr"),
+        uiOutput("ui_pm_pref"),
+        radioButtons(
+          inputId = "pm_nr_dim", label = NULL, pm_nr_dim,
+          selected = state_init("pm_nr_dim", 2),
+          inline = TRUE
+        ),
         numericInput(
           "pm_cutoff", label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05
         ),
         conditionalPanel(
           condition = "input.pm_attr != null",
-          # actionButton("pm_save_scores", "Save scores")
           tags$table(
-            tags$td(textInput("pm_store_name", "Store scores:", state_init("pm_store_name", "factor"))),
+            tags$td(textInput("pm_store_name", "Store scores:", state_init("pm_store_name", "pmfactor"))),
             tags$td(actionButton("pm_store", "Store"), style = "padding-top:30px;")
           )
+        )
+      ),
+      conditionalPanel(
+        condition = "input.tabs_prmap == 'Plot'",
+        uiOutput("ui_pm_plots"),
+        tags$table(
+          tags$td(numericInput("pm_scaling", "Arrow scale:", state_init("pm_scaling", 2.1), .5, 4, .1, width = "117px")),
+          tags$td(numericInput("pm_fontsz", "Font size:", state_init("pm_fontsz", 1.3), .5, 4, .1, width = "117px")),
+          width = "100%"
         )
       )
     ),
     help_and_report(
       modal_title = "Attribute based brand maps",
-      fun_name = "pmap",
-      help_file = inclMD(file.path(getOption("radiant.path.multivariate"), "app/tools/help/pmap.md"))
+      fun_name = "prmap",
+      help_file = inclMD(file.path(getOption("radiant.path.multivariate"), "app/tools/help/prmap.md"))
     )
   )
 })
@@ -137,37 +156,37 @@ pm_plot_height <- function()
     if (is.list(.)) .$plot_height else 650
   }
 
-output$pmap <- renderUI({
-  register_print_output("summary_pmap", ".summary_pmap")
+output$prmap <- renderUI({
+  register_print_output("summary_prmap", ".summary_prmap")
   register_plot_output(
-    "plot_pmap", ".plot_pmap",
+    "plot_prmap", ".plot_prmap",
     width_fun = "pm_plot_width",
     height_fun = "pm_plot_height"
   )
 
   pm_output_panels <- tabsetPanel(
-    id = "tabs_pmap",
+    id = "tabs_prmap",
     tabPanel(
       "Summary",
-      downloadLink("dl_pm_loadings", "", class = "fa fa-download alignright"), br(),
-      verbatimTextOutput("summary_pmap")
+      download_link("dl_pm_loadings"), br(),
+      verbatimTextOutput("summary_prmap")
     ),
     tabPanel(
       "Plot",
-      plot_downloader("pmap", height = pm_plot_height),
-      plotOutput("plot_pmap", height = "100%")
+      download_link("dlp_prmap"),
+      plotOutput("plot_prmap", height = "100%")
     )
   )
 
   stat_tab_panel(
     menu = "Multivariate > Maps",
     tool = "Attributes",
-    tool_ui = "ui_pmap",
+    tool_ui = "ui_prmap",
     output_panels = pm_output_panels
   )
 })
 
-.pmap_available <- reactive({
+.prmap_available <- reactive({
   if (not_available(input$pm_brand) || not_available(input$pm_attr)) {
     return("This analysis requires a brand variable of type factor or character and multiple attribute variables\nof type numeric or integer. If these variables are not available please select another dataset.\n\n" %>% suggest_data("retailers"))
   }
@@ -183,24 +202,24 @@ output$pmap <- renderUI({
 })
 
 
-.pmap <- eventReactive(input$pm_run, {
+.prmap <- eventReactive(input$pm_run, {
   withProgress(
     message = "Generating perceptual map", value = 1,
-    do.call(pmap, pm_inputs())
+    do.call(prmap, pm_inputs())
   )
 })
 
-.summary_pmap <- reactive({
-  if (.pmap_available() != "available") return(.pmap_available())
-  summary(.pmap(), cutoff = input$pm_cutoff)
+.summary_prmap <- reactive({
+  if (.prmap_available() != "available") return(.prmap_available())
+  summary(.prmap(), cutoff = input$pm_cutoff)
 })
 
-.plot_pmap <- reactive({
-  if (.pmap_available() != "available") return(.pmap_available())
-  capture_plot(do.call(plot, c(list(x = .pmap()), pm_plot_inputs())))
+.plot_prmap <- reactive({
+  if (.prmap_available() != "available") return(.prmap_available())
+  capture_plot(do.call(plot, c(list(x = .prmap()), pm_plot_inputs())))
 })
 
-observeEvent(input$pmap_report, {
+observeEvent(input$prmap_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$pm_cutoff, dec = 2), "")
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
@@ -208,7 +227,7 @@ observeEvent(input$pmap_report, {
   if (!is_empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
   update_report(
     inp_main = inp,
-    fun_name = "pmap", 
+    fun_name = "prmap", 
     inp_out = inp_out,
     fig.width = pm_plot_width(),
     fig.height = pm_plot_height(),
@@ -216,30 +235,38 @@ observeEvent(input$pmap_report, {
   )
 })
 
-## save factor loadings when download button is pressed
-output$dl_pm_loadings <- downloadHandler(
-  filename = function() {
-    "loadings.csv"
-  },
-  content = function(file) {
-    if (pressed(input$pm_run)) {
-      .pmap() %>%
-        {
-          if (is.list(.)) .$fres$loadings else return()
-        } %>%
-        clean_loadings(input$pm_cutoff, fsort = FALSE) %>%
-        write.csv(file = file)
-    } else {
-      cat("No output available. Press the Estimate button to generate the factor analysis results", file = file)
-    }
-  }
-)
-
 ## store factor scores
 observeEvent(input$pm_store, {
   if (pressed(input$pm_run)) {
-    .pmap() %>% {
-      if (!is.character(.)) store(., name = input$pm_store_name)
-    }
+    .prmap() %>% 
+      {if (!is.character(.)) store(., name = input$pm_store_name)}
   }
 })
+
+dl_pm_loadings <- function(path) {
+  if (pressed(input$pm_run)) {
+    .prmap() %>%
+      {if (is.list(.)) .$fres$loadings else return()} %>%
+      clean_loadings(input$pm_cutoff, fsort = FALSE) %>%
+      write.csv(file = path)
+  } else {
+    cat("No output available. Press the Estimate button to generate the factor analysis results", file = path)
+  }
+}
+
+download_handler(
+  id = "dl_pm_loadings", 
+  fun = dl_pm_loadings, 
+  fn = paste0(input$dataset, "_loadings.csv"),
+  caption = "Download factor loadings"
+)
+
+download_handler(
+  id = "dlp_prmap", 
+  fun = download_handler_plot, 
+  fn = paste0(input$dataset, "_prmap.png"),
+  caption = "Download preceptual map plot",
+  plot = .plot_prmap,
+  width = pm_plot_width,
+  height = pm_plot_height
+)
