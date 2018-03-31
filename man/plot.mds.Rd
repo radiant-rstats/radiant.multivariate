@@ -4,7 +4,7 @@
 \alias{plot.mds}
 \title{Plot method for the mds function}
 \usage{
-\method{plot}{mds}(x, rev_dim = "", fontsz = 1.3, ...)
+\method{plot}{mds}(x, rev_dim = NULL, fontsz = 1.3, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{mds}}}

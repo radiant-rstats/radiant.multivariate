@@ -5,7 +5,7 @@
 \title{Store method for the Multivariate > Conjoint > Predict}
 \usage{
 \method{store}{conjoint.predict.by}(object, name = "predict_by",
-  envir = parent.frame(), ...)
+  envir = parent.frame(), df = FALSE, ...)
 }
 \arguments{
 \item{object}{Return value from predict.conjoint}
@@ -13,6 +13,8 @@
 \item{name}{Name of the dataset to store}
 
 \item{envir}{Environment to assign 'new' dataset (optional). Used when an r_data list is not available}
+
+\item{df}{Return data.frame}
 
 \item{...}{further arguments passed to or from other methods}
 }

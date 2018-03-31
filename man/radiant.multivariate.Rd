@@ -12,7 +12,7 @@ radiant.multivariate()
 \description{
 radiant.multivariate
 
-Launch radiant.multivariate in default browser
+Launch radiant.multivariate in the default browser
 }
 \details{
 See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials

@@ -5,7 +5,7 @@
 \title{Store method for the Multivariate > Conjoint tab}
 \usage{
 \method{store}{conjoint}(object, name = "PWs", type = "PW",
-  envir = parent.frame(), ...)
+  envir = parent.frame(), df = TRUE, ...)
 }
 \arguments{
 \item{object}{Return value from conjoint}
@@ -15,6 +15,8 @@
 \item{type}{Type of output to store}
 
 \item{envir}{Environment to assign 'new' dataset (optional). Used when an r_data list is not available}
+
+\item{df}{Return data.frame}
 
 \item{...}{further arguments passed to or from other methods}
 }
