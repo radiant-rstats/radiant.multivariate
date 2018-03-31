@@ -1,9 +1,6 @@
-trim <- function(x) gsub("^\\s+|\\s+$", "", x)
-
-######### tests ########
-
 # library(radiant.multivariate)
 # library(testthat)
+trim <- function(x) gsub("^\\s+|\\s+$", "", x)
 
 context("Maps")
 
@@ -29,7 +26,7 @@ test_that("City MDS points", {
 })
 
 test_that("Computer perceptual map", {
-  result <- pmap("computer", "brand", "high_end:business")
+  result <- prmap("computer", "brand", "high_end:business")
   # str(result)
   res1 <- result$fres$scores
   # dput(result$res$points)
@@ -110,6 +107,6 @@ context("Conjoint analysis")
 test_that("Conjoint on mp3 data", {
   result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
   res1 <- capture_output(summary(result))
-  res2 <- "Conjoint analysis\nData                 : mp3 \nResponse variable    : Rating \nExplanatory variables: Memory, Radio, Size, Price, Shape \n\nConjoint part-worths:\n   Attributes      Levels      PW\n       Memory         4GB   0.000\n       Memory         6GB   7.667\n       Memory         8GB  29.667\n        Radio          No   0.000\n        Radio         Yes   6.111\n         Size       Large   0.000\n         Size      Medium   6.333\n         Size       Small   8.500\n        Price         $50   0.000\n        Price        $100  -6.833\n        Price        $150 -33.833\n        Shape    Circular   0.000\n        Shape Rectangular -27.833\n        Shape      Square -13.333\n Base utility           ~  58.111\n\nConjoint importance weights:\n Attributes    IW\n     Memory 0.280\n      Radio 0.058\n       Size 0.080\n      Price 0.319\n      Shape 0.263\n\nConjoint regression results:\n\n                   coefficient\n (Intercept)            58.111\n Memory|6GB              7.667\n Memory|8GB             29.667\n Radio|Yes               6.111\n Size|Medium             6.333\n Size|Small              8.500\n Price|$100             -6.833\n Price|$150            -33.833\n Shape|Rectangular     -27.833\n Shape|Square          -13.333\n"
+  res2 <- "Conjoint analysis\nData                 : mp3 \nResponse variable    : Rating \nExplanatory variables: Memory, Radio, Size, Price, Shape \n\nConjoint part-worths:\n   Attributes      Levels      PW\n Memory       4GB           0.000\n Memory       6GB           7.667\n Memory       8GB          29.667\n Radio        No            0.000\n Radio        Yes           6.111\n Size         Large         0.000\n Size         Medium        6.333\n Size         Small         8.500\n Price        $50           0.000\n Price        $100         -6.833\n Price        $150        -33.833\n Shape        Circular      0.000\n Shape        Rectangular -27.833\n Shape        Square      -13.333\n Base utility ~            58.111\n\nConjoint importance weights:\n Attributes    IW\n     Memory 0.280\n     Radio  0.058\n     Size   0.080\n     Price  0.319\n     Shape  0.263\n\nConjoint regression results:\n\n                   coefficient\n (Intercept)            58.111\n Memory|6GB              7.667\n Memory|8GB             29.667\n Radio|Yes               6.111\n Size|Medium             6.333\n Size|Small              8.500\n Price|$100             -6.833\n Price|$150            -33.833\n Shape|Rectangular     -27.833\n Shape|Square          -13.333\n"
   expect_equal(res1, res2)
 })
