@@ -140,7 +140,7 @@ plot.hclus <- function(x, plots = c("scree", "change"),
       ) %>%
       na.omit() %>%
       ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = bump)) +
-      geom_bar(stat = "identity", alpha = .5, fill = "blue") +
+      geom_bar(stat = "identity", alpha = 0.5, fill = "blue") +
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Change in within-cluster heterogeneity",

@@ -3,7 +3,7 @@ r_url_list <- getOption("radiant.url.list")
 r_url_list[["(Dis)similarity"]] <-
   list("tabs_mds" = list("Summary" = "multivariate/mds/", "Plot" = "multivariate/mds/plot/"))
 r_url_list[["Attributes"]] <-
-  list("tabs_pmap" = list("Summary" = "multivariate/pmap/", "Plot" = "multivariate/pmap/plot/"))
+  list("tabs_prmap" = list("Summary" = "multivariate/prmap/", "Plot" = "multivariate/prmap/plot/"))
 r_url_list[["Pre-factor"]] <-
   list("tabs_pre_factor" = list("Summary" = "multivariate/pfactor/", "Plot" = "multivariate/pfactor/plot/"))
 r_url_list[["Factor"]] <-
@@ -33,7 +33,7 @@ options(
         ),
         "Maps",
         tabPanel("(Dis)similarity", uiOutput("mds")),
-        tabPanel("Attributes", uiOutput("pmap")),
+        tabPanel("Attributes", uiOutput("prmap")),
         "----", "Factor",
         tabPanel("Pre-factor", uiOutput("pre_factor")),
         tabPanel("Factor", uiOutput("full_factor")),

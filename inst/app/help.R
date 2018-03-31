@@ -1,5 +1,5 @@
 help_multivariate <- c(
-  "(Dis)similarity map" = "mds.md", "Attribute map" = "pmap.md",
+  "(Dis)similarity map" = "mds.md", "Attribute map" = "prmap.md",
   "Pre-factor" = "pre_factor.md", "Factor" = "full_factor.md",
   "Hierarchical clustering" = "hclus.md", "K-clustering" = "kclus.md",
   "Conjoint" = "conjoint.md"

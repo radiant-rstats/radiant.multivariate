@@ -209,7 +209,7 @@ plot.kclus <- function(x, plots = "density",
     for (var in vars) {
       plot_list[[paste0("dens_", var)]] <-
         ggplot(x$dat, aes_string(x = var, fill = "Cluster")) +
-        geom_density(adjust = 2.5, alpha = .3) +
+        geom_density(adjust = 2.5, alpha = 0.3) +
         labs(y = "") + theme(axis.text.y = element_blank())
     }
   }

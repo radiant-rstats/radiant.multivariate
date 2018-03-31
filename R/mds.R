@@ -25,18 +25,18 @@
 #' @importFrom MASS isoMDS
 #'
 #' @export
-mds <- function(dataset, id1, id2, dis,
-                method = "metric",
-                nr_dim = 2,
-                seed = 1234,
-                data_filter = "") {
+mds <- function(
+  dataset, id1, id2, dis, method = "metric",
+  nr_dim = 2, seed = 1234, data_filter = ""
+) {
+
   nr_dim <- as.numeric(nr_dim)
   dat <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
   if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
 
   d <- dat[[dis]]
-  id1_dat <- dat[[id1]] %>% as.character()
-  id2_dat <- dat[[id2]] %>% as.character()
+  id1_dat <- as.character(dat[[id1]])
+  id2_dat <- as.character(dat[[id2]])
   rm(dat)
 
   ## ids
@@ -104,6 +104,7 @@ mds <- function(dataset, id1, id2, dis,
 #'
 #' @export
 summary.mds <- function(object, dec = 2, ...) {
+
   if (is.character(object)) return(cat(object))
 
   cat("(Dis)similarity based brand map (MDS)\n")
@@ -155,12 +156,10 @@ summary.mds <- function(object, dec = 2, ...) {
 #' @importFrom wordcloud textplot
 #'
 #' @export
-plot.mds <- function(x,
-                     rev_dim = "",
-                     fontsz = 1.3,
-                     ...) {
-  object <- x
-  rm(x)
+plot.mds <- function(x, rev_dim = NULL, fontsz = 1.3, ...) {
+  object <- x; rm(x)
+  if (is.character(object)) return(cat(object))
+  if (is_empty(fontsz)) fontsz <- 1.3
 
   ## set extremes for plot
   lim <- max(abs(object$res$points))
@@ -174,10 +173,13 @@ plot.mds <- function(x,
   }
 
   ## reverse selected dimensions
-  if (!is.null(rev_dim) && rev_dim != "") {
-    as.numeric(rev_dim) %>% {
-      object$res$points[, .] <<- -1 * object$res$points[, .]
+  if (!is_empty(rev_dim)) {
+    rev_dim <- as.numeric(rev_dim)
+    if (max(rev_dim) > ncol(object$res$points)) {
+      return(invisible())
     }
+    as.numeric(rev_dim) %>% 
+      {object$res$points[, .] <<- -1 * object$res$points[, .]}
   }
 
   ## plot maps

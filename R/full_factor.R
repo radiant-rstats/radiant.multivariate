@@ -23,11 +23,11 @@
 #' @importFrom GPArotation quartimax oblimin simplimax
 #'
 #' @export
-full_factor <- function(dataset, vars,
-                        method = "PCA",
-                        nr_fact = 1,
-                        rotation = "varimax",
-                        data_filter = "") {
+full_factor <- function(
+  dataset, vars, method = "PCA", nr_fact = 1,
+  rotation = "varimax", data_filter = ""
+) {
+
   dat <- getdata(dataset, vars, filt = data_filter)
   if (!is_string(dataset)) {
     dataset <- deparse(substitute(dataset)) %>%
@@ -42,7 +42,8 @@ full_factor <- function(dataset, vars,
 
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dat)) {
-    cat("The number of factors cannot exceed the number of variables.\n")
+    return("The number of factors cannot exceed the number of variables" %>%
+        add_class("full_factor"))
     nrFac <- ncol(dat)
   }
 
@@ -52,10 +53,16 @@ full_factor <- function(dataset, vars,
       oblique.scores = FALSE
     )
   } else {
-    fres <- psych::fa(
+    fres <- try(psych::fa(
       dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
       oblique.scores = FALSE, fm = "ml"
-    )
+    ), silent = TRUE)
+    if (is(fres, "try-error")) {
+      return(
+        "An error occured. Increase the number of variables or reduce the number of factors" %>%
+          add_class("full_factor")
+      )
+    }
   }
 
   ## convert loadings object to data.frame
@@ -97,11 +104,11 @@ full_factor <- function(dataset, vars,
 #' @importFrom psych fa.sort
 #'
 #' @export
-summary.full_factor <- function(object,
-                                cutoff = 0,
-                                fsort = FALSE,
-                                dec = 2,
-                                ...) {
+summary.full_factor <- function(
+  object, cutoff = 0, fsort = FALSE,
+  dec = 2, ...
+) {
+
   if (is.character(object)) return(cat(object))
 
   cat("Factor analysis\n")
@@ -118,7 +125,8 @@ summary.full_factor <- function(object,
   cat("\nFactor loadings:\n")
 
   ## show only the loadings > cutoff
-  with(object, clean_loadings(floadings, cutoff, fsort, dec)) %>% print()
+  with(object, clean_loadings(floadings, cutoff, fsort, dec, "")) %>% 
+    print()
 
   ## fit measures
   cat("\nFit measures:\n")
@@ -169,8 +177,7 @@ summary.full_factor <- function(object,
 #'
 #' @export
 plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
-  object <- x
-  rm(x)
+  object <- x; rm(x)
 
   ## when no analysis was conducted (e.g., no variables selected)
   if (is.character(object)) {
@@ -255,6 +262,7 @@ store.full_factor <- function(object, ..., name = "") {
 #' @param fsort Sort factor loadings
 #' @param cutoff Show only loadings with (absolute) values above cutoff (default = 0)
 #' @param dec Number of decimals to show
+#' @param repl Replace loadings below the cutoff by NA (or "")
 #'
 #' @examples
 #' result <- full_factor("diamonds",c("price","carat","table","x","y"))
@@ -263,20 +271,19 @@ store.full_factor <- function(object, ..., name = "") {
 #' @importFrom psych fa.sort
 #'
 #' @export
-clean_loadings <- function(floadings,
-                           cutoff = 0,
-                           fsort = FALSE,
-                           dec = 8) {
-  floadings %<>% {
-    if (fsort) select(psych::fa.sort(.), -order) else .
-  }
+clean_loadings <- function(
+  floadings, cutoff = 0, fsort = FALSE, dec = 8, repl = NA
+) {
+
+  floadings %<>% 
+    {if (fsort) select(psych::fa.sort(.), -order) else .}
 
   if (cutoff == 0) {
     floadings %<>% round(dec)
   } else {
     ind <- abs(floadings) < cutoff
     floadings %<>% round(dec)
-    floadings[ind] <- ""
+    floadings[ind] <- repl
   }
   floadings
 }

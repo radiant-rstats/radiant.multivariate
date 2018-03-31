@@ -398,7 +398,7 @@ plot.conjoint <- function(
     IW.df <- the_table[["IW"]]
     lab <- if (object$by == "none") "" else paste0(" (", show, ")")
     plot_list[["iw"]] <- ggplot(IW.df, aes_string(x = "Attributes", y = "IW", fill = "Attributes")) +
-      geom_bar(stat = "identity", alpha = .5) +
+      geom_bar(stat = "identity", alpha = 0.5) +
       theme(legend.position = "none") +
       labs(title = paste0("Importance weights", lab))
   }
@@ -499,6 +499,7 @@ the_table <- function(model, dat, evar) {
 #' @param name Name of the dataset to store
 #' @param type Type of output to store
 #' @param envir Environment to assign 'new' dataset (optional). Used when an r_data list is not available
+#' @param df Return data.frame
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom pryr where
@@ -506,7 +507,7 @@ the_table <- function(model, dat, evar) {
 #' @export
 store.conjoint <- function(
   object, name = "PWs", type = "PW", 
-  envir = parent.frame(), ...
+  envir = parent.frame(), df = TRUE, ...
 ) {
 
   levs <- object$levs
@@ -536,7 +537,9 @@ store.conjoint <- function(
     }
   }
 
-  if (exists("r_environment")) {
+  if (df) {
+    return(res)
+  } else if (exists("r_environment")) {
     env <- r_environment
   } else if (exists("r_data")) {
     env <- pryr::where("r_data")
@@ -567,11 +570,12 @@ store.conjoint <- function(
 #' @param ... Additional arguments
 #' @param data Data or dataset name (e.g., data = mtcars or data = "mtcars")
 #' @param name Variable name(s) assigned to predicted values
+#' @param df Return data.frame
 #'
 #' @export
 store.conjoint.predict <- function(
   object, ..., data = attr(object, "pred_data"), 
-  name = "prediction"
+  name = "prediction", df = FALSE
 ) {
 
   if (is_empty(name)) name <- "prediction"
@@ -595,7 +599,11 @@ store.conjoint.predict <- function(
   pred <- as.data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(df)), stringsAsFactors = FALSE)
   pred[indr$ind, ] <- as.vector(df) ## as.vector removes all attributes from df
 
-  changedata(data, vars = pred, var_names = name)
+  if (isTRUE(df)) {
+    return(data)
+  } else {
+    changedata(data, vars = pred, var_names = name)
+  }
 }
 
 #' Store method for the Multivariate > Conjoint > Predict
@@ -605,6 +613,7 @@ store.conjoint.predict <- function(
 #' @param object Return value from predict.conjoint
 #' @param name Name of the dataset to store
 #' @param envir Environment to assign 'new' dataset (optional). Used when an r_data list is not available
+#' @param df Return data.frame
 #' @param ... further arguments passed to or from other methods
 #'
 #' @importFrom pryr where
@@ -612,10 +621,12 @@ store.conjoint.predict <- function(
 #' @export
 store.conjoint.predict.by <- function(
   object, name = "predict_by", 
-  envir = parent.frame(), ...
+  envir = parent.frame(), df = FALSE, ...
 ) {
   
-  if (exists("r_environment")) {
+  if (isTRUE(df)) {
+    return(object)
+  } else if (exists("r_environment")) {
     env <- r_environment
   } else if (exists("r_data")) {
     env <- pryr::where("r_data")

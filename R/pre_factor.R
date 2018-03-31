@@ -155,13 +155,12 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #'
 #' @export
-plot.pre_factor <- function(x, plots = c("scree", "change"),
-                            cutoff = 0.2,
-                            shiny = FALSE,
-                            custom = FALSE,
-                            ...) {
-  object <- x
-  rm(x)
+plot.pre_factor <- function(
+  x, plots = c("scree", "change"), cutoff = 0.2,
+  shiny = FALSE, custom = FALSE, ...
+) {
+
+  object <- x; rm(x)
   if (is.character(object) || is.character(object$pre_r2) ||
     length(plots) == 0) {
     return(invisible())
@@ -184,12 +183,8 @@ plot.pre_factor <- function(x, plots = c("scree", "change"),
 
   if ("change" %in% plots) {
     plot_list[[which("change" == plots)]] <- pre_eigen %>%
-      {
-        (. - lag(.)) / lag(.)
-      } %>%
-      {
-        . / min(., na.rm = TRUE)
-      } %>%
+      {(. - lag(.)) / lag(.)} %>%
+      {. / min(., na.rm = TRUE)} %>%
       data.frame(
         bump = .,
         nr_fact = paste0(0:(length(.) - 1), "-", 1:length(.)),
@@ -197,7 +192,7 @@ plot.pre_factor <- function(x, plots = c("scree", "change"),
       ) %>%
       na.omit() %>%
       ggplot(aes(x = factor(nr_fact, levels = nr_fact), y = bump)) +
-      geom_bar(stat = "identity", alpha = .5, fill = "blue") +
+      geom_bar(stat = "identity", alpha = 0.5, fill = "blue") +
       labs(list(
         title = paste("Change in Eigenvalues"),
         x = "# factors", y = "Rate of change index"
