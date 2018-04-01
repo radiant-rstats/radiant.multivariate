@@ -5,7 +5,7 @@
 \title{Store method for the Multivariate > Conjoint tab}
 \usage{
 \method{store}{conjoint}(object, name = "PWs", type = "PW",
-  envir = parent.frame(), df = TRUE, ...)
+  envir = parent.frame(), df = FALSE, ...)
 }
 \arguments{
 \item{object}{Return value from conjoint}
