@@ -318,7 +318,7 @@ output$ui_conjoint <- renderUI({
         condition = "input.tabs_conjoint == 'Plot'",
         selectInput(
           "ca_plots", "Conjoint plots:", choices = ca_plots,
-          selected = state_single("ca_plots", ca_plots, "pw")
+          selected = state_single("ca_plots", ca_plots, "none")
         ),
         conditionalPanel(
           condition = "input.ca_plots == 'pw'",
@@ -490,7 +490,7 @@ observeEvent(input$conjoint_report, {
   inp_out <- list("", "")
   inp_out[[1]] <- clean_args(ca_sum_inputs(), ca_sum_args[-1])
   figs <- FALSE
-  if (!is_empty(input$ca_plots)) {
+  if (!is_empty(input$ca_plots, "none")) {
     inp_out[[2]] <- clean_args(ca_plot_inputs(), ca_plot_args[-1])
     inp_out[[2]]$custom <- FALSE
     outputs <- c(outputs, "plot")
