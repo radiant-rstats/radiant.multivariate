@@ -31,6 +31,11 @@ output$ui_ff_vars <- renderUI({
   )
 })
 
+output$ui_ff_store_name <- renderUI({
+  req(input$dataset)
+  textInput("ff_store_name", "Store factor scores:", "", placeholder = "Provide single variable name")
+})
+
 observe({
   ## dep on most inputs
   input$data_filter
@@ -80,8 +85,9 @@ output$ui_full_factor <- renderUI({
         conditionalPanel(
           condition = "input.ff_vars != null",
           tags$table(
-            tags$td(textInput("ff_store_name", "Store scores:", state_init("ff_store_name", "factor"))),
-            tags$td(actionButton("ff_store", "Store"), style = "padding-top:30px;")
+            # tags$td(textInput("ff_store_name", "Store scores:", state_init("ff_store_name", "factor"))),
+            tags$td(uiOutput("ui_ff_store_name")),
+            tags$td(actionButton("ff_store", "Store", icon = icon("plus")), style = "padding-top:30px;")
           )
         )
       )
@@ -195,7 +201,15 @@ output$full_factor <- renderUI({
 observeEvent(input$full_factor_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2), list(custom = FALSE))
-  xcmd <- paste0("# store(result, name = \"", input$ff_store_name, "\")\n# clean_loadings(result$floadings, cutoff = ", input$ff_cutoff, ", fsort = ", input$ff_fsort, ", dec = 8) %>% write.csv(file = \"~/loadings.csv\")")
+  if (!is_empty(input$ff_store_name)) {
+    xcmd <- paste0("store(result, name = \"", input$ff_store_name, "\")\n")
+  } else {
+    xcmd <- ""
+  }
+
+  # xcmd <- paste0(xcmd, "# clean_loadings(result$floadings, cutoff = ", input$ff_cutoff, ", fsort = ", input$ff_fsort, ", dec = 8) %>%\n#  write.csv(file = \"~/loadings.csv\")")
+  # xcmd <- paste0("# store(result, name = \"", input$ff_store_name, "\")\n# clean_loadings(result$floadings, cutoff = ", input$ff_cutoff, ", fsort = ", input$ff_fsort, ", dec = 8) %>% write.csv(file = \"~/loadings.csv\")")
+
   update_report(
     inp_main = clean_args(ff_inputs(), ff_args),
     fun_name = "full_factor",
@@ -207,10 +221,23 @@ observeEvent(input$full_factor_report, {
 })
 
 ## store factor scores
+# observeEvent(input$ff_store, {
+#   if (pressed(input$ff_run)) {
+#     .full_factor() %>% 
+#       {if (!is.character(.)) store(., name = input$ff_store_name)}
+#   }
+# })
+
+## store factor scores
 observeEvent(input$ff_store, {
-  if (pressed(input$ff_run)) {
-    .full_factor() %>% 
-      {if (!is.character(.)) store(., name = input$ff_store_name)}
+  req(input$ff_store_name, input$ff_run)
+  robj <- .prmap()
+  if (!is.character(robj)) {
+    withProgress(
+      message = "Storing factor scores", value = 1,
+      # r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$ff_store_name)
+      store(robj, name = input$ff_store_name)
+    )
   }
 })
 

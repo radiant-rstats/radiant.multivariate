@@ -5,7 +5,7 @@
 \title{Predict method for the conjoint function}
 \usage{
 \method{predict}{conjoint}(object, pred_data = "", pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, dec = 3, ...)
+  conf_lev = 0.95, se = FALSE, interval = "confidence", dec = 3, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}
@@ -17,6 +17,8 @@
 \item{conf_lev}{Confidence level used to estimate confidence intervals (.95 is the default)}
 
 \item{se}{Logical that indicates if prediction standard errors should be calculated (default = FALSE)}
+
+\item{interval}{Type of interval calculation ("confidence" or "prediction"). Set to "none" if se is FALSE}
 
 \item{dec}{Number of decimals to show}
 

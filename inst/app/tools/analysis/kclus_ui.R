@@ -43,6 +43,11 @@ observeEvent(input$dataset, {
   updateSelectInput(session = session, inputId = "km_plots", selected = "none")
 })
 
+output$ui_km_store_name <- renderUI({
+  req(input$dataset)
+  textInput("km_store_name", NULL, "", placeholder = "Provide variable name")
+})
+
 observe({
   ## dep on most inputs
   input$data_filter
@@ -107,9 +112,11 @@ output$ui_kclus <- renderUI({
         ),
         conditionalPanel(
           condition = "input.km_vars != null",
+          HTML("<label>Store recommendations:</label>"), 
           tags$table(
-            tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name", "kclus"))),
-            tags$td(actionButton("km_store", "Store"), style = "padding-top:30px;")
+            # tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name", "kclus"))),
+            tags$td(uiOutput("ui_km_store_name")),
+            tags$td(actionButton("km_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
           )
         )
       ),
@@ -237,11 +244,23 @@ observeEvent(input$kclus_report, {
   )
 })
 
+# observeEvent(input$km_store, {
+#   if (pressed(input$km_run)) {
+#     .kclus() %>% 
+#       {if (is.list(.)) store(., name = input$km_store_name)}
+#   }
+# })
+
 ## store cluster membership
 observeEvent(input$km_store, {
-  if (pressed(input$km_run)) {
-    .kclus() %>% 
-      {if (is.list(.)) store(., name = input$km_store_name)}
+  req(input$km_store_name, input$km_run)
+  robj <- .kclus()
+  if (!is.character(robj)) {
+    withProgress(
+      message = "Storing cluster membership", value = 1,
+      # r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$ff_store_name)
+      store(robj, name = input$km_store_name)
+    )
   }
 })
 

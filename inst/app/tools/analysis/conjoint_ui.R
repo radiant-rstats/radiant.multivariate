@@ -219,7 +219,7 @@ output$ui_ca_store_pred <- renderUI({
     if (!input$ca_pred_plot) tags$br(),
     HTML(lab),
     tags$td(textInput("ca_store_pred_name", NULL, state_init("ca_store_pred_name", name))),
-    tags$td(actionButton("ca_store_pred", "Store"), style = "padding-top:5px;")
+    tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), style = "padding-top:5px;")
   )
 })
 
@@ -497,6 +497,7 @@ observeEvent(input$conjoint_report, {
     figs <- TRUE
   }
   xcmd <- ""
+
   if (input$ca_by != "none") {
     xcmd <- paste0("# store(result, name = \"", input$ca_store_pw_name, "\", type = \"PW\")\n")
   }

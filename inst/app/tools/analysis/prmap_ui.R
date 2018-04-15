@@ -1,7 +1,6 @@
 #########################################
 # Perceptual map using factor analysis
 #########################################
-
 pm_nr_dim <- c("2 dimensions" = 2, "3 dimensions" = 3)
 
 ## list of function arguments
@@ -72,6 +71,11 @@ output$ui_pm_plots <- renderUI({
   )
 })
 
+output$ui_pm_store_name <- renderUI({
+  req(input$dataset)
+  textInput("pm_store_name", "Store factor scores:", "", placeholder = "Provide single variable name")
+})
+
 observe({
   ## dep on most inputs
   input$data_filter
@@ -116,8 +120,8 @@ output$ui_prmap <- renderUI({
         conditionalPanel(
           condition = "input.pm_attr != null",
           tags$table(
-            tags$td(textInput("pm_store_name", "Store scores:", state_init("pm_store_name", "pmfactor"))),
-            tags$td(actionButton("pm_store", "Store"), style = "padding-top:30px;")
+            tags$td(uiOutput("ui_pm_store_name")),
+            tags$td(actionButton("pm_store", "Store", icon = icon("plus")), style = "padding-top:30px;")
           )
         )
       ),
@@ -225,21 +229,32 @@ observeEvent(input$prmap_report, {
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
   inp <- clean_args(pm_inputs(), pm_args)
   if (!is_empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
+  if (!is_empty(input$pm_store_name)) {
+    xcmd <- paste0("store(result, name = \"", input$pm_store_name, "\")")
+  } else {
+    xcmd <- ""
+  }
+
   update_report(
     inp_main = inp,
     fun_name = "prmap", 
     inp_out = inp_out,
     fig.width = pm_plot_width(),
     fig.height = pm_plot_height(),
-    xcmd = paste0("# store(result, name = '", input$pm_store_name, "')")
+    xcmd = xcmd 
   )
 })
 
 ## store factor scores
 observeEvent(input$pm_store, {
-  if (pressed(input$pm_run)) {
-    .prmap() %>% 
-      {if (!is.character(.)) store(., name = input$pm_store_name)}
+  req(input$pm_store_name, input$pm_run)
+  robj <- .prmap()
+  if (!is.character(robj)) {
+    withProgress(
+      message = "Storing factor scores", value = 1,
+      # r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$pm_store_name)
+      store(robj, name = input$pm_store_name)
+    )
   }
 })
 

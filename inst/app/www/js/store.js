@@ -1,6 +1,7 @@
 $(document).keydown(function(event) {
-  // focusing in text (area) inputs
-  if ($("#ff_store_name").is(":focus") && event.keyCode == 13) {
+  if ($("#pm_store_name").is(":focus") && event.keyCode == 13) {
+    $("#pm_store").click();
+  } else if ($("#ff_store_name").is(":focus") && event.keyCode == 13) {
     $("#ff_store").click();
   } else if ($("#km_store_name").is(":focus") && event.keyCode == 13) {
     $("#km_store").click();

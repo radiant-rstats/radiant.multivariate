@@ -28,37 +28,35 @@ conjoint <- function(
 
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
+  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
   dat <- getdata(dataset, vars, filt = data_filter)
   if (!is_string(dataset)) {
     dataset <- deparse(substitute(dataset)) %>% 
     set_attr("df", TRUE)
   }
 
-  radiant.model::var_check(evar, colnames(dat)[-1], int) %>% {
-    vars <<- .$vars
-    evar <<- .$ev
-    int <<- .$intv
-  }
+  radiant.model::var_check(evar, colnames(dat)[-1], int) %>% 
+    {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
 
   ## in case : was used to select a range of variables
   # evar <- colnames(dat)[-1]
-  if (by != "none") {
+  if (!is_empty(by, "none")) {
     evar <- setdiff(evar, by)
     vars <- setdiff(vars, by)
-    levs <- dat[[by]] %>% 
+    bylevs <- dat[[by]] %>% 
       as_factor() %>% 
       levels()
-    model_list <- vector("list", length(levs)) %>% set_names(levs)
+    model_list <- vector("list", length(bylevs)) %>% set_names(bylevs)
   } else {
-    levs <- "full"
+    bylevs <- "full"
     model_list <- list(full = list(model = NA, coeff = NA, tab = NA))
   }
 
   formula <- paste(rvar, "~", paste(vars, collapse = " + ")) %>% as.formula()
 
-  for (i in seq_along(levs)) {
+  for (i in seq_along(bylevs)) {
     if (!by == "none") {
-      cdat <- filter(dat, .data[[by]] == levs[i]) %>%
+      cdat <- filter(dat, .data[[by]] == bylevs[i]) %>%
         select_at(.vars = setdiff(colnames(dat), by))
     } else {
       cdat <- dat
@@ -74,18 +72,20 @@ conjoint <- function(
     coeff <- tidy(model)
     tab <- the_table(coeff, cdat, evar)
 
-    coeff$` ` <- sig_stars(coeff$p.value) %>% 
+    # coeff$` ` <- sig_stars(coeff$p.value) %>% 
+    coeff$sig_star <- sig_stars(coeff$p.value) %>% 
       format(justify = "left")
-    colnames(coeff) <- c("  ", "coefficient", "std.error", "t.value", "p.value", " ")
+    colnames(coeff) <- c("label", "coefficient", "std.error", "t.value", "p.value", "sig_star")
     hasLevs <- sapply(select(dat, -1), function(x) is.factor(x) || is.logical(x) || is.character(x))
     if (sum(hasLevs) > 0) {
       for (j in names(hasLevs[hasLevs])) {
-        coeff$`  ` %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>% 
+        # coeff$`  ` %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>% 
+        coeff$label %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>% 
           gsub(paste0(":", j), paste0(":", j, "|"), .)
       }
       rm(j, hasLevs)
     }
-    model_list[[levs[i]]] <- list(model = model, coeff = coeff, tab = tab)
+    model_list[[bylevs[i]]] <- list(model = model, coeff = coeff, tab = tab)
   }
 
   rm(model, coeff, tab)
@@ -146,22 +146,26 @@ summary.conjoint <- function(
   cat("\nConjoint regression results:\n\n")
 
   coeff <- object$model_list[[show]]$coeff
-  coeff$`  ` %<>% format(justify = "left")
+  # coeff$`  ` %<>% format(justify = "left")
+  coeff$label %<>% format(justify = "left")
+  # coeff <- rename(coeff, `  ` = labels, ` ` = sig_stars)
   if (!additional) {
     coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
-    print(coeff[, 1:2], row.names = FALSE)
+    print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
     cat("\n")
   } else {
     if (all(coeff$p.value == "NaN")) {
       coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
-      print(coeff[, 1:2], row.names = FALSE)
+      # print(coeff[, 1:2], row.names = FALSE)
+      print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
       cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
       return()
     } else {
       p.small <- coeff$p.value < .001
       coeff[, 2:5] %<>% formatdf(dec)
       coeff$p.value[p.small] <- "< .001"
-      print(coeff, row.names = FALSE)
+      print(rename(coeff, `  ` = "label", ` ` = "sig_star"), row.names = FALSE)
+      # print(coeff, row.names = FALSE)
     }
 
     model <- object$model_list[[show]]$model
@@ -214,6 +218,7 @@ summary.conjoint <- function(
 #' @param pred_cmd Command used to generate data for prediction
 #' @param conf_lev Confidence level used to estimate confidence intervals (.95 is the default)
 #' @param se Logical that indicates if prediction standard errors should be calculated (default = FALSE)
+#' @param interval Type of interval calculation ("confidence" or "prediction"). Set to "none" if se is FALSE
 #' @param dec Number of decimals to show
 #' @param ... further arguments passed to or from other methods
 #'
@@ -230,15 +235,28 @@ summary.conjoint <- function(
 #' @export
 predict.conjoint <- function(
   object, pred_data = "", pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, dec = 3,
+  conf_lev = 0.95, se = FALSE, 
+  interval = "confidence", dec = 3,
   ...
 ) {
+
+  if (is.character(object)) return(object)
+  if (!isTRUE(se)) {
+    interval <- "none"
+  } else if (isTRUE(interval == "none")) {
+    se <- FALSE
+  }
+
+  # ensure you have a name for the prediction dataset
+  if (!is.character(pred_data)) {
+    attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
+  }
 
   pfun <- function(model, pred, se, conf_lev) {
     pred_val <-
       try(
         sshhr(
-          predict(model, pred, interval = ifelse(se, "prediction", "none"), level = conf_lev)
+          predict(model, pred, interval = ifelse(se, interval, "none"), level = conf_lev)
         ),
         silent = TRUE
       )
@@ -257,11 +275,14 @@ predict.conjoint <- function(
     pred_val
   }
 
-  if (object$by == "none") {
+  if (is_empty(object$by, "none")) {
     object$model <- object$model_list[["full"]]$model
-    predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
+    predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec) %>%
+      set_attr("interval", interval)
+
   } else {
-    predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec)
+    predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec) %>%
+      set_attr("interval", interval)
   }
 }
 
@@ -299,17 +320,17 @@ predict_conjoint_by <- function(
   }
 
   pred <- list()
-  levs <- object$levs
+  bylevs <- object$bylevs
 
-  for (i in seq_along(levs)) {
-    object$model <- object$model_list[[levs[i]]]$model
+  for (i in seq_along(bylevs)) {
+    object$model <- object$model_list[[bylevs[i]]]$model
     pred[[i]] <- predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
 
     ## when se is true reordering the columns removes attributes for some reason
     if (i == 1) att <- attributes(pred[[1]])
 
     if (is.character(pred[[i]])) return(pred[[i]])
-    pred[[i]] %<>% {.[[object$by]] <- levs[i]; .} %>% 
+    pred[[i]] %<>% {.[[object$by]] <- bylevs[i]; .} %>% 
       {.[, c(object$by, head(colnames(.), -1))]}
   }
 
@@ -443,11 +464,11 @@ the_table <- function(model, dat, evar) {
 
   isFct <- sapply(attr, is.factor)
   if (sum(isFct) < ncol(attr)) return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
-  levs <- lapply(attr[, isFct, drop = FALSE], levels)
+  bylevs <- lapply(attr[, isFct, drop = FALSE], levels)
   vars <- colnames(attr)[isFct]
 
-  nlevs <- sapply(levs, length)
-  PW.df <- data.frame(rep(vars, nlevs), unlist(levs), stringsAsFactors = FALSE)
+  nlevs <- sapply(bylevs, length)
+  PW.df <- data.frame(rep(vars, nlevs), unlist(bylevs), stringsAsFactors = FALSE)
   colnames(PW.df) <- c("Attributes", "Levels")
   PW.df$PW <- 0
 
@@ -511,7 +532,7 @@ store.conjoint <- function(
   envir = parent.frame(), df = FALSE, ...
 ) {
 
-  levs <- object$levs
+  bylevs <- object$bylevs
 
   if (type == "PW") {
     cn <- tidy(object$model_list[[1]]$model)$term[-1]
@@ -525,16 +546,16 @@ store.conjoint <- function(
       gsub("[^A-z0-9_\\.]", "", .)
   }
 
-  res <- matrix(NA, nrow = length(levs), ncol = length(cn) + 1)
+  res <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1)
   colnames(res) <- c(object$by, cn)
   res <- as.data.frame(res, stringsAsFactors = FALSE)
-  res[[object$by]] <- levs
+  res[[object$by]] <- bylevs
 
-  for (i in seq_along(levs)) {
+  for (i in seq_along(bylevs)) {
     if (type == "IW") {
-      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$tab$IW$IW
+      res[i, 2:ncol(res)] <- object$model_list[[bylevs[i]]]$tab$IW$IW
     } else {
-      res[i, 2:ncol(res)] <- object$model_list[[levs[i]]]$coeff$coefficient
+      res[i, 2:ncol(res)] <- object$model_list[[bylevs[i]]]$coeff$coefficient
     }
   }
 
