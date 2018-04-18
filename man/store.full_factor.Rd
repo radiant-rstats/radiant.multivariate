@@ -4,14 +4,16 @@
 \alias{store.full_factor}
 \title{Store factor scores to active dataset}
 \usage{
-\method{store}{full_factor}(object, ..., name = "")
+\method{store}{full_factor}(dataset, object, name = "", ...)
 }
 \arguments{
+\item{dataset}{Dataset to append to factor scores to}
+
 \item{object}{Return value from \code{\link{full_factor}}}
 
-\item{...}{Additional arguments}
-
 \item{name}{Name of factor score variables}
+
+\item{...}{Additional arguments}
 }
 \description{
 Store factor scores to active dataset
@@ -21,8 +23,8 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} fo
 }
 \examples{
  full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%
-   store \%>\%
-   head
+   store(shopping, .) \%>\%
+   head()
 
 }
 \seealso{

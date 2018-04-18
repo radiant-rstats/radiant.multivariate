@@ -4,13 +4,13 @@
 \alias{predict.conjoint}
 \title{Predict method for the conjoint function}
 \usage{
-\method{predict}{conjoint}(object, pred_data = "", pred_cmd = "",
+\method{predict}{conjoint}(object, pred_data = NULL, pred_cmd = "",
   conf_lev = 0.95, se = FALSE, interval = "confidence", dec = 3, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}
 
-\item{pred_data}{Name of the dataset to use for prediction}
+\item{pred_data}{Provide the dataframe to generate predictions. The dataset must contain all columns used in the estimation}
 
 \item{pred_cmd}{Command used to generate data for prediction}
 
@@ -31,8 +31,8 @@ Predict method for the conjoint function
 See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
 \examples{
-result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
-predict(result, pred_data = "mp3")
+result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
+predict(result, pred_data = mp3)
 
 }
 \seealso{

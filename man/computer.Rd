@@ -12,6 +12,6 @@ data(computer)
 Perceptions of computer (re)sellers
 }
 \details{
-Perceptions of computer (re)sellers. The dataset is used to illustrate perceptual maps. Description provided in attr(computer,"description")
+Perceptions of computer (re)sellers. The dataset is used to illustrate perceptual maps. Description provided in attr(computer, "description")
 }
 \keyword{datasets}

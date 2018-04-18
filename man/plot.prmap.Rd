@@ -4,7 +4,8 @@
 \alias{plot.prmap}
 \title{Plot method for the prmap function}
 \usage{
-\method{plot}{prmap}(x, plots = "", scaling = 2.1, fontsz = 1.3, ...)
+\method{plot}{prmap}(x, plots = "", scaling = 2, fontsz = 5,
+  seed = 1234, shiny = FALSE, custom = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{prmap}}}
@@ -15,6 +16,12 @@
 
 \item{fontsz}{Font size to use in plots}
 
+\item{seed}{Random seed}
+
+\item{shiny}{Did the function call originate inside a shiny app}
+
+\item{custom}{Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.}
+
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
@@ -24,13 +31,15 @@ Plot method for the prmap function
 See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 }
 \examples{
-result <- prmap("computer", "brand", "high_end:business")
+result <- prmap(computer, brand = "brand", attr = "high_end:business")
 plot(result, plots = "brand")
 plot(result, plots = c("brand", "attr"))
-plot(result, plots = c("brand", "attr"))
 plot(result, scaling = 1, plots = c("brand", "attr"))
-result <- prmap("computer", "brand", "high_end:dated",
-               pref = c("innovative", "business"))
+result <- prmap(
+  retailers, brand = "retailer",
+  attr = "good_value:cluttered",
+  pref = c("segment1", "segment2")
+)
 plot(result, plots = c("brand", "attr", "pref"))
 
 }

@@ -12,6 +12,6 @@ data(tpbrands)
 Toothpaste brands
 }
 \details{
-Perceived (dis)similarity of a set of toothpaste brands. The dataset is used to illustrate multi-dimensional scaling (MDS). Description provided in attr(tpbrands,"description")
+Perceived (dis)similarity of a set of toothpaste brands. The dataset is used to illustrate multi-dimensional scaling (MDS). Description provided in attr(tpbrands, "description")
 }
 \keyword{datasets}

@@ -22,9 +22,9 @@ Plot method for the full_factor function
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
-result <- full_factor("diamonds",c("price","carat","table"))
+result <- full_factor(diamonds, c("price", "carat", "table"))
 plot(result)
-result <- full_factor("computer","high_end:business")
+result <- full_factor(computer, "high_end:business")
 summary(result)
 
 }

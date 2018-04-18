@@ -60,10 +60,10 @@ output$ui_mds_dis <- renderUI({
 })
 
 output$ui_mds_rev_dim <- renderUI({
+  # req(input$mds_nr_dim, input$mds_fontsz)
   rev_list <- list()
   # nr_dim <- ncol(.getdata())
   rev_list[paste("dimension", 1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
-  # rev_list[paste("dimension", 1:nr_dim)] <- 1:nr_dim
   checkboxGroupInput(
     "mds_rev_dim", "Reverse:", rev_list,
     selected = state_group("mds_rev_dim", ""),
@@ -79,8 +79,6 @@ observe({
 
   ## notify user when the model needs to be updated
   ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-
-  # if (pressed(input$mds_run) && (!is.null(input$mds_id1) || !is.character(.mds()))) {
   if (pressed(input$mds_run)) {
     if (is.null(input$mds_id1)) { 
       updateTabsetPanel(session, "tabs_mds", selected = "Summary")
@@ -118,7 +116,7 @@ output$ui_mds <- renderUI({
       ),
       conditionalPanel(
         condition = "input.tabs_mds == 'Plot'",
-        numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz", 1.3), .5, 4, .1),
+        numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz", 12), 1, 30, 1),
         uiOutput("ui_mds_rev_dim")
       )
     ),
@@ -176,12 +174,13 @@ output$mds <- renderUI({
 
 .mds_available <- reactive({
   if (not_pressed(input$mds_run)) {
-    return("** Press the Estimate button to generate maps **")
+    "** Press the Estimate button to generate maps **"
+  } else if (not_available(input$mds_id1) || not_available(input$mds_id2) || not_available(input$mds_dis)) {
+    "This analysis requires two id-variables of type character or factor and a measure\nof dissimilarity of type numeric or interval. Please select another dataset\n\n" %>% 
+      suggest_data("city")
+  } else {
+    "available"
   }
-  if (not_available(input$mds_id1) || not_available(input$mds_id2) || not_available(input$mds_dis)) {
-    return("This analysis requires two id-variables of type character or factor and a measure\nof dissimilarity of type numeric or interval. Please select another dataset\n\n" %>% suggest_data("city"))
-  }
-  "available"
 })
 
 .mds <- eventReactive(input$mds_run, {
@@ -199,17 +198,24 @@ output$mds <- renderUI({
 
 .plot_mds <- reactive({
   if (.mds_available() != "available") return(.mds_available())
-  .mds() %>% 
-    {if (is.character(.)) . else capture_plot(do.call(plot, c(list(x = .), mds_plot_inputs())))}
+  req("mds_rev_dim" %in% names(input))
+  robj <- .mds()
+  if (is.character(robj)) return(robj)
+  withProgress(message = "Generating brand maps", value = 1, {
+    do.call(plot, c(list(x = robj), mds_plot_inputs(), shiny = TRUE))
+  }) 
 })
 
 observeEvent(input$mds_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(dec = 2), "")
+  inp <- mds_inputs()
+  inp$nr_dim <- as.integer(inp$nr_dim)
   inp_out[[2]] <- clean_args(mds_plot_inputs(), mds_plot_args[-1])
   update_report(
-    inp_main = clean_args(mds_inputs(), mds_args),
-    fun_name = "mds", inp_out = inp_out,
+    inp_main = clean_args(inp, mds_args),
+    fun_name = "mds", 
+    inp_out = inp_out,
     fig.width = mds_plot_width(),
     fig.height = mds_plot_height()
   )

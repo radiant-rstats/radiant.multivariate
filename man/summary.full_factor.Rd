@@ -25,13 +25,13 @@ Summary method for the full_factor function
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
-result <- full_factor("diamonds",c("price","carat","depth","table","x"))
+result <- full_factor(diamonds , c("price", "carat", "depth", "table", "x"))
 summary(result)
 summary(result, cutoff = 0, fsort = FALSE)
 summary(result, cutoff = 0, fsort = TRUE)
 summary(result, cutoff = .5, fsort = TRUE)
-diamonds \%>\% full_factor(c("price","carat","depth","table","x")) \%>\% summary
-diamonds \%>\% full_factor(c("price","carat","depth","table","x")) \%>\% summary(cutoff = .5)
+diamonds \%>\% full_factor(c("price", "carat", "depth", "table", "x")) \%>\% summary()
+diamonds \%>\% full_factor(c("price", "carat", "depth", "table", "x")) \%>\% summary(cutoff = .5)
 
 }
 \seealso{

@@ -12,24 +12,26 @@
 #' @return A list of all variables used in hclus as an object of class hclus
 #'
 #' @examples
-#' result <- hclus("shopping", vars = "v1:v6")
+#' result <- hclus(shopping, vars = "v1:v6")
 #'
 #' @seealso \code{\link{summary.hclus}} to summarize results
 #' @seealso \code{\link{plot.hclus}} to plot results
 #'
 #' @export
-hclus <- function(dataset, vars,
-                  distance = "sq.euclidian",
-                  method = "ward.D",
-                  max_cases = 5000,
-                  data_filter = "") {
-  dat <- getdata(dataset, vars, filt = data_filter)
-  if (nrow(dat) > max_cases) {
+hclus <- function(
+  dataset, vars, distance = "sq.euclidian",
+  method = "ward.D", max_cases = 5000,
+  data_filter = ""
+) {
+
+  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
+  dataset <- getdata(dataset, vars, filt = data_filter)
+  if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))
   }
 
-  dat %>%
+  dataset %>%
     scale() %>%
     {
       if (distance == "sq.euclidian") {
@@ -40,7 +42,7 @@ hclus <- function(dataset, vars,
     } %>%
     hclust(d = ., method = method) -> hc_out
 
-  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  # if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
   as.list(environment()) %>% add_class("hclus")
 }
 
@@ -52,7 +54,7 @@ hclus <- function(dataset, vars,
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- hclus("shopping", vars = c("v1:v6"))
+#' result <- hclus(shopping, vars = c("v1:v6"))
 #' summary(result)
 #'
 #' @seealso \code{\link{hclus}} to generate results
@@ -63,7 +65,7 @@ summary.hclus <- function(object, ...) {
   if (is.character(object)) return(object)
 
   cat("Hierarchical cluster analysis\n")
-  cat("Data        :", object$dataset, "\n")
+  cat("Data        :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -85,7 +87,7 @@ summary.hclus <- function(object, ...) {
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- hclus("shopping", vars = c("v1:v6"))
+#' result <- hclus(shopping, vars = c("v1:v6"))
 #' plot(result, plots = c("change", "scree"), cutoff = .05)
 #' plot(result, plots = "dendro", cutoff = 0)
 #' shopping %>% hclus(vars = c("v1:v6")) %>% plot
@@ -94,23 +96,23 @@ summary.hclus <- function(object, ...) {
 #' @seealso \code{\link{summary.hclus}} to summarize results
 #'
 #' @export
-plot.hclus <- function(x, plots = c("scree", "change"),
-                       cutoff = 0.05,
-                       shiny = FALSE,
-                       custom = FALSE,
-                       ...) {
-  object <- x
-  rm(x)
-  if (is.character(object)) return(invisible())
+plot.hclus <- function(
+  x, plots = c("scree", "change"),
+  cutoff = 0.05, shiny = FALSE,
+  custom = FALSE, ...
+) {
+
+  # object <- x; rm(x)
+
+  if (is.character(x)) return(invisible())
   if (is_not(cutoff)) cutoff <- 0
-  object$hc_out$height %<>% {
-    . / max(.)
-  }
+  x$hc_out$height %<>% 
+    {. / max(.)}
 
   plot_list <- list()
   if ("scree" %in% plots) {
     plot_list[["scree"]] <-
-      object$hc_out$height[object$hc_out$height > cutoff] %>%
+      x$hc_out$height[x$hc_out$height > cutoff] %>%
       data.frame(
         height = .,
         nr_clus = as.integer(length(.):1),
@@ -129,10 +131,8 @@ plot.hclus <- function(x, plots = c("scree", "change"),
 
   if ("change" %in% plots) {
     plot_list[["change"]] <-
-      object$hc_out$height[object$hc_out$height > cutoff] %>%
-      {
-        (. - lag(.)) / lag(.)
-      } %>%
+      x$hc_out$height[x$hc_out$height > cutoff] %>%
+      {(. - lag(.)) / lag(.)} %>%
       data.frame(
         bump = .,
         nr_clus = paste0((length(.) + 1):2, "-", length(.):1),
@@ -150,7 +150,7 @@ plot.hclus <- function(x, plots = c("scree", "change"),
   }
 
   if ("dendro" %in% plots) {
-    hc <- as.dendrogram(object$hc_out)
+    hc <- as.dendrogram(x$hc_out)
     xlab <- ""
     if (length(plots) > 1) {
       xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in Report > Rmd to view different plot types."

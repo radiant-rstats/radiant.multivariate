@@ -202,7 +202,10 @@ observeEvent(input$full_factor_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2), list(custom = FALSE))
   if (!is_empty(input$ff_store_name)) {
-    xcmd <- paste0("store(result, name = \"", input$ff_store_name, "\")\n")
+    # xcmd <- paste0("store(result, name = \"", input$ff_store_name, "\")\n")
+    xcmd <- paste0(input$dataset, " <- store(", 
+      input$dataset, ", result, name = \"", input$ff_store_name, "\")"
+    )
   } else {
     xcmd <- ""
   }
@@ -231,12 +234,12 @@ observeEvent(input$full_factor_report, {
 ## store factor scores
 observeEvent(input$ff_store, {
   req(input$ff_store_name, input$ff_run)
-  robj <- .prmap()
+  robj <- .full_factor()
   if (!is.character(robj)) {
     withProgress(
       message = "Storing factor scores", value = 1,
-      # r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$ff_store_name)
-      store(robj, name = input$ff_store_name)
+      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$ff_store_name)
+      # store(robj, name = input$ff_store_name)
     )
   }
 })

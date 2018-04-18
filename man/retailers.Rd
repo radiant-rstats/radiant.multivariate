@@ -12,6 +12,6 @@ data(retailers)
 Perceptions of retailers
 }
 \details{
-Consumer evaluations for a set of retailers in the Chicago area on 7 attributes. The dataset is used to illustrate perceptual maps. Description provided in attr(retailers,"description")
+Consumer evaluations for a set of retailers in the Chicago area on 7 attributes. The dataset is used to illustrate perceptual maps. Description provided in attr(retailers, "description")
 }
 \keyword{datasets}

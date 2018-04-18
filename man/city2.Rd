@@ -12,6 +12,6 @@ data(city2)
 City distances 2
 }
 \details{
-Distance in miles between 12 cities in the USA. The dataset is used to illustrate multi-dimensional scaling (MDS). Description provided in attr(city2,"description")
+Distance in miles between 12 cities in the USA. The dataset is used to illustrate multi-dimensional scaling (MDS). Description provided in attr(city2, "description")
 }
 \keyword{datasets}

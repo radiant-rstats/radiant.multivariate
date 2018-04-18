@@ -32,7 +32,7 @@ Conjoint analysis
 See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
 \examples{
-result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
+result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 result <- mp3 \%>\% conjoint(rvar = "Rating", evar = "Memory:Shape")
 
 }

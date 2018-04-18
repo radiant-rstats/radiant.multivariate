@@ -15,7 +15,7 @@
 #' @return A list of all variables used in kclus as an object of class kclus
 #'
 #' @examples
-#' result <- kclus("shopping", c("v1:v6"))
+#' result <- kclus(shopping, c("v1:v6"))
 #'
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{plot.kclus}} to plot results
@@ -24,14 +24,11 @@
 #' @importFrom Gmedian Gmedian kGmedian
 #'
 #' @export
-kclus <- function(dataset, vars,
-                  fun = "mean",
-                  hc_init = TRUE,
-                  distance = "sq.euclidian",
-                  method = "ward.D",
-                  seed = 1234,
-                  nr_clus = 2,
-                  data_filter = "") {
+kclus <- function(
+  dataset, vars, fun = "mean", hc_init = TRUE,
+  distance = "sq.euclidian", method = "ward.D",
+  seed = 1234, nr_clus = 2, data_filter = ""
+) {
   
   dat <- getdata(dataset, vars, filt = data_filter)
   if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
@@ -125,9 +122,9 @@ kclus <- function(dataset, vars,
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- kclus("shopping", vars = c("v1:v6"))
+#' result <- kclus(shopping, vars = c("v1:v6"))
 #' summary(result)
-#' shopping %>% kclus(vars = c("v1:v6"), nr_clus = 3) %>% summary
+#' shopping %>% kclus(vars = c("v1:v6"), nr_clus = 3) %>% summary()
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{plot.kclus}} to plot results
@@ -180,19 +177,19 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- kclus("shopping", vars = c("v1:v6"))
+#' result <- kclus(shopping, vars = "v1:v6")
 #' plot(result)
-#' shopping %>% kclus(, vars = c("v1:v6")) %>% plot
+#' shopping %>% kclus(vars = c("v1:v6")) %>% plot()
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
 #' @export
-plot.kclus <- function(x, plots = "density",
-                       shiny = FALSE,
-                       custom = FALSE,
-                       ...) {
+plot.kclus <- function(
+  x, plots = "density", shiny = FALSE,
+  custom = FALSE, ...
+) {
 
   # x$dat <- mutate(x$dat, Cluster = as.factor(x$km_out$cluster))
   x$dat$Cluster <- as.factor(x$km_out$cluster)
@@ -271,25 +268,29 @@ plot.kclus <- function(x, plots = "density",
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 #'
+#' @param dataset Dataset to append to cluster membership variable to
 #' @param object Return value from \code{\link{kclus}}
-#' @param ... Additional arguments
 #' @param name Name of cluster membership variable
+#' @param ... Additional arguments
 #'
 #' @examples
-#' kclus(shopping, vars = "v1:v6") %>% store %>% head
+#' kclus(shopping, vars = "v1:v6") %>% 
+#'   store(shopping, .) %>% 
+#'   head()
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{plot.kclus}} to plot results
 #'
 #' @export
-store.kclus <- function(object, ..., name = "") {
+store.kclus <- function(dataset, object, name = "", ...) {
   ## membership variable name
   if (is_empty(name)) name <- paste0("kclus", object$nr_clus)
   # dat <- {if (object$dataset == "-----") object$dat else object$dataset}
-  dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
-  indr <- indexr(dat, object$vars, object$data_filter)
+  # dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
+  indr <- indexr(dataset, object$vars, object$data_filter)
   km <- rep(NA, indr$nr)
   km[indr$ind] <- object$km_out$cluster
-  changedata(dat, vars = as.factor(km), var_names = name)
+  dataset[[name]] <- km
+  dataset
 }

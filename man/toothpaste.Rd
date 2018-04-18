@@ -12,6 +12,6 @@ data(toothpaste)
 Toothpaste attitudes
 }
 \details{
-Attitudinal data on toothpaste for 60 consumers. Description provided in attr(toothpaste,"description")
+Attitudinal data on toothpaste for 60 consumers. Description provided in attr(toothpaste, "description")
 }
 \keyword{datasets}

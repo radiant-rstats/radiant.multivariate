@@ -14,9 +14,9 @@
 #' @return A list of all variables defined in the function as an object of class mds
 #'
 #' @examples
-#' result <- mds("city", "from", "to", "distance")
+#' result <- mds(city, "from", "to", "distance")
 #' summary(result)
-#' result <- mds("diamonds", "clarity", "cut", "price")
+#' result <- mds(diamonds, "clarity", "cut", "price")
 #' summary(result)
 #'
 #' @seealso \code{\link{summary.mds}} to summarize results
@@ -65,9 +65,7 @@ mds <- function(
   # res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
   # if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
 
-  seed %>% gsub("[^0-9]", "", .) %>% {
-    if (!is_empty(.)) set.seed(seed)
-  }
+  seed %>% gsub("[^0-9]", "", .) %>% {if (!is_empty(.)) set.seed(seed)}
   res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
   res$stress <- res$stress / 100
 
@@ -76,9 +74,7 @@ mds <- function(
     ## Using R^2
     # res$stress <- sqrt(1 - cor(dist(res$points),mds_dis_mat)^2) * 100
     # Using standard Kruskal formula for metric MDS
-    res$stress <- {
-      sum((dist(res$points) - mds_dis_mat) ^ 2) / sum(mds_dis_mat ^ 2)
-    } %>%
+    res$stress <- {sum((dist(res$points) - mds_dis_mat) ^ 2) / sum(mds_dis_mat ^ 2)} %>%
       sqrt()
   }
 
@@ -94,10 +90,10 @@ mds <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- mds("city", "from", "to", "distance")
+#' result <- mds(city, "from", "to", "distance")
 #' summary(result)
 #' summary(result, dec = 2)
-#' city %>% mds("from", "to", "distance") %>% summary
+#' city %>% mds("from", "to", "distance") %>% summary()
 #'
 #' @seealso \code{\link{mds}} to calculate results
 #' @seealso \code{\link{plot.mds}} to plot results
@@ -113,7 +109,7 @@ summary.mds <- function(object, dec = 2, ...) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")
-  cat("# dimensions:", object$nr_dim, "\n")
+  cat("Dimensions:", object$nr_dim, "\n")
   meth <- if (object$method == "non-metric") "Non-metric" else "Metric"
   cat("Method      :", meth, "\n")
   cat("Observations:", object$nrObs, "\n")
@@ -142,66 +138,68 @@ summary.mds <- function(object, dec = 2, ...) {
 #' @param x Return value from \code{\link{mds}}
 #' @param rev_dim Flip the axes in plots
 #' @param fontsz Font size to use in plots
+#' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- mds("city","from","to","distance")
+#' result <- mds(city, "from", "to", "distance")
 #' plot(result)
 #' plot(result, rev_dim = 1:2)
-#' plot(result, rev_dim = 1:2, fontsz = 2)
+#' plot(result, rev_dim = 1:2, fontsz = 8)
 #'
 #' @seealso \code{\link{mds}} to calculate results
 #' @seealso \code{\link{summary.mds}} to plot results
 #'
-#' @importFrom wordcloud textplot
+#' @importFrom ggrepel geom_text_repel
 #'
 #' @export
-plot.mds <- function(x, rev_dim = NULL, fontsz = 1.3, ...) {
-  object <- x; rm(x)
-  if (is.character(object)) return(cat(object))
-  if (is_empty(fontsz)) fontsz <- 1.3
+plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALSE, ...) {
+  if (is.character(x)) return(cat(x))
 
   ## set extremes for plot
-  lim <- max(abs(object$res$points))
+  lim <- max(abs(x$res$points))
 
-  ## set plot space
-  if (object$nr_dim == 3 && ncol(object$res$points) == 3) {
-    op <- par(mfrow = c(3, 1))
-    fontsz <- fontsz + .6
-  } else {
-    op <- par(mfrow = c(1, 1))
-  }
+  ## set seed for ggrepel label positioning
+  set.seed(x$seed)
 
+  tbl <- as.data.frame(x$res$points) %>%
+    set_colnames(paste0("dim", seq_len(ncol(.))))
+  tbl$rnames <- rownames(tbl)
   ## reverse selected dimensions
   if (!is_empty(rev_dim)) {
-    rev_dim <- as.numeric(rev_dim)
-    if (max(rev_dim) > ncol(object$res$points)) {
-      return(invisible())
-    }
-    as.numeric(rev_dim) %>% 
-      {object$res$points[, .] <<- -1 * object$res$points[, .]}
+    rev_dim <- as.integer(rev_dim)
+    tbl[, rev_dim] <- -1 * tbl[, rev_dim]
   }
 
-  ## plot maps
-  for (i in 1:(object$nr_dim - 1)) {
-    for (j in (i + 1):object$nr_dim) {
-      plot(
-        c(-lim, lim), type = "n", xlab = "", ylab = "", axes = FALSE, asp = 1,
-        yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim, lim)
-      )
-
-      if (object$nr_dim > 2) {
-        title(main = paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
-      }
-
-      points(object$res$points[, i], object$res$points[, j], pch = 16, cex = .6)
-      wordcloud::textplot(
-        object$res$points[, i], object$res$points[, j] +
-          (.04 * lim), object$lab, col = rainbow(object$nrLev, start = .6, end = .1),
-        cex = fontsz, new = FALSE
-      )
-      abline(v = 0, h = 0)
+  plot_list <- list()
+  for (i in 1:(x$nr_dim - 1)) {
+    for (j in (i + 1):x$nr_dim) {
+      i_name <- paste0("dim", i)
+      j_name <- paste0("dim", j)
+      plot_list[[paste0("dim", i, "_dim", j)]] <- ggplot(tbl, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
+        geom_point() +
+        ggrepel::geom_text_repel(size = fontsz) +
+        # geom_segment(aes_string(x = 0, y = 0, xend = i_name, yend = j_name)) +
+        theme(legend.position = "none") +
+        coord_cartesian(xlim = c(-lim, lim), ylim = c(-lim, lim)) +
+        geom_vline(xintercept = 0, size = 0.3) +
+        geom_hline(yintercept = 0, size = 0.3) +
+        labs(
+          x = paste("Dimension", i),
+          y = paste("Dimension", j)
+        )
     }
   }
-  par(op)
+
+  if (custom) {
+    if (length(plot_list) == 1) {
+      return(plot_list[[1]])
+    } else {
+      return(plot_list)
+    }
+  }
+
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+  {if (shiny) . else print(.)}
 }

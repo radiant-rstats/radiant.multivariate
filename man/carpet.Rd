@@ -12,6 +12,6 @@ data(carpet)
 Carpet cleaners
 }
 \details{
-Rankings reflect the evaluation of 18 alternative carpet cleaners by one respondent. Description provided in attr(carpet,"description")
+Rankings reflect the evaluation of 18 alternative carpet cleaners by one respondent. Description provided in attr(carpet," description")
 }
 \keyword{datasets}

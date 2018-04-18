@@ -20,9 +20,9 @@ Summary method for kclus
 See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 }
 \examples{
-result <- kclus("shopping", vars = c("v1:v6"))
+result <- kclus(shopping, vars = c("v1:v6"))
 summary(result)
-shopping \%>\% kclus(vars = c("v1:v6"), nr_clus = 3) \%>\% summary
+shopping \%>\% kclus(vars = c("v1:v6"), nr_clus = 3) \%>\% summary()
 
 }
 \seealso{

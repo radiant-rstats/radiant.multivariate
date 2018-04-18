@@ -24,7 +24,7 @@ Sort and clean loadings
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
-result <- full_factor("diamonds",c("price","carat","table","x","y"))
+result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
 clean_loadings(result$floadings, TRUE, .5, 2)
 
 }

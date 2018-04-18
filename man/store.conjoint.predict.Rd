@@ -4,19 +4,16 @@
 \alias{store.conjoint.predict}
 \title{Store predicted values generated in predict.conjoint}
 \usage{
-\method{store}{conjoint.predict}(object, ..., data = attr(object,
-  "pred_data"), name = "prediction", df = FALSE)
+\method{store}{conjoint.predict}(dataset, object, name = "prediction", ...)
 }
 \arguments{
+\item{dataset}{Dataset to add predictions to}
+
 \item{object}{Return value from model predict function}
-
-\item{...}{Additional arguments}
-
-\item{data}{Data or dataset name (e.g., data = mtcars or data = "mtcars")}
 
 \item{name}{Variable name(s) assigned to predicted values}
 
-\item{df}{Return data.frame}
+\item{...}{Additional arguments}
 }
 \description{
 Store predicted values generated in predict.conjoint

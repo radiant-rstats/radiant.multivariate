@@ -30,7 +30,7 @@ Hierarchical cluster analysis
 See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 }
 \examples{
-result <- hclus("shopping", vars = "v1:v6")
+result <- hclus(shopping, vars = "v1:v6")
 
 }
 \seealso{

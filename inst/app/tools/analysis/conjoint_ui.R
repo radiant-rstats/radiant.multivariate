@@ -193,14 +193,15 @@ output$ui_ca_store <- renderUI({
   tagList(
     HTML("<label>Store all PWs in a new dataset:</label>"),
     tags$table(
-      tags$td(textInput("ca_store_pw_name", NULL, state_init("ca_store_pw_name", "PWs"))),
-      tags$td(actionButton("ca_store_pw", "Store"), style = "padding-top:5px;")
+      tags$td(textInput("ca_store_pw_name", NULL, "", placeholder = "Provide data name")),
+      tags$td(actionButton("ca_store_pw", "Store", icon = icon("plus")), style = "padding-top:5px;")
     ),
     tags$br(),
     HTML("<label>Store all IWs in a new dataset:</label>"),
     tags$table(
-      tags$td(textInput("ca_store_iw_name", NULL, state_init("ca_store_iw_name", "IWs"))),
-      tags$td(actionButton("ca_store_iw", "Store"), style = "padding-top:5px;")
+      # tags$td(textInput("ca_store_iw_name", NULL, state_init("ca_store_iw_name", "IWs"))),
+      tags$td(textInput("ca_store_iw_name", NULL, "", placeholder = "Provide data name")),
+      tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus")), style = "padding-top:5px;")
     )
   )
 })
@@ -209,7 +210,7 @@ output$ui_ca_store_pred <- renderUI({
   req(input$ca_predict != "none")
   req(input$ca_by)
   lab <- "<label>Store predictions:</label>"
-  name <- "predict_ca"
+  name <- "pred_ca"
   if (input$ca_by != "none") {
     lab <- sub(":", " in new dataset:", lab)
     name <- "predict_by"
@@ -499,7 +500,12 @@ observeEvent(input$conjoint_report, {
   xcmd <- ""
 
   if (input$ca_by != "none") {
-    xcmd <- paste0("# store(result, name = \"", input$ca_store_pw_name, "\", type = \"PW\")\n")
+    if (!is_empty(input$ca_store_pw_name)) {
+      xcmd <- paste0(xcmd, input$ca_store_pw_name, " result$PW\nregister(\"", input$ca_store_pw_name, "\")\n")
+    }
+    if (!is_empty(input$ca_store_iw_name)) {
+      xcmd <- paste0(xcmd, input$ca_store_pw_name, " result$IW\nregister(\"", input$ca_store_iw_name, "\")\n")
+    }
   }
 
   if (!is_empty(input$ca_predict, "none") &&
@@ -513,11 +519,10 @@ observeEvent(input$conjoint_report, {
 
     xcmd <- paste0(xcmd, "print(pred, n = 10)")
     if (input$ca_predict %in% c("data", "datacmd") || input$ca_by != "none") {
-      xcmd <- paste0(xcmd, "\n# store(pred, data = \"", input$ca_pred_data, "\", name = \"", input$ca_store_pred_name, "\")")
-      # xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/", input$ca_store_pred_name, ".csv\", row.names = FALSE)")
-    } else {
-      # xcmd <- paste0(xcmd, "\n# write.csv(pred, file = \"~/ca_predictions.csv\", row.names = FALSE)")
-    }
+      xcmd <- paste0(xcmd, "\n", input$ca_pred_data, " <- store(", 
+        input$ca_pred_data, ", pred, name = \"", input$ca_store_pred_name, "\")"
+      )
+    } 
 
     if (input$ca_pred_plot && !is_empty(input$ca_xvar)) {
       inp_out[[3 + figs]] <- clean_args(ca_pred_plot_inputs(), ca_pred_plot_args[-1])
@@ -539,22 +544,26 @@ observeEvent(input$conjoint_report, {
 })
 
 observeEvent(input$ca_store_pw, {
-  req(pressed(input$ca_run))
+  name <- input$ca_store_pw_name
+  req(pressed(input$ca_run), name)
   robj <- .conjoint()
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing PWs", value = 1,
-    store(robj, name = input$ca_store_pw_name, type = "PW")
+    # store(robj, name = input$ca_store_pw_name, type = "PW")
+    r_data[[name]] <- store(robj, type = "PW")
   )
 })
 
 observeEvent(input$ca_store_iw, {
-  req(pressed(input$ca_run))
+  name <- input$ca_store_iw_name
+  req(pressed(input$ca_run), name)
   robj <- .conjoint()
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing IWs", value = 1,
-    store(robj, name = input$ca_store_iw_name, type = "IW")
+    # store(robj, name = input$ca_store_iw_name, type = "IW")
+    r_data[[name]] <- store(robj, type = "IW")
   )
 })
 
@@ -564,7 +573,11 @@ observeEvent(input$ca_store_pred, {
   if (is.null(pred)) return()
   withProgress(
     message = "Storing predictions", value = 1,
-    store(pred, data = input$ca_pred_data, name = input$ca_store_pred_name)
+    # store(pred, data = input$ca_pred_data, name = input$ca_store_pred_name)
+    r_data[[input$ca_pred_data]] <- radiant.model:::store.model.predict(
+      r_data[[input$ca_pred_data]], pred, 
+      name = input$ca_store_pred_name
+    )
   )
 })
 

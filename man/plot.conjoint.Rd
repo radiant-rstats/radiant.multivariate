@@ -29,7 +29,7 @@ Plot method for the conjoint function
 See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
 \examples{
-result <- conjoint(dataset = "mp3", rvar = "Rating", evar = "Memory:Shape")
+result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 plot(result, scale_plot = TRUE)
 plot(result, plots = "iw")
 

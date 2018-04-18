@@ -22,13 +22,20 @@ Summary method for the prmap function
 See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 }
 \examples{
-result <- prmap("computer","brand","high_end:business")
+result <- prmap(computer, brand = "brand", attr = "high_end:business")
 summary(result)
 summary(result, cutoff = .3)
-result <- prmap("computer","brand","high_end:dated", pref = c("innovative","business"))
+result <- prmap(
+  computer, brand = "brand", attr = "high_end:dated",
+  pref = c("innovative","business")
+)
 summary(result)
-computer \%>\% prmap("brand","high_end:dated", pref = c("innovative","business")) \%>\%
-  summary
+computer \%>\%
+  prmap(
+    brand = "brand", attr = "high_end:dated",
+    pref = c("innovative","business")
+  ) \%>\%
+  summary()
 
 }
 \seealso{

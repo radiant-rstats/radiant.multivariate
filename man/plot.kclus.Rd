@@ -25,9 +25,9 @@ Plot method for kclus
 See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 }
 \examples{
-result <- kclus("shopping", vars = c("v1:v6"))
+result <- kclus(shopping, vars = "v1:v6")
 plot(result)
-shopping \%>\% kclus(, vars = c("v1:v6")) \%>\% plot
+shopping \%>\% kclus(vars = c("v1:v6")) \%>\% plot()
 
 }
 \seealso{

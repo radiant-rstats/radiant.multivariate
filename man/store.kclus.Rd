@@ -4,14 +4,16 @@
 \alias{store.kclus}
 \title{Add a cluster membership variable to the active dataset}
 \usage{
-\method{store}{kclus}(object, ..., name = "")
+\method{store}{kclus}(dataset, object, name = "", ...)
 }
 \arguments{
+\item{dataset}{Dataset to append to cluster membership variable to}
+
 \item{object}{Return value from \code{\link{kclus}}}
 
-\item{...}{Additional arguments}
-
 \item{name}{Name of cluster membership variable}
+
+\item{...}{Additional arguments}
 }
 \description{
 Add a cluster membership variable to the active dataset
@@ -20,7 +22,9 @@ Add a cluster membership variable to the active dataset
 See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 }
 \examples{
-kclus(shopping, vars = "v1:v6") \%>\% store \%>\% head
+kclus(shopping, vars = "v1:v6") \%>\% 
+  store(shopping, .) \%>\% 
+  head()
 
 }
 \seealso{

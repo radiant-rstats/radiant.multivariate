@@ -229,7 +229,17 @@ observeEvent(input$kclus_report, {
     outputs <- c("summary")
     figs <- FALSE
   }
-  xcmd <- paste0("# store(result, name = \"", input$km_store_name, "\")")
+
+  if (!is_empty(input$km_store_name)) {
+    # xcmd <- paste0("store(result, name = \"", input$ff_store_name, "\")\n")
+    xcmd <- paste0(input$dataset, " <- store(", 
+      input$dataset, ", result, name = \"", input$km_store_name, "\")"
+    )
+  } else {
+    xcmd <- ""
+  }
+
+  # xcmd <- paste0("# store(result, name = \"", input$km_store_name, "\")")
   # xcmd <- paste0(xcmd, "\n# write.csv(result$clus_means, file = \"~/kclus.csv\")")
 
   update_report(
@@ -258,8 +268,8 @@ observeEvent(input$km_store, {
   if (!is.character(robj)) {
     withProgress(
       message = "Storing cluster membership", value = 1,
-      # r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$ff_store_name)
-      store(robj, name = input$km_store_name)
+      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$km_store_name)
+      # store(robj, name = input$km_store_name)
     )
   }
 })

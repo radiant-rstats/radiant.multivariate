@@ -12,9 +12,9 @@
 #' @return A list with all variables defined in the function as an object of class full_factor
 #'
 #' @examples
-#' result <- full_factor("diamonds",c("price","carat","table","x","y"))
-#' result <- full_factor("diamonds",c("price","carat","table","x","y"), method = "maxlik")
-#' result <- diamonds %>% full_factor(c("price","carat","table","x","y"), method = "maxlik")
+#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
+#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"), method = "maxlik")
+#' result <- diamonds %>% full_factor(c("price", "carat", "table", "x", "y"), method = "maxlik")
 #'
 #' @seealso \code{\link{summary.full_factor}} to summarize results
 #' @seealso \code{\link{plot.full_factor}} to plot results
@@ -28,33 +28,34 @@ full_factor <- function(
   rotation = "varimax", data_filter = ""
 ) {
 
-  dat <- getdata(dataset, vars, filt = data_filter)
-  if (!is_string(dataset)) {
-    dataset <- deparse(substitute(dataset)) %>%
-      set_attr("df", TRUE)
-  }
+  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
+  dataset <- getdata(dataset, vars, filt = data_filter)
+  # if (!is_string(dataset)) {
+  #   dataset <- deparse(substitute(dataset)) %>%
+  #     set_attr("df", TRUE)
+  # }
 
-  nrObs <- nrow(dat)
-  if (nrObs <= ncol(dat)) {
+  nrObs <- nrow(dataset)
+  if (nrObs <= ncol(dataset)) {
     return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
       add_class("full_factor"))
   }
 
   nrFac <- max(1, as.numeric(nr_fact))
-  if (nrFac > ncol(dat)) {
+  if (nrFac > ncol(dataset)) {
     return("The number of factors cannot exceed the number of variables" %>%
         add_class("full_factor"))
-    nrFac <- ncol(dat)
+    nrFac <- ncol(dataset)
   }
 
   if (method == "PCA") {
     fres <- psych::principal(
-      dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,
       oblique.scores = FALSE
     )
   } else {
     fres <- try(psych::fa(
-      dat, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,
       oblique.scores = FALSE, fm = "ml"
     ), silent = TRUE)
     if (is(fres, "try-error")) {
@@ -90,13 +91,13 @@ full_factor <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor("diamonds",c("price","carat","depth","table","x"))
+#' result <- full_factor(diamonds , c("price", "carat", "depth", "table", "x"))
 #' summary(result)
 #' summary(result, cutoff = 0, fsort = FALSE)
 #' summary(result, cutoff = 0, fsort = TRUE)
 #' summary(result, cutoff = .5, fsort = TRUE)
-#' diamonds %>% full_factor(c("price","carat","depth","table","x")) %>% summary
-#' diamonds %>% full_factor(c("price","carat","depth","table","x")) %>% summary(cutoff = .5)
+#' diamonds %>% full_factor(c("price", "carat", "depth", "table", "x")) %>% summary()
+#' diamonds %>% full_factor(c("price", "carat", "depth", "table", "x")) %>% summary(cutoff = .5)
 #'
 #' @seealso \code{\link{full_factor}} to calculate results
 #' @seealso \code{\link{plot.full_factor}} to plot results
@@ -112,7 +113,7 @@ summary.full_factor <- function(
   if (is.character(object)) return(cat(object))
 
   cat("Factor analysis\n")
-  cat("Data        :", object$dataset, "\n")
+  cat("Data        :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -167,46 +168,50 @@ summary.full_factor <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor("diamonds",c("price","carat","table"))
+#' result <- full_factor(diamonds, c("price", "carat", "table"))
 #' plot(result)
-#' result <- full_factor("computer","high_end:business")
+#' result <- full_factor(computer, "high_end:business")
 #' summary(result)
 #'
 #' @seealso \code{\link{full_factor}} to calculate results
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
+#' @importFrom ggrepel geom_text_repel
+#'
 #' @export
 plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
-  object <- x; rm(x)
 
   ## when no analysis was conducted (e.g., no variables selected)
-  if (is.character(object)) {
-    return(plot(x = 1, type = "n", main = object, axes = FALSE, xlab = "", ylab = ""))
+  if (is.character(x)) {
+    return(plot(x = 1, type = "n", main = x, axes = FALSE, xlab = "", ylab = ""))
   }
 
-  if (object$fres$factors < 2) {
-    object <- "Plots require two or more factors"
-    return(plot(x = 1, type = "n", main = object, axes = FALSE, xlab = "", ylab = ""))
+  if (x$fres$factors < 2) {
+    x <- "Plots require two or more factors"
+    return(plot(x = 1, type = "n", main = x, axes = FALSE, xlab = "", ylab = ""))
   }
 
-  df <- object$floadings
+  df <- x$floadings
   rnames <- rownames(df)
   cnames <- colnames(df)
   plot_list <- list()
-  pnr <- 1
-  ab_df <- data.frame(a = c(0, 0), b = c(1, 0), stringsAsFactors = FALSE)
+  # pnr <- 1
+  # ab_df <- data.frame(a = c(0, 0), b = c(1, 0), stringsAsFactors = FALSE)
   for (i in 1:(length(cnames) - 1)) {
     for (j in (i + 1):length(cnames)) {
       i_name <- cnames[i]
       j_name <- cnames[j]
       df2 <- cbind(df[, c(i_name, j_name)], rnames)
-      plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
-        geom_text() +
+      # plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
+      plot_list[[paste0(i_name, "_", j_name)]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
+        geom_point() +
+        ggrepel::geom_text_repel() +
+        geom_segment(aes_string(x = 0, y = 0, xend = i_name, yend = j_name)) +
         theme(legend.position = "none") +
         xlim(-1, 1) + ylim(-1, 1) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
-      pnr <- pnr + 1
+      # pnr <- pnr + 1
     }
   }
 
@@ -218,40 +223,38 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
     }
   }
 
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>% {
-    if (shiny) . else print(.)
-  }
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>% 
+    {if (shiny) . else print(.)}
 }
 
 #' Store factor scores to active dataset
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
-#'
+#'  
+#' @param dataset Dataset to append to factor scores to
 #' @param object Return value from \code{\link{full_factor}}
-#' @param ... Additional arguments
 #' @param name Name of factor score variables
+#' @param ... Additional arguments
 #'
 #' @examples
 #'  full_factor(shopping, "v1:v6", nr_fact = 3) %>%
-#'    store %>%
-#'    head
+#'    store(shopping, .) %>%
+#'    head()
 #'
 #' @seealso \code{\link{full_factor}} to generate results
 #' @seealso \code{\link{summary.full_factor}} to summarize results
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
 #' @export
-store.full_factor <- function(object, ..., name = "") {
-  ## membership variable name
-  fscores <- as.data.frame(object$fres$scores, stringsAsFactors = FALSE)
+store.full_factor <- function(dataset, object, name = "", ...) {
   if (is_empty(name)) name <- "factor"
-
-  dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
-  indr <- indexr(dat, object$vars, object$data_filter)
+  fscores <- as.data.frame(object$fres$scores, stringsAsFactors = FALSE)
+  # dataset <- if (length(attr(object$dataset, "df") > 0)) object$dataset else object$dataset
+  indr <- indexr(dataset, object$vars, object$data_filter)
   fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)), stringsAsFactors = FALSE)
   fs[indr$ind, ] <- fscores
-
-  changedata(dat, vars = fs, var_names = paste0(name, 1:ncol(fscores)))
+  dataset[, paste0(name, 1:ncol(fscores))] <- fs
+  dataset
 }
 
 #' Sort and clean loadings
@@ -265,7 +268,7 @@ store.full_factor <- function(object, ..., name = "") {
 #' @param repl Replace loadings below the cutoff by NA (or "")
 #'
 #' @examples
-#' result <- full_factor("diamonds",c("price","carat","table","x","y"))
+#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
 #' clean_loadings(result$floadings, TRUE, .5, 2)
 #'
 #' @importFrom psych fa.sort

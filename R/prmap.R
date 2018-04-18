@@ -12,7 +12,7 @@
 #' @return A list of all variables defined in the function as an object of class prmap
 #'
 #' @examples
-#' result <- prmap("computer","brand","high_end:business")
+#' result <- prmap(computer, brand = "brand", attr = "high_end:business")
 #'
 #' @seealso \code{\link{summary.prmap}} to summarize results
 #' @seealso \code{\link{plot.prmap}} to plot results
@@ -20,47 +20,46 @@
 #' @importFrom psych principal
 #'
 #' @export
-prmap <- function(
-  dataset, brand, attr, pref = "",
-  nr_dim = 2, data_filter = ""
-) {
+prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "") {
 
   nr_dim <- as.numeric(nr_dim)
   vars <- c(brand, attr)
-  dat <- getdata(dataset, vars, filt = data_filter)
+  if (!is_empty(pref)) vars <- c(vars, pref)
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
+  dataset <- getdata(dataset, vars, filt = data_filter)
 
-  brands <- dat[[1]] %>%
+  brands <- dataset[[brand]] %>%
     as.character() %>%
     gsub("^\\s+|\\s+$", "", .)
-  f_data <- dat[, -1, drop = FALSE]
-  nrObs <- nrow(dat)
+  f_data <- getdata(dataset, attr)
+  nrObs <- nrow(dataset)
 
   # in case : is used
   if (length(attr) < ncol(f_data)) attr <- colnames(f_data)
+  if (nr_dim > length(attr)) {
+    return("The number of dimensions cannot exceed the number of attributes" %>%
+             add_class("prmap"))
+  }
 
   fres <- sshhr(psych::principal(
-    cov(f_data), nfactors = nr_dim,
-    rotate = "varimax", scores = FALSE, oblique.scores = FALSE
+    cov(f_data), nfactors = nr_dim, rotate = "varimax",
+    scores = FALSE, oblique.scores = FALSE
   ))
 
   m <- fres$loadings[, colnames(fres$loadings)]
   cscm <- m %*% solve(crossprod(m))
-  # store in fres so you can re-use save_factors
+  ## store in fres so you can re-use save_factors
   fres$scores <- scale(as.matrix(f_data), center = TRUE, scale = TRUE) %*% cscm
   rownames(fres$scores) <- brands
 
   if (!is_empty(pref)) {
-    vars <- c(vars, pref)
-    pref_cor <- sshhr(getdata(dataset, pref, filt = data_filter)) %>%
+    pref_cor <- getdata(dataset, pref) %>%
       cor(fres$scores) %>%
       data.frame(stringsAsFactors = FALSE)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
   }
 
   rm(f_data, m, cscm)
-
-  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
-
   as.list(environment()) %>% add_class(c("prmap", "full_factor"))
 }
 
@@ -74,21 +73,31 @@ prmap <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- prmap("computer","brand","high_end:business")
+#' result <- prmap(computer, brand = "brand", attr = "high_end:business")
 #' summary(result)
 #' summary(result, cutoff = .3)
-#' result <- prmap("computer","brand","high_end:dated", pref = c("innovative","business"))
+#' result <- prmap(
+#'   computer, brand = "brand", attr = "high_end:dated",
+#'   pref = c("innovative","business")
+#' )
 #' summary(result)
-#' computer %>% prmap("brand","high_end:dated", pref = c("innovative","business")) %>%
-#'   summary
+#' computer %>%
+#'   prmap(
+#'     brand = "brand", attr = "high_end:dated",
+#'     pref = c("innovative","business")
+#'   ) %>%
+#'   summary()
 #'
 #' @seealso \code{\link{prmap}} to calculate results
 #' @seealso \code{\link{plot.prmap}} to plot results
 #'
 #' @export
 summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
+
+  if (is.character(object)) return(object)
+
   cat("Attribute based brand map\n")
-  cat("Data        :", object$dataset, "\n")
+  cat("Data        :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -96,7 +105,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   if (!is.null(object$pref) && object$pref != "") {
     cat("Preferences :", paste0(object$pref, collapse = ", "), "\n")
   }
-  cat("# dimensions:", object$nr_dim, "\n")
+  cat("Dimensions:", object$nr_dim, "\n")
   cat("Rotation    : varimax\n")
   cat("Observations:", object$nrObs, "\n")
 
@@ -148,117 +157,129 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
 #' @param plots Components to include in the plot ("brand", "attr"). If data on preferences is available use "pref" to add preference arrows to the plot
 #' @param scaling Arrow scaling in the brand map
 #' @param fontsz Font size to use in plots
+#' @param seed Random seed
+#' @param shiny Did the function call originate inside a shiny app
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- prmap("computer", "brand", "high_end:business")
+#' result <- prmap(computer, brand = "brand", attr = "high_end:business")
 #' plot(result, plots = "brand")
 #' plot(result, plots = c("brand", "attr"))
-#' plot(result, plots = c("brand", "attr"))
 #' plot(result, scaling = 1, plots = c("brand", "attr"))
-#' result <- prmap("computer", "brand", "high_end:dated",
-#'                pref = c("innovative", "business"))
+#' result <- prmap(
+#'   retailers, brand = "retailer",
+#'   attr = "good_value:cluttered",
+#'   pref = c("segment1", "segment2")
+#' )
 #' plot(result, plots = c("brand", "attr", "pref"))
 #'
 #' @seealso \code{\link{prmap}} to calculate results
 #' @seealso \code{\link{summary.prmap}} to plot results
 #'
-#' @importFrom wordcloud textplot
+#' @importFrom ggrepel geom_text_repel
 #'
 #' @export
-plot.prmap <- function(x,
-                      plots = "",
-                      scaling = 2.1,
-                      fontsz = 1.3,
-                      ...) {
-  scaling <- as.numeric(scaling)
-  object <- x; rm(x)
+plot.prmap <- function(
+  x, plots = "", scaling = 2, fontsz = 5, seed = 1234,
+  shiny = FALSE, custom = FALSE, ...
+) {
 
-  std_pc <- scaling * object$pref_cor
-  std_m <- scaling * object$fres$loadings
-  std_scores <- object$fres$scores
-  lab_buf <- 1.1
+  # x <- prmap(computer, brand = "brand", attr = "high_end:business")
+  # plots = "brand"
+  # plots = c("brand", "attr")
+  # scaling = 2
+  # fontsz = 5
+  # seed = 1234
 
-  ## adding a buffer so the labels don't move off the screen
-  lim <- max(abs(std_m), abs(std_scores)) * lab_buf
+  if (is.character(x)) return(x)
 
-  # using ggplot is not an option at this time because labels are likely to overlap
-  # the wordcloud with wordlayout package may be an option but it does not seem to produce the
-  # desired effect
-  # wctemp <- wordcloud::wordlayout(mtcars$wt, mtcars$mpg, rownames(mtcars), cex = 3)[,1:2] %>%
-  #             data.frame(stringsAsFactors = FALSE) %>%
-  #             set_colnames(c("wt","mpg"))
-  # use geom_text and geom_points
-  # http://sape.inf.usi.ch/quick-reference/ggplot2/geom_segment
-  # http://docs.ggplot2.org/0.9.3.1/geom_abline.html
+  ## set seed for ggrepel label positioning
+  set.seed(seed)
 
-  if (object$nr_dim == 3) {
-    op <- par(mfrow = c(3, 1))
-    fontsz <- fontsz + .6
+  pm_dat <- list()
+  ## brand coordinates
+  pm_dat$brand <- as.data.frame(x$fres$scores) %>%
+    set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
+    mutate(rnames = rownames(.), type = "brand")
+
+  ## preference coordinates
+  if (!is.null(x$pref_cor)) {
+    pm_dat$pref <- x$pref_cor %>%
+      select(-ncol(.)) %>%
+      set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
+      {. * scaling} %>%
+      mutate(rnames = rownames(.), type = "pref")
   } else {
-    op <- par(mfrow = c(1, 1))
+    plots <- setdiff(plots, "pref")
   }
 
-  for (i in 1:(object$nr_dim - 1)) {
-    for (j in (i + 1):object$nr_dim) {
-      plot(
-        c(-lim, lim), type = "n", xlab = "", ylab = "", axes = FALSE, asp = 1,
-        yaxt = "n", xaxt = "n", ylim = c(-lim, lim), xlim = c(-lim, lim)
-      )
+  ## attribute coordinates
+  std_m <- x$fres$loadings
+  dn <- dimnames(std_m)
+  pm_dat$attr <- std_m %>% matrix(nrow = length(dn[[1]])) %>%
+    set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
+    set_rownames(dn[[1]]) %>%
+    data.frame(stringsAsFactors = FALSE) %>%
+    {. * scaling} %>%
+    mutate(rnames = rownames(.), type = "attr")
 
-      if (object$nr_dim > 2) {
-        title(paste("Dimension", i, "vs Dimension", j), cex.main = fontsz)
-      }
+  ## combining data
+  pm_dat <- bind_rows(pm_dat)
 
-      abline(v = 0, h = 0)
+  ## set plot limits
+  isNum <- sapply(pm_dat, is.numeric)
+  lim <- max(abs(select(pm_dat, which(isNum))))
 
-      object$brand
-
-      if ("brand" %in% plots) {
-        points(std_scores[, i], std_scores[, j], pch = 16, cex = .6)
-        wordcloud::textplot(
-          std_scores[, i], std_scores[, j] + (.04 * lim),
-          object$brands, cex = fontsz, new = FALSE
+  label_colors <- c(brand = "black", attr = "darkblue", pref = "red")
+  plot_list <- list()
+  for (i in 1:(x$nr_dim - 1)) {
+    for (j in (i + 1):x$nr_dim) {
+      i_name <- paste0("dim", i)
+      j_name <- paste0("dim", j)
+      p <- ggplot() +
+        theme(legend.position = "none") +
+        coord_cartesian(xlim = c(-lim, lim), ylim = c(-lim, lim)) +
+        geom_vline(xintercept = 0, size = 0.3) +
+        geom_hline(yintercept = 0, size = 0.3) +
+        labs(
+          x = paste("Dimension", i),
+          y = paste("Dimension", j)
         )
-      }
 
-      if ("attr" %in% plots) {
-        wordcloud::textplot(
-          std_m[, i] * lab_buf, std_m[, j] * lab_buf,
-          object$attr, cex = fontsz,
-          col = "darkblue", new = FALSE
-        )
-        ## add arrows
-        for (k in object$attr)
-          arrows(
-            0, 0, x1 = std_m[k, i], y1 = std_m[k, j], lty = "dashed",
-            length = .05
-          )
-      }
+      if (!is_empty(plots)) {
+        p <- p + ggrepel::geom_text_repel(
+          data = filter(pm_dat, !! as.symbol("type") %in% plots),
+          aes_string(x = i_name, y = j_name, label = "rnames", color = "type"),
+          size = fontsz
+        ) +
+          scale_color_manual(values = label_colors)
 
-      if ("pref" %in% plots) {
-        if (nrow(std_pc) > 1) {
-          ## textplot needs at least two coordinates
-          wordcloud::textplot(
-            std_pc[, i] * lab_buf, std_pc[, j] * lab_buf,
-            object$pref, cex = fontsz,
-            col = "darkred", new = FALSE
-          )
-        } else {
-          text(
-            std_pc[, i] * lab_buf, std_pc[, j] * lab_buf, object$pref,
-            cex = fontsz, col = "darkred"
-          )
+        if ("brand" %in% plots) {
+          p <- p + geom_point(data = filter(pm_dat, !! as.symbol("type") == "brand"), aes_string(x = i_name, y = j_name))
         }
-        for (l in object$pref) {
-          arrows(
-            0, 0, x1 = std_pc[l, i], y1 = std_pc[l, j], lty = "dashed",
-            col = "red", length = .05
+
+        if (any(c("attr", "pref") %in% plots)) {
+          pm_arrows <- filter(pm_dat, !! as.symbol("type") %in% setdiff(plots, "brand"))
+          pm_arrows[, isNum] <- pm_arrows[, isNum] * 0.9
+          p <- p + geom_segment(
+            data = pm_arrows, aes_string(x = 0, y = 0, xend = i_name, yend = j_name, color = "type"),
+            arrow = arrow(length = unit(0.01, "npc"), type = "closed"), size = 0.3, linetype = "dashed"
           )
         }
       }
+      plot_list[[paste0("dim", i, "_dim", j)]] <- p
     }
   }
 
-  par(op)
+  if (custom) {
+    if (length(plot_list) == 1) {
+      return(plot_list[[1]])
+    } else {
+      return(plot_list)
+    }
+  }
+
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+    {if (shiny) . else print(.)}
 }

@@ -30,9 +30,9 @@ Factor analysis (PCA)
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
-result <- full_factor("diamonds",c("price","carat","table","x","y"))
-result <- full_factor("diamonds",c("price","carat","table","x","y"), method = "maxlik")
-result <- diamonds \%>\% full_factor(c("price","carat","table","x","y"), method = "maxlik")
+result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
+result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"), method = "maxlik")
+result <- diamonds \%>\% full_factor(c("price", "carat", "table", "x", "y"), method = "maxlik")
 
 }
 \seealso{

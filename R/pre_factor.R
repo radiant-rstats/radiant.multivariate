@@ -9,7 +9,7 @@
 #' @return A list with all variables defined in the function as an object of class pre_factor
 #'
 #' @examples
-#' result <- pre_factor("diamonds",c("price","carat","table"))
+#' result <- pre_factor(diamonds, c("price", "carat", "table"))
 #'
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #' @seealso \code{\link{plot.pre_factor}} to plot results
@@ -17,8 +17,8 @@
 #' @importFrom psych KMO cortest.bartlett
 #'
 #' @export
-pre_factor <- function(dataset, vars,
-                       data_filter = "") {
+pre_factor <- function(dataset, vars, data_filter = "") {
+
   dat <- getdata(dataset, vars, filt = data_filter)
   nrObs <- nrow(dat)
 
@@ -71,10 +71,10 @@ pre_factor <- function(dataset, vars,
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pre_factor("diamonds",c("price","carat","table"))
+#' result <- pre_factor(diamonds, c("price", "carat", "table"))
 #' summary(result)
-#' diamonds %>% pre_factor(c("price","carat","table")) %>% summary
-#' result <- pre_factor("computer","high_end:business")
+#' diamonds %>% pre_factor(c("price", "carat", "table")) %>% summary()
+#' result <- pre_factor(computer, "high_end:business")
 #' summary(result)
 #'
 #' @seealso \code{\link{pre_factor}} to calculate results
@@ -147,7 +147,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pre_factor("diamonds",c("price","carat","table"))
+#' result <- pre_factor(diamonds, c("price", "carat", "table"))
 #' plot(result)
 #' plot(result, plots = c("change", "scree"), cutoff = .05)
 #'

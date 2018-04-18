@@ -4,19 +4,14 @@
 \alias{store.conjoint}
 \title{Store method for the Multivariate > Conjoint tab}
 \usage{
-\method{store}{conjoint}(object, name = "PWs", type = "PW",
-  envir = parent.frame(), df = FALSE, ...)
+\method{store}{conjoint}(dataset, object, name, ...)
 }
 \arguments{
+\item{dataset}{Dataset}
+
 \item{object}{Return value from conjoint}
 
-\item{name}{Name of the dataset to store}
-
-\item{type}{Type of output to store}
-
-\item{envir}{Environment to assign 'new' dataset (optional). Used when an r_data list is not available}
-
-\item{df}{Return data.frame}
+\item{name}{Variable name(s) assigned to predicted values}
 
 \item{...}{further arguments passed to or from other methods}
 }

@@ -12,6 +12,6 @@ data(movie)
 Conjoint data for Movie theaters
 }
 \details{
-Rankings reflect the evaluation of 18 alternative movie theaters by one respondent. Description provided in attr(movie,"description")
+Rankings reflect the evaluation of 18 alternative movie theaters by one respondent. Description provided in attr(movie, "description")
 }
 \keyword{datasets}

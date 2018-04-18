@@ -18,7 +18,7 @@ Summary method for the hclus function
 See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 }
 \examples{
-result <- hclus("shopping", vars = c("v1:v6"))
+result <- hclus(shopping, vars = c("v1:v6"))
 summary(result)
 
 }

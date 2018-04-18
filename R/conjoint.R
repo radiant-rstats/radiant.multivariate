@@ -13,7 +13,7 @@
 #' @return A list with all variables defined in the function as an object of class conjoint
 #'
 #' @examples
-#' result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
+#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 #' result <- mp3 %>% conjoint(rvar = "Rating", evar = "Memory:Shape")
 #'
 #' @seealso \code{\link{summary.conjoint}} to summarize results
@@ -26,16 +26,19 @@ conjoint <- function(
   reverse = FALSE, data_filter = ""
 ) {
 
+  # dataset <- r_data$mp3_segment
+  # rvar = "Rating"
+  # evar = "Memory:Shape"
+  # int = ""
+  # by = "ID"
+  # reverse = FALSE
+  # data_filter = ""
+
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
   df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
   dat <- getdata(dataset, vars, filt = data_filter)
-  if (!is_string(dataset)) {
-    dataset <- deparse(substitute(dataset)) %>% 
-    set_attr("df", TRUE)
-  }
-
-  radiant.model::var_check(evar, colnames(dat)[-1], int) %>% 
+  radiant.model::var_check(evar, colnames(dat)[-1], int) %>%
     {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
 
   ## in case : was used to select a range of variables
@@ -43,8 +46,8 @@ conjoint <- function(
   if (!is_empty(by, "none")) {
     evar <- setdiff(evar, by)
     vars <- setdiff(vars, by)
-    bylevs <- dat[[by]] %>% 
-      as_factor() %>% 
+    bylevs <- dat[[by]] %>%
+      as_factor() %>%
       levels()
     model_list <- vector("list", length(bylevs)) %>% set_names(bylevs)
   } else {
@@ -72,20 +75,47 @@ conjoint <- function(
     coeff <- tidy(model)
     tab <- the_table(coeff, cdat, evar)
 
-    # coeff$` ` <- sig_stars(coeff$p.value) %>% 
-    coeff$sig_star <- sig_stars(coeff$p.value) %>% 
+    coeff$sig_star <- sig_stars(coeff$p.value) %>%
       format(justify = "left")
     colnames(coeff) <- c("label", "coefficient", "std.error", "t.value", "p.value", "sig_star")
     hasLevs <- sapply(select(dat, -1), function(x) is.factor(x) || is.logical(x) || is.character(x))
     if (sum(hasLevs) > 0) {
       for (j in names(hasLevs[hasLevs])) {
-        # coeff$`  ` %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>% 
-        coeff$label %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>% 
+        coeff$label %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>%
           gsub(paste0(":", j), paste0(":", j, "|"), .)
       }
       rm(j, hasLevs)
     }
     model_list[[bylevs[i]]] <- list(model = model, coeff = coeff, tab = tab)
+  }
+
+  ## creating PW and IW data.frames
+  if (!is_empty(by, "none")) {
+    cn <- gsub("\\|", "_", model_list[[1]]$coeff$label) %>%
+      gsub("[^A-z0-9_\\.]", "", .)
+
+    PW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1) %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      set_colnames(c(by, cn))
+    PW[[by]] <- bylevs
+
+    for (i in seq_along(bylevs)) {
+      PW[i, 2:ncol(PW)] <- model_list[[bylevs[i]]]$coeff$coefficient
+    }
+
+    ## creating IW data.frame
+    cn <- model_list[[1]]$tab$IW$Attribute %>%
+      gsub("[^A-z0-9_\\.]", "", .)
+
+    IW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1) %>%
+      as.data.frame(stringsAsFactors = FALSE) %>%
+      set_colnames(c(by, cn))
+    IW[[by]] <- bylevs
+
+    for (i in seq_along(bylevs)) {
+      IW[i, 2:ncol(IW)] <- model_list[[bylevs[i]]]$tab$IW$IW
+    }
+    rm(cn)
   }
 
   rm(model, coeff, tab)
@@ -105,9 +135,9 @@ conjoint <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
+#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 #' summary(result, mc_diag = TRUE)
-#' mp3 %>% conjoint(rvar = "Rating", evar = "Memory:Shape") %>% summary(., mc_diag = TRUE)
+#' mp3 %>% conjoint(rvar = "Rating", evar = "Memory:Shape") %>% summary(mc_diag = TRUE)
 #'
 #' @seealso \code{\link{conjoint}} to generate results
 #' @seealso \code{\link{plot.conjoint}} to plot results
@@ -121,7 +151,7 @@ summary.conjoint <- function(
 ) {
 
   cat("Conjoint analysis\n")
-  cat("Data                 :", object$dataset, "\n")
+  cat("Data                 :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter               :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -146,9 +176,7 @@ summary.conjoint <- function(
   cat("\nConjoint regression results:\n\n")
 
   coeff <- object$model_list[[show]]$coeff
-  # coeff$`  ` %<>% format(justify = "left")
   coeff$label %<>% format(justify = "left")
-  # coeff <- rename(coeff, `  ` = labels, ` ` = sig_stars)
   if (!additional) {
     coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
     print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
@@ -156,7 +184,6 @@ summary.conjoint <- function(
   } else {
     if (all(coeff$p.value == "NaN")) {
       coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
-      # print(coeff[, 1:2], row.names = FALSE)
       print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
       cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
       return()
@@ -165,7 +192,6 @@ summary.conjoint <- function(
       coeff[, 2:5] %<>% formatdf(dec)
       coeff$p.value[p.small] <- "< .001"
       print(rename(coeff, `  ` = "label", ` ` = "sig_star"), row.names = FALSE)
-      # print(coeff, row.names = FALSE)
     }
 
     model <- object$model_list[[show]]$model
@@ -195,8 +221,8 @@ summary.conjoint <- function(
       car::vif(object$model_list[[show]]$model) %>%
         {if (!dim(.) %>% is.null()) .[, "GVIF"] else .} %>% # needed when factors are included
         data.frame(
-          VIF = ., 
-          Rsq = 1 - 1 / ., 
+          VIF = .,
+          Rsq = 1 - 1 / .,
           stringsAsFactors = FALSE
         ) %>%
         round(dec) %>%
@@ -214,7 +240,7 @@ summary.conjoint <- function(
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
 #' @param object Return value from \code{\link{conjoint}}
-#' @param pred_data Name of the dataset to use for prediction
+#' @param pred_data Provide the dataframe to generate predictions. The dataset must contain all columns used in the estimation
 #' @param pred_cmd Command used to generate data for prediction
 #' @param conf_lev Confidence level used to estimate confidence intervals (.95 is the default)
 #' @param se Logical that indicates if prediction standard errors should be calculated (default = FALSE)
@@ -227,15 +253,15 @@ summary.conjoint <- function(
 #' @seealso \code{\link{plot.conjoint}} to plot results
 #'
 #' @examples
-#' result <- conjoint("mp3", rvar = "Rating", evar = "Memory:Shape")
-#' predict(result, pred_data = "mp3")
+#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
+#' predict(result, pred_data = mp3)
 #'
 #' @importFrom radiant.model predict_model
 #'
 #' @export
 predict.conjoint <- function(
-  object, pred_data = "", pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, 
+  object, pred_data = NULL, pred_cmd = "",
+  conf_lev = 0.95, se = FALSE,
   interval = "confidence", dec = 3,
   ...
 ) {
@@ -247,8 +273,8 @@ predict.conjoint <- function(
     se <- FALSE
   }
 
-  # ensure you have a name for the prediction dataset
-  if (!is.character(pred_data)) {
+  ## ensure you have a name for the prediction dataset
+  if (!is_empty(pred_data)) {
     attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
   }
 
@@ -307,15 +333,15 @@ predict.conjoint <- function(
 #'
 #' @export
 predict_conjoint_by <- function(
-  object, pfun, pred_data = "", pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, dec = 3, 
+  object, pfun, pred_data = NULL, pred_cmd = "",
+  conf_lev = 0.95, se = FALSE, dec = 3,
   ...
 ) {
 
   if (is.character(object)) return(object)
 
   ## ensure you have a name for the prediction dataset
-  if (!is.character(pred_data)) {
+  if (!is_empty(pred_data)) {
     attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
   }
 
@@ -330,16 +356,16 @@ predict_conjoint_by <- function(
     if (i == 1) att <- attributes(pred[[1]])
 
     if (is.character(pred[[i]])) return(pred[[i]])
-    pred[[i]] %<>% {.[[object$by]] <- bylevs[i]; .} %>% 
+    pred[[i]] %<>% {.[[object$by]] <- bylevs[i]; .} %>%
       {.[, c(object$by, head(colnames(.), -1))]}
   }
 
   pred <- bind_rows(pred)
   att$row.names <- 1:nrow(pred)
   att$vars <- att$names <- colnames(pred)
-  if (is_string(object$dataset)) att$dataset <- object$dataset
+  # if (is_string(object$dataset)) att$dataset <- object$dataset
   attributes(pred) <- att
-  add_class(pred, "conjoint.predict.by")
+  add_class(pred, "conjoint.predict")
 }
 
 #' Print method for predict.conjoint
@@ -367,7 +393,7 @@ print.conjoint.predict <- function(x, ..., n = 50)
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- conjoint(dataset = "mp3", rvar = "Rating", evar = "Memory:Shape")
+#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 #' plot(result, scale_plot = TRUE)
 #' plot(result, plots = "iw")
 #'
@@ -428,7 +454,7 @@ plot.conjoint <- function(
 
   if (custom) {
     if (length(plot_list) == 1) {
-      return(plot_list[[1]]) 
+      return(plot_list[[1]])
     } else {
       return(plot_list)
     }
@@ -447,7 +473,7 @@ plot.conjoint <- function(
 #' @param evar Explanatory variables used in the conjoint regression
 #'
 #' @examples
-#' result <- conjoint(dataset = "mp3", rvar = "Rating", evar = "Memory:Shape")
+#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 #' the_table(tidy(result$model_list[[1]][["model"]]), result$dat, result$evar)
 #'
 #' @seealso \code{\link{conjoint}} to generate results
@@ -517,185 +543,66 @@ the_table <- function(model, dat, evar) {
 #'
 #' @details Store data frame with PWs or IWs in Radiant r_data list if available
 #'
+#' @param dataset Dataset
 #' @param object Return value from conjoint
-#' @param name Name of the dataset to store
-#' @param type Type of output to store
-#' @param envir Environment to assign 'new' dataset (optional). Used when an r_data list is not available
-#' @param df Return data.frame
+#' @param name Variable name(s) assigned to predicted values
 #' @param ... further arguments passed to or from other methods
 #'
-#' @importFrom pryr where
-#'
 #' @export
-store.conjoint <- function(
-  object, name = "PWs", type = "PW", 
-  envir = parent.frame(), df = FALSE, ...
-) {
-
-  bylevs <- object$bylevs
-
-  if (type == "PW") {
-    cn <- tidy(object$model_list[[1]]$model)$term[-1]
-
-    for (i in object$evar)
-      cn %<>% gsub(i, paste0(i, "_"), .) %>% gsub("\\_\\_", "\\_", .)
-
-    cn <- gsub("[^A-z0-9_\\.]", "", cn) %>% c("Intercept", .)
+store.conjoint <- function(dataset, object, name, ...) {
+  if (missing(name)) {
+    object$tab
   } else {
-    cn <- object$model_list[[1]]$tab$IW$Attribute %>%
-      gsub("[^A-z0-9_\\.]", "", .)
+    print(list(...))
+    stop(
+      paste0(
+        "This function is deprecated. Use the code below for part worths instead:\n\n",
+        name, " <- ", deparse(substitute(object)), "$PW\nregister(\"",
+        name, ")\n\n",
+        "This function is deprecated. Use the code below for importance weights instead:\n\n",
+        name, " <- ", deparse(substitute(object)), "$IW\nregister(\"",
+        name, ")"
+      ),
+      call. = FALSE
+    )
   }
-
-  res <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1)
-  colnames(res) <- c(object$by, cn)
-  res <- as.data.frame(res, stringsAsFactors = FALSE)
-  res[[object$by]] <- bylevs
-
-  for (i in seq_along(bylevs)) {
-    if (type == "IW") {
-      res[i, 2:ncol(res)] <- object$model_list[[bylevs[i]]]$tab$IW$IW
-    } else {
-      res[i, 2:ncol(res)] <- object$model_list[[bylevs[i]]]$coeff$coefficient
-    }
-  }
-
-  if (df) {
-    return(res)
-  } else if (exists("r_environment")) {
-    env <- r_environment
-  } else if (exists("r_data")) {
-    env <- pryr::where("r_data")
-  } else {
-    assign(name, res, envir = envir)
-    message("Dataset ", name, " created in ", environmentName(envir), " environment")
-    return(invisible())
-  }
-
-  ## use data description from the original if available
-  if (is_empty(env$r_data[[paste0(name, "_descr")]])) {
-    s <- ifelse(type == "PW", "PWs", "IWs")
-    attr(res, "description") <- paste0("## Conjoint ", s, "\n\nThis dataset contains ", s, " derived from dataset ", object$dataset)
-  } else {
-    attr(res, "description") <- env$r_data[[paste0(name, "_descr")]]
-  }
-
-  env$r_data[[name]] <- res
-  env$r_data[[paste0(name, "_descr")]] <- attr(res, "description")
-  env$r_data[["datasetlist"]] <- c(name, env$r_data[["datasetlist"]]) %>% unique()
 }
 
-#' Store predicted values generated in predict.conjoint
+##' Store predicted values generated in predict.conjoint
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
+#' @param dataset Dataset to add predictions to
 #' @param object Return value from model predict function
-#' @param ... Additional arguments
-#' @param data Data or dataset name (e.g., data = mtcars or data = "mtcars")
 #' @param name Variable name(s) assigned to predicted values
-#' @param df Return data.frame
+#' @param ... Additional arguments
 #'
 #' @export
-store.conjoint.predict <- function(
-  object, ..., data = attr(object, "pred_data"), 
-  name = "prediction", df = FALSE
-) {
+store.conjoint.predict <- function(dataset, object, name = "prediction", ...) {
+  radiant.model:::store.model.predict(dataset, object, name = name, ...)
+  # if (is_empty(name)) name <- "prediction"
 
-  if (is_empty(name)) name <- "prediction"
+  # ## gsub needed because trailing/leading spaces may be added to the variable name
+  # ind <- which(colnames(object) == "Prediction")
 
-  ## gsub needed because trailing/leading spaces may be added to the variable name
-  ind <- which(colnames(object) == "Prediction")
+  # ## if se was calculated
+  # if (length(name) == 1) {
+  #   name <- unlist(strsplit(name, "(\\s*,\\s*|\\s*;\\s*|\\s+)")) %>%
+  #     gsub("\\s", "", .)
+  # }
+  # if (length(name) > 1) {
+  #   name <- name[1:min(3, length(name))]
+  #   ind_mult <- ind:(ind + length(name[-1]))
+  #   df <- object[, ind_mult, drop = FALSE]
+  # } else {
+  #   df <- object[, "Prediction", drop = FALSE]
+  # }
 
-  ## if se was calculated
-  name <- unlist(strsplit(name, ",")) %>% gsub("\\s", "", .)
-  if (length(name) > 1) {
-    name <- name[1:min(3, length(name))]
-    ind_mult <- ind:(ind + length(name[-1]))
-    df <- object[, ind_mult, drop = FALSE]
-  } else {
-    df <- object[, "Prediction", drop = FALSE]
-  }
+  # vars <- colnames(object)[1:(ind - 1)]
+  # indr <- indexr(dataset, vars, "", cmd = attr(object, "pred_cmd"))
+  # pred <- as.data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(df)), stringsAsFactors = FALSE)
+  # pred[indr$ind, ] <- as.vector(df) ## as.vector removes all attributes from df
 
-  vars <- colnames(object)[1:(ind - 1)]
-  indr <- indexr(data, vars, "", cmd = attr(object, "pred_cmd"))
-
-  pred <- as.data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(df)), stringsAsFactors = FALSE)
-  pred[indr$ind, ] <- as.vector(df) ## as.vector removes all attributes from df
-
-  if (isTRUE(df)) {
-    return(data)
-  } else {
-    changedata(data, vars = pred, var_names = name)
-  }
+  # dataset[, name] <- pred
+  # dataset
 }
-
-#' Store method for the Multivariate > Conjoint > Predict
-#'
-#' @details Store data frame with predictions in Radiant r_data list if available
-#'
-#' @param object Return value from predict.conjoint
-#' @param name Name of the dataset to store
-#' @param envir Environment to assign 'new' dataset (optional). Used when an r_data list is not available
-#' @param df Return data.frame
-#' @param ... further arguments passed to or from other methods
-#'
-#' @importFrom pryr where
-#'
-#' @export
-store.conjoint.predict.by <- function(
-  object, name = "predict_by", 
-  envir = parent.frame(), df = FALSE, ...
-) {
-  
-  if (isTRUE(df)) {
-    return(object)
-  } else if (exists("r_environment")) {
-    env <- r_environment
-  } else if (exists("r_data")) {
-    env <- pryr::where("r_data")
-  } else {
-    assign(name, object, envir = envir)
-    message("Dataset ", name, " created in ", environmentName(envir), " environment")
-    return(invisible())
-  }
-
-  # ## use data description from the original if available
-  if (is_empty(env$r_data[[paste0(name, "_descr")]])) {
-    if (attr(object, "pred_type") == "data") {
-      s <- paste("The prediction dataset used was", attr(object, "pred_data"))
-    } else if (attr(object, "pred_type") == "cmd") {
-      pred_cmd <- gsub("([\\=\\+\\*-])", " \\1 ", attr(object, "pred_cmd")) %>% gsub("([;,])", "\\1 ", .)
-      s <- paste("The prediction command used was ", pred_cmd)
-    } else {
-      pred_cmd <- gsub("([\\=\\+\\*-])", " \\1 ", attr(object, "pred_cmd")) %>% gsub("([;,])", "\\1 ", .)
-      s <- paste("The prediction dataset used was ", attr(object, "pred_data"), " and the dataset was adapted using the following prediction command:", pred_cmd)
-    }
-
-    attr(object, "description") <- paste0("## Conjoint predictions\n\nThis dataset contains predictions from a conjoint analysis on ", attr(object, "dataset"), ". ", s, ". Note that a separate regression model was estimated for each level of ", colnames(object)[1], ".")
-  } else {
-    attr(object, "description") <- env$r_data[[paste0(name, "_descr")]]
-  }
-
-  env$r_data[[name]] <- object
-  env$r_data[[paste0(name, "_descr")]] <- attr(object, "description")
-  env$r_data[["datasetlist"]] <- c(name, env$r_data[["datasetlist"]]) %>% unique()
-}
-
-## code for 'exploded logistic regression' when ranking data is provided
-# library(MASS)
-# library(dplyr)
-# library(magrittr)
-#
-# load("~/gh/radiant/inst/base/data/carpet.rda")
-# # carpet %<>% {bind_rows(list(.,.,.))}
-# carpet$rev_ranking <- ordered(as.factor(19 - carpet$ranking))
-# carpet$price <- factor(carpet$price, levels = c("1.59","1.39","1.19"))
-# carpet$brand <- factor(carpet$brand, levels = c("Glory","K2R","Bissell"))
-#
-# m <- polr(rev_ranking ~ design + brand + price + seal + money_back, data = carpet, Hess = FALSE)
-# # coef(m) %>% {. / max(abs(.))}
-# coef(m) %>% {. / abs(.["designB"])}
-#
-# carpet$ranking_lm <- 19 - carpet$ranking
-# l <- lm(ranking_lm ~ design + brand + price + seal + money_back, data = carpet)
-# # coef(l) %>% {./ max(abs(.))}
-# coef(l) %>% {. / abs(.["designB"])} %>% .[-1]
