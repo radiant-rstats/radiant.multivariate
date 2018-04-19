@@ -273,7 +273,9 @@ predict.conjoint <- function(
 
   ## ensure you have a name for the prediction dataset
   if (is.data.frame(pred_data)) {
-    attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
+    df_name <- deparse(substitute(pred_data))
+  } else {
+    df_name <- pred_data
   }
 
   pfun <- function(model, pred, se, conf_lev) {
@@ -302,11 +304,13 @@ predict.conjoint <- function(
   if (is_empty(object$by, "none")) {
     object$model <- object$model_list[["full"]]$model
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec) %>%
-      set_attr("interval", interval)
+      set_attr("interval", interval) %>%
+      set_attr("pred_data", df_name)
 
   } else {
     predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec) %>%
-      set_attr("interval", interval)
+      set_attr("interval", interval) %>%
+      set_attr("pred_data", df_name)
   }
 }
 
@@ -361,7 +365,8 @@ predict_conjoint_by <- function(
   att$row.names <- 1:nrow(pred)
   att$vars <- att$names <- colnames(pred)
   attributes(pred) <- att
-  add_class(pred, "conjoint.predict")
+  add_class(pred, "conjoint.predict.by") %>%
+    add_class("conjoint.predict")
 }
 
 #' Print method for predict.conjoint
@@ -373,7 +378,7 @@ predict_conjoint_by <- function(
 #' @importFrom radiant.model print_predict_model
 #'
 #' @export
-print.conjoint.predict <- function(x, ..., n = 50)
+print.conjoint.predict <- function(x, ..., n = 20)
   print_predict_model(x, ..., n = n, header = "Conjoint Analysis")
 
 #' Plot method for the conjoint function
@@ -574,29 +579,4 @@ store.conjoint <- function(dataset, object, name, ...) {
 #' @export
 store.conjoint.predict <- function(dataset, object, name = "prediction", ...) {
   radiant.model:::store.model.predict(dataset, object, name = name, ...)
-  # if (is_empty(name)) name <- "prediction"
-
-  # ## gsub needed because trailing/leading spaces may be added to the variable name
-  # ind <- which(colnames(object) == "Prediction")
-
-  # ## if se was calculated
-  # if (length(name) == 1) {
-  #   name <- unlist(strsplit(name, "(\\s*,\\s*|\\s*;\\s*|\\s+)")) %>%
-  #     gsub("\\s", "", .)
-  # }
-  # if (length(name) > 1) {
-  #   name <- name[1:min(3, length(name))]
-  #   ind_mult <- ind:(ind + length(name[-1]))
-  #   df <- object[, ind_mult, drop = FALSE]
-  # } else {
-  #   df <- object[, "Prediction", drop = FALSE]
-  # }
-
-  # vars <- colnames(object)[1:(ind - 1)]
-  # indr <- indexr(dataset, vars, "", cmd = attr(object, "pred_cmd"))
-  # pred <- as.data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(df)), stringsAsFactors = FALSE)
-  # pred[indr$ind, ] <- as.vector(df) ## as.vector removes all attributes from df
-
-  # dataset[, name] <- pred
-  # dataset
 }

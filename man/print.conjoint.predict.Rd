@@ -4,7 +4,7 @@
 \alias{print.conjoint.predict}
 \title{Print method for predict.conjoint}
 \usage{
-\method{print}{conjoint.predict}(x, ..., n = 50)
+\method{print}{conjoint.predict}(x, ..., n = 20)
 }
 \arguments{
 \item{x}{Return value from prediction method}

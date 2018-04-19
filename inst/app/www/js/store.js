@@ -7,5 +7,9 @@ $(document).keydown(function(event) {
     $("#km_store").click();
   } else if ($("#ca_store_pred_name").is(":focus") && event.keyCode == 13) {
     $("#ca_store_pred").click();
+  } else if ($("#ca_store_pw_name").is(":focus") && event.keyCode == 13) {
+    $("#ca_store_pw").click();
+  } else if ($("#ca_store_iw_name").is(":focus") && event.keyCode == 13) {
+    $("#ca_store_iw").click();
   }
 });

@@ -287,6 +287,6 @@ store.kclus <- function(dataset, object, name = "", ...) {
   indr <- indexr(dataset, object$vars, object$data_filter)
   km <- rep(NA, indr$nr)
   km[indr$ind] <- object$km_out$cluster
-  dataset[[name]] <- km
+  dataset[[name]] <- as.factor(km)
   dataset
 }

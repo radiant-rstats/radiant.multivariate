@@ -159,7 +159,6 @@ output$ui_ca_show <- renderUI({
 ## reset ca_show if needed
 observeEvent(input$ca_by == "none" && !is_empty(input$ca_show), {
   updateSelectInput(session = session, inputId = "ca_show", selected = NULL)
-
 })
 
 ## reset prediction and plot settings when the dataset changes
@@ -173,7 +172,6 @@ observe({
   input$data_filter
   input$show_filter
   sapply(r_drop(names(ca_args)), function(x) input[[paste0("ca_", x)]])
-
   ## notify user when the model needs to be updated
   ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
   if (pressed(input$ca_run)) {
@@ -199,7 +197,6 @@ output$ui_ca_store <- renderUI({
     tags$br(),
     HTML("<label>Store all IWs in a new dataset:</label>"),
     tags$table(
-      # tags$td(textInput("ca_store_iw_name", NULL, state_init("ca_store_iw_name", "IWs"))),
       tags$td(textInput("ca_store_iw_name", NULL, "", placeholder = "Provide data name")),
       tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus")), style = "padding-top:5px;")
     )
@@ -213,13 +210,14 @@ output$ui_ca_store_pred <- renderUI({
   name <- "pred_ca"
   if (input$ca_by != "none") {
     lab <- sub(":", " in new dataset:", lab)
-    name <- "predict_by"
+    name <- ""
   }
 
   tags$table(
     if (!input$ca_pred_plot) tags$br(),
     HTML(lab),
-    tags$td(textInput("ca_store_pred_name", NULL, state_init("ca_store_pred_name", name))),
+    # tags$td(textInput("ca_store_pred_name", NULL, state_init("ca_store_pred_name", name))),
+    tags$td(textInput("ca_store_pred_name", NULL, name, placeholder = "Provide data name")),
     tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), style = "padding-top:5px;")
   )
 })
@@ -501,32 +499,48 @@ observeEvent(input$conjoint_report, {
 
   if (input$ca_by != "none") {
     if (!is_empty(input$ca_store_pw_name)) {
-      xcmd <- paste0(xcmd, input$ca_store_pw_name, " result$PW\nregister(\"", input$ca_store_pw_name, "\")\n")
+      xcmd <- paste0(xcmd, input$ca_store_pw_name, " <- result$PW; register(\"", input$ca_store_pw_name, "\")\n")
     }
     if (!is_empty(input$ca_store_iw_name)) {
-      xcmd <- paste0(xcmd, input$ca_store_pw_name, " result$IW\nregister(\"", input$ca_store_iw_name, "\")\n")
+      xcmd <- paste0(xcmd, input$ca_store_iw_name, " <- result$IW; register(\"", input$ca_store_iw_name, "\")\n")
     }
   }
 
   if (!is_empty(input$ca_predict, "none") &&
-    (!is_empty(input$ca_pred_data) || !is_empty(input$ca_pred_cmd))) {
+     (!is_empty(input$ca_pred_data) || !is_empty(input$ca_pred_cmd))) {
+
     pred_args <- clean_args(ca_pred_inputs(), ca_pred_args[-1])
     if (!is_empty(pred_args[["pred_cmd"]])) {
       pred_args[["pred_cmd"]] <- strsplit(pred_args[["pred_cmd"]], ";")[[1]]
     }
-    inp_out[[2 + figs]] <- pred_args
-    outputs <- c(outputs, "pred <- predict")
+    if (!is_empty(pred_args$pred_data)) {
+      pred_args$pred_data <- as.symbol(pred_args$pred_data)
+    } 
 
-    xcmd <- paste0(xcmd, "print(pred, n = 10)")
-    if (input$ca_predict %in% c("data", "datacmd") || input$ca_by != "none") {
-      xcmd <- paste0(xcmd, "\n", input$ca_pred_data, " <- store(", 
-        input$ca_pred_data, ", pred, name = \"", input$ca_store_pred_name, "\")"
-      )
+    inp_out[[2 + figs]] <- pred_args
+    pred_name <- "pred"
+    if (!is_empty(input$ca_by, "none") && !is_empty(input$ca_store_pred_name)) {
+      pred_name <- input$ca_store_pred_name
+      outputs <- c(outputs, paste0(pred_name, " <- predict"))
+      xcmd <- paste0(xcmd, pred_name %>% paste0("register(\"", ., "\")\nprint(", . ,", n = 10)"))
+    } else {
+      outputs <- c(outputs, "pred <- predict")
+      xcmd <- paste0(xcmd, "print(pred, n = 10)")
+      if (input$ca_predict %in% c("data", "datacmd")) {
+        if (is_empty(input$ca_by, "none")) {
+          name <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*|\\s+)")) %>%
+            gsub("\\s", "", .) %>%
+            deparse(., control = "keepNA", width.cutoff = 500L)
+          xcmd <- paste0(xcmd, "\n", input$ca_pred_data , " <- store(", 
+            input$ca_pred_data, ", pred, name = ", name, ")"
+          )
+        } 
+      }
     } 
 
     if (input$ca_pred_plot && !is_empty(input$ca_xvar)) {
       inp_out[[3 + figs]] <- clean_args(ca_pred_plot_inputs(), ca_pred_plot_args[-1])
-      inp_out[[3 + figs]]$result <- "pred"
+      inp_out[[3 + figs]]$result <- pred_name
       outputs <- c(outputs, "plot")
       figs <- TRUE
     }
@@ -550,9 +564,9 @@ observeEvent(input$ca_store_pw, {
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing PWs", value = 1,
-    # store(robj, name = input$ca_store_pw_name, type = "PW")
-    r_data[[name]] <- store(robj, type = "PW")
+    r_data[[name]] <- robj$PW
   )
+  register(name)
 })
 
 observeEvent(input$ca_store_iw, {
@@ -562,23 +576,30 @@ observeEvent(input$ca_store_iw, {
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing IWs", value = 1,
-    # store(robj, name = input$ca_store_iw_name, type = "IW")
-    r_data[[name]] <- store(robj, type = "IW")
+    r_data[[name]] <- robj$IW
   )
+  register(name)
 })
 
 observeEvent(input$ca_store_pred, {
   req(!is_empty(input$ca_pred_data), pressed(input$ca_run))
   pred <- .predict_conjoint()
   if (is.null(pred)) return()
-  withProgress(
-    message = "Storing predictions", value = 1,
-    # store(pred, data = input$ca_pred_data, name = input$ca_store_pred_name)
-    r_data[[input$ca_pred_data]] <- radiant.model:::store.model.predict(
-      r_data[[input$ca_pred_data]], pred, 
-      name = input$ca_store_pred_name
+  if ("conjoint.predict.by" %in% class(pred)) {
+    withProgress(
+      message = "Storing predictions in new dataset", value = 1,
+        r_data[[input$ca_store_pred_name]] <- pred, 
     )
-  )
+    register(input$ca_store_pred_name)
+  } else {
+    withProgress(
+      message = "Storing predictions", value = 1,
+      r_data[[input$ca_pred_data]] <- radiant.model:::store.model.predict(
+        r_data[[input$ca_pred_data]], pred, 
+        name = input$ca_store_pred_name
+      )
+    )
+  }
 })
 
 dl_ca_PWs <- function(path) {

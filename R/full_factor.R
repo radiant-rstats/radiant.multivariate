@@ -199,9 +199,12 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
       plot_list[[paste0(i_name, "_", j_name)]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
         geom_point() +
         ggrepel::geom_text_repel() +
-        geom_segment(aes_string(x = 0, y = 0, xend = i_name, yend = j_name)) +
+        geom_segment(
+          aes_string(x = 0, y = 0, xend = i_name, yend = j_name), 
+          size = 0.5, linetype = "dashed", alpha = 0.5
+        ) +
         theme(legend.position = "none") +
-        xlim(-1, 1) + ylim(-1, 1) +
+        coord_cartesian(xlim = c(-1, 1), ylim = c(-1, 1)) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
     }
