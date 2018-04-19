@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset
 #' @param id1 A character variable or factor with unique entries
 #' @param id2 A character variable or factor with unique entries
 #' @param dis A numeric measure of brand dissimilarity
@@ -31,13 +31,13 @@ mds <- function(
 ) {
 
   nr_dim <- as.numeric(nr_dim)
-  dat <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
-  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
+  dataset <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
 
-  d <- dat[[dis]]
-  id1_dat <- as.character(dat[[id1]])
-  id2_dat <- as.character(dat[[id2]])
-  rm(dat)
+  d <- dataset[[dis]]
+  id1_dat <- as.character(dataset[[id1]])
+  id2_dat <- as.character(dataset[[id2]])
+  rm(dataset)
 
   ## ids
   lab <- unique(c(id1_dat, id2_dat))
@@ -104,7 +104,7 @@ summary.mds <- function(object, dec = 2, ...) {
   if (is.character(object)) return(cat(object))
 
   cat("(Dis)similarity based brand map (MDS)\n")
-  cat("Data        :", object$dataset, "\n")
+  cat("Data        :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }

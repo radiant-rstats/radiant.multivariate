@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset
 #' @param vars Vector of variables to include in the analysis
 #' @param distance Distance
 #' @param method Method
@@ -24,7 +24,7 @@ hclus <- function(
   data_filter = ""
 ) {
 
-  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- getdata(dataset, vars, filt = data_filter)
   if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
@@ -42,7 +42,6 @@ hclus <- function(
     } %>%
     hclust(d = ., method = method) -> hc_out
 
-  # if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
   as.list(environment()) %>% add_class("hclus")
 }
 
@@ -102,12 +101,9 @@ plot.hclus <- function(
   custom = FALSE, ...
 ) {
 
-  # object <- x; rm(x)
-
   if (is.character(x)) return(invisible())
   if (is_not(cutoff)) cutoff <- 0
-  x$hc_out$height %<>% 
-    {. / max(.)}
+  x$hc_out$height %<>% {. / max(.)}
 
   plot_list <- list()
   if ("scree" %in% plots) {

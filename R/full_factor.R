@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset
 #' @param vars Variables to include in the analysis
 #' @param method Factor extraction method to use
 #' @param nr_fact Number of factors to extract
@@ -28,12 +28,8 @@ full_factor <- function(
   rotation = "varimax", data_filter = ""
 ) {
 
-  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- getdata(dataset, vars, filt = data_filter)
-  # if (!is_string(dataset)) {
-  #   dataset <- deparse(substitute(dataset)) %>%
-  #     set_attr("df", TRUE)
-  # }
 
   nrObs <- nrow(dataset)
   if (nrObs <= ncol(dataset)) {
@@ -195,14 +191,11 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
   rnames <- rownames(df)
   cnames <- colnames(df)
   plot_list <- list()
-  # pnr <- 1
-  # ab_df <- data.frame(a = c(0, 0), b = c(1, 0), stringsAsFactors = FALSE)
   for (i in 1:(length(cnames) - 1)) {
     for (j in (i + 1):length(cnames)) {
       i_name <- cnames[i]
       j_name <- cnames[j]
       df2 <- cbind(df[, c(i_name, j_name)], rnames)
-      # plot_list[[pnr]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
       plot_list[[paste0(i_name, "_", j_name)]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
         geom_point() +
         ggrepel::geom_text_repel() +
@@ -211,7 +204,6 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
         xlim(-1, 1) + ylim(-1, 1) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
-      # pnr <- pnr + 1
     }
   }
 
@@ -249,7 +241,6 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
 store.full_factor <- function(dataset, object, name = "", ...) {
   if (is_empty(name)) name <- "factor"
   fscores <- as.data.frame(object$fres$scores, stringsAsFactors = FALSE)
-  # dataset <- if (length(attr(object$dataset, "df") > 0)) object$dataset else object$dataset
   indr <- indexr(dataset, object$vars, object$data_filter)
   fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)), stringsAsFactors = FALSE)
   fs[indr$ind, ] <- fscores

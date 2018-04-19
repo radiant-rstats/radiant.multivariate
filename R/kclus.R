@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset 
 #' @param vars Vector of variables to include in the analysis
 #' @param fun Function to use: "mean" or "median"
 #' @param hc_init Use centers from hclus as the starting point
@@ -30,8 +30,8 @@ kclus <- function(
   seed = 1234, nr_clus = 2, data_filter = ""
 ) {
   
-  dat <- getdata(dataset, vars, filt = data_filter)
-  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
+  dataset <- getdata(dataset, vars, filt = data_filter)
 
   if (fun == "median" && length(vars) < 2) {
     stop("K-medians requires at least two variables as input")
@@ -39,14 +39,14 @@ kclus <- function(
 
   ## converting factors to integer with first level = 1
   convert <- function(x) as.integer(x == levels(x)[1])
-  dat <- mutate_if(dat, is.factor, convert)
+  dataset <- mutate_if(dataset, is.factor, convert)
 
   if (hc_init) {
-    init <- hclus(dat, vars, distance = distance, method = method, max_cases = Inf)
+    init <- hclus(dataset, vars, distance = distance, method = method, max_cases = Inf)
 
     clus_var <- cutree(init$hc_out, k = nr_clus)
     hc_cent <- c()
-    km_out <- dat %>%
+    km_out <- dataset %>%
       mutate(clus_var = clus_var) %>%
       mutate_all(funs(as.vector(scale(.)))) %T>% {
         hc_cent <<-
@@ -69,7 +69,7 @@ kclus <- function(
     seed %>% gsub("[^0-9]", "", .) %>% {
       if (!is_empty(.)) set.seed(seed)
     }
-    km_out <- dat %>%
+    km_out <- dataset %>%
       mutate_all(funs(as.vector(scale(.)))) %>%
       {
         if (fun == "median") {
@@ -83,7 +83,7 @@ kclus <- function(
 
   ## same calculations of SST etc. as for kmeans (verified)
   if (fun == "median") {
-    sdat <- mutate_all(dat, funs(as.vector(scale(.))))
+    sdat <- mutate_all(dataset, funs(as.vector(scale(.))))
     km_out$withinss <-
       mutate(sdat, clus_var = km_out$cluster) %>%
       group_by(clus_var) %>%
@@ -100,7 +100,7 @@ kclus <- function(
 
   ## Gmedian / tibble / dplyr issue
   clus_names <- paste("Cluster", 1:nr_clus)
-  clus_means <- dat %>%
+  clus_means <- dataset %>%
     mutate(clus_var = km_out$cluster) %>%
     group_by(clus_var) %>%
     summarise_all(funs(mean(.))) %>%
@@ -133,7 +133,7 @@ kclus <- function(
 #' @export
 summary.kclus <- function(object, dec = 2, ...) {
   cat(paste0("K-", object$fun, "s cluster analysis\n"))
-  cat("Data         :", object$dataset, "\n")
+  cat("Data         :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter       :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -191,9 +191,8 @@ plot.kclus <- function(
   custom = FALSE, ...
 ) {
 
-  # x$dat <- mutate(x$dat, Cluster = as.factor(x$km_out$cluster))
-  x$dat$Cluster <- as.factor(x$km_out$cluster)
-  vars <- colnames(x$dat) %>% .[-length(.)]
+  x$dataset$Cluster <- as.factor(x$km_out$cluster)
+  vars <- colnames(x$dataset) %>% .[-length(.)]
 
   ## what to report?
   # fun <- if (x$fun == "mean") mean else median
@@ -205,7 +204,7 @@ plot.kclus <- function(
   if ("density" %in% plots) {
     for (var in vars) {
       plot_list[[paste0("dens_", var)]] <-
-        ggplot(x$dat, aes_string(x = var, fill = "Cluster")) +
+        ggplot(x$dataset, aes_string(x = var, fill = "Cluster")) +
         geom_density(adjust = 2.5, alpha = 0.3) +
         labs(y = "") + theme(axis.text.y = element_blank())
     }
@@ -216,7 +215,7 @@ plot.kclus <- function(
 
     for (var in vars) {
       dat_summary <-
-        select_at(x$dat, .vars = c(var, "Cluster")) %>%
+        select_at(x$dataset, .vars = c(var, "Cluster")) %>%
         group_by_at(.vars = "Cluster") %>%
         summarise_all(
           funs(
@@ -241,7 +240,7 @@ plot.kclus <- function(
     for (var in vars) {
       plot_list[[paste0("scatter_", var)]] <-
         visualize(
-          x$dat, xvar = "Cluster", yvar = var,
+          x$dataset, xvar = "Cluster", yvar = var,
           check = "jitter",
           type = "scatter",
           linecol = "blue",
@@ -284,10 +283,7 @@ plot.kclus <- function(
 #'
 #' @export
 store.kclus <- function(dataset, object, name = "", ...) {
-  ## membership variable name
   if (is_empty(name)) name <- paste0("kclus", object$nr_clus)
-  # dat <- {if (object$dataset == "-----") object$dat else object$dataset}
-  # dat <- if (length(attr(object$dataset, "df") > 0)) object$dat else object$dataset
   indr <- indexr(dataset, object$vars, object$data_filter)
   km <- rep(NA, indr$nr)
   km[indr$ind] <- object$km_out$cluster

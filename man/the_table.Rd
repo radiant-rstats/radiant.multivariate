@@ -4,12 +4,12 @@
 \alias{the_table}
 \title{Function to calculate the PW and IW table for conjoint}
 \usage{
-the_table(model, dat, evar)
+the_table(model, dataset, evar)
 }
 \arguments{
 \item{model}{Tidied model results (broom) output from \code{\link{conjoint}} passed on by summary.conjoint}
 
-\item{dat}{Conjoint data}
+\item{dataset}{Conjoint data}
 
 \item{evar}{Explanatory variables used in the conjoint regression}
 }
@@ -21,7 +21,7 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for a
 }
 \examples{
 result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
-the_table(tidy(result$model_list[[1]][["model"]]), result$dat, result$evar)
+the_table(tidy(result$model_list[[1]][["model"]]), result$dataset, result$evar)
 
 }
 \seealso{

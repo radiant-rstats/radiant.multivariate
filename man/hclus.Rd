@@ -8,7 +8,7 @@ hclus(dataset, vars, distance = "sq.euclidian", method = "ward.D",
   max_cases = 5000, data_filter = "")
 }
 \arguments{
-\item{dataset}{Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant}
+\item{dataset}{Dataset}
 
 \item{vars}{Vector of variables to include in the analysis}
 

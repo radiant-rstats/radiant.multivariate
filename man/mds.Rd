@@ -8,7 +8,7 @@ mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2, seed = 1234,
   data_filter = "")
 }
 \arguments{
-\item{dataset}{Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant}
+\item{dataset}{Dataset}
 
 \item{id1}{A character variable or factor with unique entries}
 

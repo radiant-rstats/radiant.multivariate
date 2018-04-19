@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset
 #' @param vars Variables to include in the analysis
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
@@ -19,18 +19,17 @@
 #' @export
 pre_factor <- function(dataset, vars, data_filter = "") {
 
-  dat <- getdata(dataset, vars, filt = data_filter)
-  nrObs <- nrow(dat)
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
+  dataset <- getdata(dataset, vars, filt = data_filter)
+  nrObs <- nrow(dataset)
 
-  if (!is_string(dataset)) dataset <- deparse(substitute(dataset)) %>% set_attr("df", TRUE)
-
-  if (nrObs <= ncol(dat)) {
+  if (nrObs <= ncol(dataset)) {
     return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
       add_class("pre_factor"))
   }
 
-  cmat <- cor(dat)
-  btest <- psych::cortest.bartlett(cmat, nrow(dat))
+  cmat <- cor(dataset)
+  btest <- psych::cortest.bartlett(cmat, nrow(dataset))
   pre_kmo <- psych::KMO(cmat)
   pre_eigen <- eigen(cmat)$values
 
@@ -48,7 +47,7 @@ pre_factor <- function(dataset, vars, data_filter = "") {
     pre_r2 <- err_mess
   }
 
-  rm(dat)
+  rm(dataset)
 
   as.list(environment()) %>% add_class("pre_factor")
 }
@@ -90,7 +89,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
   }
 
   cat("Pre-factor analysis diagnostics\n")
-  cat("Data        :", object$dataset, "\n")
+  cat("Data        :", object$df_name, "\n")
   if (object$data_filter %>% gsub("\\s", "", .) != "") {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
@@ -160,15 +159,14 @@ plot.pre_factor <- function(
   shiny = FALSE, custom = FALSE, ...
 ) {
 
-  object <- x; rm(x)
-  if (is.character(object) || is.character(object$pre_r2) ||
+  if (is.character(x) || is.character(x$pre_r2) ||
     length(plots) == 0) {
     return(invisible())
   }
 
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
 
-  pre_eigen <- with(object, pre_eigen[pre_eigen > cutoff])
+  pre_eigen <- with(x, pre_eigen[pre_eigen > cutoff])
   dat <- data.frame(y = pre_eigen, x = as.integer(1:length(pre_eigen)), stringsAsFactors = FALSE)
 
   plot_list <- list()

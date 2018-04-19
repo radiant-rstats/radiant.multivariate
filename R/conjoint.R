@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
-#' @param dataset Dataset name (string). This can be a dataframe in the global environment or an element in an r_data list from Radiant
+#' @param dataset Dataset
 #' @param rvar The response variable (e.g., profile ratings)
 #' @param evar Explanatory variables in the regression
 #' @param int Interaction terms to include in the model
@@ -36,17 +36,17 @@ conjoint <- function(
 
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
-  df_name <- if (!is_string(dataset)) deparse(substitute(dataset)) else dataset
-  dat <- getdata(dataset, vars, filt = data_filter)
-  radiant.model::var_check(evar, colnames(dat)[-1], int) %>%
+  df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
+  dataset <- getdata(dataset, vars, filt = data_filter)
+  radiant.model::var_check(evar, colnames(dataset)[-1], int) %>%
     {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
 
   ## in case : was used to select a range of variables
-  # evar <- colnames(dat)[-1]
+  # evar <- colnames(dataset)[-1]
   if (!is_empty(by, "none")) {
     evar <- setdiff(evar, by)
     vars <- setdiff(vars, by)
-    bylevs <- dat[[by]] %>%
+    bylevs <- dataset[[by]] %>%
       as_factor() %>%
       levels()
     model_list <- vector("list", length(bylevs)) %>% set_names(bylevs)
@@ -59,16 +59,14 @@ conjoint <- function(
 
   for (i in seq_along(bylevs)) {
     if (!by == "none") {
-      cdat <- filter(dat, .data[[by]] == bylevs[i]) %>%
-        select_at(.vars = setdiff(colnames(dat), by))
+      cdat <- filter(dataset, .data[[by]] == bylevs[i]) %>%
+        select_at(.vars = setdiff(colnames(dataset), by))
     } else {
-      cdat <- dat
+      cdat <- dataset
     }
 
     if (reverse) {
-      cdat[[rvar]] <- cdat[[rvar]] %>% {
-        (max(.) + 1) - .
-      }
+      cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
     }
 
     model <- sshhr(lm(formula, data = cdat))
@@ -78,7 +76,7 @@ conjoint <- function(
     coeff$sig_star <- sig_stars(coeff$p.value) %>%
       format(justify = "left")
     colnames(coeff) <- c("label", "coefficient", "std.error", "t.value", "p.value", "sig_star")
-    hasLevs <- sapply(select(dat, -1), function(x) is.factor(x) || is.logical(x) || is.character(x))
+    hasLevs <- sapply(select(dataset, -1), function(x) is.factor(x) || is.logical(x) || is.character(x))
     if (sum(hasLevs) > 0) {
       for (j in names(hasLevs[hasLevs])) {
         coeff$label %<>% gsub(paste0("^", j), paste0(j, "|"), .) %>%
@@ -274,7 +272,7 @@ predict.conjoint <- function(
   }
 
   ## ensure you have a name for the prediction dataset
-  if (!is_empty(pred_data)) {
+  if (is.data.frame(pred_data)) {
     attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
   }
 
@@ -339,9 +337,8 @@ predict_conjoint_by <- function(
 ) {
 
   if (is.character(object)) return(object)
-
   ## ensure you have a name for the prediction dataset
-  if (!is_empty(pred_data)) {
+  if (is.data.frame(pred_data)) {
     attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
   }
 
@@ -363,7 +360,6 @@ predict_conjoint_by <- function(
   pred <- bind_rows(pred)
   att$row.names <- 1:nrow(pred)
   att$vars <- att$names <- colnames(pred)
-  # if (is_string(object$dataset)) att$dataset <- object$dataset
   attributes(pred) <- att
   add_class(pred, "conjoint.predict")
 }
@@ -406,22 +402,20 @@ plot.conjoint <- function(
   shiny = FALSE, custom = FALSE, ...
 ) {
 
-  object <- x; rm(x)
-
-  if (object$by == "none" || is_empty(show) || !show %in% names(object$model_list)) {
-    show <- names(object$model_list)[1]
+  if (x$by == "none" || is_empty(show) || !show %in% names(x$model_list)) {
+    show <- names(x$model_list)[1]
   }
 
-  the_table <- object$model_list[[show]]$tab
+  the_table <- x$model_list[[show]]$tab
   plot_ylim <- the_table$plot_ylim
   plot_list <- list()
 
   if ("pw" %in% plots) {
     PW.df <- the_table[["PW"]]
 
-    lab <- if (object$by == "none") "" else paste0("(", show, ")")
+    lab <- if (x$by == "none") "" else paste0("(", show, ")")
 
-    for (var in object$evar) {
+    for (var in x$evar) {
       PW.var <- PW.df[PW.df[["Attributes"]] == var, ]
 
       # setting the levels in the same order as in the_table. Without this
@@ -443,7 +437,7 @@ plot.conjoint <- function(
 
   if ("iw" %in% plots) {
     IW.df <- the_table[["IW"]]
-    lab <- if (object$by == "none") "" else paste0(" (", show, ")")
+    lab <- if (x$by == "none") "" else paste0(" (", show, ")")
     plot_list[["iw"]] <- ggplot(IW.df, aes_string(x = "Attributes", y = "IW", fill = "Attributes")) +
       geom_bar(stat = "identity", alpha = 0.5) +
       theme(legend.position = "none") +
@@ -469,22 +463,22 @@ plot.conjoint <- function(
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 #'
 #' @param model Tidied model results (broom) output from \code{\link{conjoint}} passed on by summary.conjoint
-#' @param dat Conjoint data
+#' @param dataset Conjoint data
 #' @param evar Explanatory variables used in the conjoint regression
 #'
 #' @examples
 #' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
-#' the_table(tidy(result$model_list[[1]][["model"]]), result$dat, result$evar)
+#' the_table(tidy(result$model_list[[1]][["model"]]), result$dataset, result$evar)
 #'
 #' @seealso \code{\link{conjoint}} to generate results
 #' @seealso \code{\link{summary.conjoint}} to summarize results
 #' @seealso \code{\link{plot.conjoint}} to plot results
 #'
 #' @export
-the_table <- function(model, dat, evar) {
+the_table <- function(model, dataset, evar) {
   if (is.character(model)) return(list("PW" = "No attributes selected."))
 
-  attr <- select_at(dat, .vars = evar) %>%
+  attr <- select_at(dataset, .vars = evar) %>%
     mutate_if(is.logical, as.factor) %>%
     mutate_if(is.character, as.factor)
 
