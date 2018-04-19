@@ -9,7 +9,7 @@ repos:
   CRAN: https://cloud.r-project.org
 
 r_github_packages:
-  - radiant-rstats/radiant.data
-  - radiant-rstats/radiant.basics
-  - radiant-rstats/radiant.model
+  - radiant-rstats/radiant.data@MRB
+  - radiant-rstats/radiant.basics@MRB
+  - radiant-rstats/radiant.model@MRB
 
