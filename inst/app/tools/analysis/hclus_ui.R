@@ -87,8 +87,8 @@ output$ui_hclus <- renderUI({
             value = state_init("hc_cutoff", 0.05), step = .02, width = "117px"
           )),
           td(numericInput(
-            "hc_max_cases", "Max cases:", min = 1,
-            value = state_init("hc_max_cases", 5000), step = 10
+            "hc_max_cases", "Max cases:", min = 100, max = 100000, step = 100,
+            value = state_init("hc_max_cases", 5000) 
           ))
         )
       ))
@@ -108,9 +108,9 @@ observeEvent(input$hc_plots, {
   }
 })
 
-
 hc_plot <- reactive({
   plots <- input$hc_plots
+  req(plots)
   ph <- plots %>% 
     {if (length(.) == 1 && . == "dendro") 800 else 400}
   pw <- if (!is_empty(plots) && plots == "dendro") 900 else 650
@@ -159,23 +159,26 @@ output$hclus <- renderUI({
 
 .summary_hclus <- reactive({
   if (not_available(input$hc_vars)) {
-    return("This analysis requires one or more variables of type integer or numeric.\nIf these variable types are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
+    "This analysis requires one or more variables of type integer or numeric.\nIf these variable types are not available please select another dataset.\n\n" %>% 
+      suggest_data("toothpaste")
+  } else if (not_pressed(input$hc_run))  {
+    "** Press the Estimate button to generate cluster solution **"
+  } else {
+    summary(.hclus())
   }
-
-  if (not_pressed(input$hc_run)) return("** Press the Estimate button to generate cluster solution **")
-
-  summary(.hclus())
 })
 
-.plot_hclus <- reactive({
-  if (not_available(input$hc_vars) || not_pressed(input$hc_run)) {
-    return(invisible())
+.plot_hclus <- eventReactive({
+  c(input$hc_run, input$hc_plots, input$hc_cutoff)
+}, {
+  if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) {
+    invisible()
+  } else {
+    withProgress(
+      message = "Generating cluster plot", value = 1,
+      capture_plot(plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff))
+    )
   }
-
-  ## wait until hc_plots is updated
-  if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) return(invisible())
-
-  capture_plot(plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff))
 })
 
 observeEvent(input$hclus_report, {

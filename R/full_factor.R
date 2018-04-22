@@ -114,7 +114,7 @@ summary.full_factor <- function(
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
-  cat("# factors   :", object$nr_fact, "\n")
+  cat("Factors     :", object$nr_fact, "\n")
   cat("Method      :", object$method, "\n")
   cat("Rotation    :", object$rotation, "\n")
   cat("Observations:", formatnr(object$nrObs, dec = 0), "\n")

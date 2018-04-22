@@ -101,6 +101,7 @@ plot.hclus <- function(
   custom = FALSE, ...
 ) {
 
+  if (is_empty(plots)) return(invisible())
   if (is.character(x)) return(invisible())
   if (is_not(cutoff)) cutoff <- 0
   x$hc_out$height %<>% {. / max(.)}
@@ -155,6 +156,13 @@ plot.hclus <- function(
     ## can't combine base graphics with grid graphics
     ## https://cran.r-project.org/web/packages/gridExtra/vignettes/grid.arrange.html
     ## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
+
+    ## trying out ggraph - looks great but dendrogram very slow for larger datasets
+    # install.packages("ggraph")
+    # library(ggraph)
+    # https://www.r-graph-gallery.com/335-custom-ggraph-dendrogram/
+    # plot_list[["dendro"]] <- ggraph(hc, 'dendrogram', circular = FALSE) + 
+      # geom_edge_elbow() 
 
     if (cutoff == 0) {
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")

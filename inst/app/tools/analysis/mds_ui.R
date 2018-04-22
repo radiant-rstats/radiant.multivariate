@@ -116,7 +116,7 @@ output$ui_mds <- renderUI({
       ),
       conditionalPanel(
         condition = "input.tabs_mds == 'Plot'",
-        numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz", 12), 1, 30, 1),
+        numericInput("mds_fontsz", "Font size:", state_init("mds_fontsz", 5), 1, 30, 1),
         uiOutput("ui_mds_rev_dim")
       )
     ),
