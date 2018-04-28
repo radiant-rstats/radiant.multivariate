@@ -234,9 +234,7 @@ output$ui_ca_predict_plot <- renderUI({
 output$ui_ca_pred_data <- renderUI({
   selectizeInput(
     inputId = "ca_pred_data", label = "Prediction data:",
-    # choices = c("None" = "", r_data$datasetlist),
     choices = c("None" = "", r_info[["datasetlist"]]),
-    # selected = state_single("ca_pred_data", c("None" = "", r_data$datasetlist)), 
     selected = state_single("ca_pred_data", c("None" = "", r_info[["datasetlist"]])), 
     multiple = FALSE
   )
@@ -468,7 +466,9 @@ output$conjoint <- renderUI({
   if (input$ca_predict == "cmd" && is_empty(input$ca_pred_cmd)) {
     return(invisible())
   }
-  do.call(plot, c(list(x = .predict_conjoint()), ca_pred_plot_inputs()))
+  withProgress(message = "Generating prediction plot", value = 1, {
+    do.call(plot, c(list(x = .predict_conjoint()), ca_pred_plot_inputs()))
+  })
 })
 
 .plot_conjoint <- reactive({

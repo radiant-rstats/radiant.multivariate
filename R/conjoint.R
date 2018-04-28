@@ -26,14 +26,6 @@ conjoint <- function(
   reverse = FALSE, data_filter = ""
 ) {
 
-  # dataset <- r_data$mp3_segment
-  # rvar = "Rating"
-  # evar = "Memory:Shape"
-  # int = ""
-  # by = "ID"
-  # reverse = FALSE
-  # data_filter = ""
-
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
