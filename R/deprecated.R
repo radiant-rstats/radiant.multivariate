@@ -9,10 +9,10 @@
 #' @export  kmeans_clus hier_clus pmap
 #' @aliases kmeans_clus hier_clus pmap
 #' @section Details:
-#' \tabular{rl}{
-#'   \code{kmeans_clus} is now a synonym for \code{\link{kclus}}\cr
-#'   \code{hier_clus} is now a synonym for \code{\link{hclus}}\cr
-#'   \code{pmap} is now a synonym for \code{\link{prmap}}\cr
+#' \itemize{
+#'   \item \code{kmeans_clus} is now a synonym for \code{\link{kclus}}
+#'   \item \code{hier_clus} is now a synonym for \code{\link{hclus}}
+#'   \item \code{pmap} is now a synonym for \code{\link{prmap}}
 #' }
 #'
 kmeans_clus <- function(...) {
