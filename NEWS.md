@@ -10,7 +10,7 @@
 
 * `pmap` was renamed to `prmap` to avoid conflict with `purrr::pmap`
 
-# radiant.multivariate 0.9.2
+# radiant.multivariate 0.9.2.0
 
 ## Major changes
 
@@ -32,7 +32,7 @@
 
 * Upgraded dplyr dependency to 0.7.1
 
-# radiant.multivariate 0.8.2
+# radiant.multivariate 0.8.2.0
 
 ## Minor changes
 
