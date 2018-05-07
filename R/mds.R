@@ -75,7 +75,7 @@ mds <- function(
     # res$stress <- sqrt(1 - cor(dist(res$points),mds_dis_mat)^2) * 100
     # Using standard Kruskal formula for metric MDS
     res$stress <- {sum((dist(res$points) - mds_dis_mat) ^ 2) / sum(mds_dis_mat ^ 2)} %>%
-      sqrt()
+      sqrt(.)
   }
 
   as.list(environment()) %>% add_class("mds")
