@@ -26,12 +26,12 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
   vars <- c(brand, attr)
   if (!is_empty(pref)) vars <- c(vars, pref)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
 
   brands <- dataset[[brand]] %>%
     as.character() %>%
     gsub("^\\s+|\\s+$", "", .)
-  f_data <- getdata(dataset, attr)
+  f_data <- get_data(dataset, attr)
   nrObs <- nrow(dataset)
 
   # in case : is used
@@ -53,7 +53,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
   rownames(fres$scores) <- brands
 
   if (!is_empty(pref)) {
-    pref_cor <- getdata(dataset, pref) %>%
+    pref_cor <- get_data(dataset, pref) %>%
       cor(fres$scores) %>%
       data.frame(stringsAsFactors = FALSE)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
@@ -159,7 +159,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
 #' @param fontsz Font size to use in plots
 #' @param seed Random seed
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

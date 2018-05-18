@@ -22,13 +22,13 @@ output$ui_km_vars <- renderUI({
   ## are there any two-level vars
   dum <- two_level_vars()
   if (length(dum) > 0) {
-    isVars <- .getclass() %in% c("integer", "numeric", "factor")
-    isFct <- {.getclass() == "factor"} %>% 
+    isVars <- .get_class() %in% c("integer", "numeric", "factor")
+    isFct <- {.get_class() == "factor"} %>% 
       {names(.[.])} %>% 
       setdiff(., dum)
     vars <- varnames()[isVars] %>% .[!. %in% isFct]
   } else {
-    isVars <- .getclass() %in% c("integer", "numeric")
+    isVars <- .get_class() %in% c("integer", "numeric")
     vars <- varnames()[isVars]
   }
 

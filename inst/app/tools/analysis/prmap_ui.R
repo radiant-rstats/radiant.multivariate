@@ -31,7 +31,7 @@ pm_plot_inputs <- reactive({
 })
 
 output$ui_pm_brand <- renderUI({
-  isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .get_class() | "factor" == .get_class()
   vars <- varnames()[isLabel]
   selectInput(
     inputId = "pm_brand", label = "Brand:", choices = vars,
@@ -40,7 +40,7 @@ output$ui_pm_brand <- renderUI({
 })
 
 output$ui_pm_attr <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "pm_attr", label = "Attributes:", choices = vars,
@@ -51,7 +51,7 @@ output$ui_pm_attr <- renderUI({
 
 output$ui_pm_pref <- renderUI({
   if (not_available(input$pm_attr)) return()
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   if (length(vars) > 0) vars <- vars[-which(vars %in% input$pm_attr)]
   selectInput(
@@ -196,7 +196,7 @@ output$prmap <- renderUI({
   } else if (length(input$pm_attr) < 2) {
     "Please select two or more attribute variables"
   } else {
-    brand <- .getdata()[[input$pm_brand]]
+    brand <- .get_data()[[input$pm_brand]]
     if (length(unique(brand)) < length(brand)) {
       "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
         suggest_data("retailers")

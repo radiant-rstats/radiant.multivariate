@@ -29,7 +29,7 @@ conjoint <- function(
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
   radiant.model::var_check(evar, colnames(dataset)[-1], int) %>%
     {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
 
@@ -159,10 +159,10 @@ summary.conjoint <- function(
   tab <- object$model_list[[show]]$tab
   cat("Conjoint part-worths:\n")
   tab$PW[,1:2] %<>% format(justify = "left")
-  print(formatdf(tab$PW, dec), row.names = FALSE)
+  print(format_df(tab$PW, dec), row.names = FALSE)
   cat("\nConjoint importance weights:\n")
   tab$IW[,1:2] %<>% format(justify = "left")
-  print(formatdf(tab$IW, dec), row.names = FALSE)
+  print(format_df(tab$IW, dec), row.names = FALSE)
   cat("\nConjoint regression results:\n\n")
 
   coeff <- object$model_list[[show]]$coeff
@@ -179,7 +179,7 @@ summary.conjoint <- function(
       return()
     } else {
       p.small <- coeff$p.value < .001
-      coeff[, 2:5] %<>% formatdf(dec)
+      coeff[, 2:5] %<>% format_df(dec)
       coeff$p.value[p.small] <- "< .001"
       print(rename(coeff, `  ` = "label", ` ` = "sig_star"), row.names = FALSE)
     }
@@ -198,7 +198,7 @@ summary.conjoint <- function(
     cat("\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
     cat("R-squared:", paste0(reg_fit$r.squared, ", "), "Adjusted R-squared:", reg_fit$adj.r.squared, "\n")
     cat("F-statistic:", reg_fit$statistic, paste0("df(", reg_fit$df - df_int, ",", reg_fit$df.residual, "), p.value"), reg_fit$p.value)
-    cat("\nNr obs:", formatnr(reg_fit$df + reg_fit$df.residual, dec = 0), "\n\n")
+    cat("\nNr obs:", format_nr(reg_fit$df + reg_fit$df.residual, dec = 0), "\n\n")
 
     if (anyNA(model$coeff)) {
       cat("The set of explanatory variables exhibit perfect multicollinearity.\nOne or more variables were dropped from the estimation.\n")
@@ -382,7 +382,7 @@ print.conjoint.predict <- function(x, ..., n = 20)
 #' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param scale_plot Scale the axes of the part-worth plots to the same range
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

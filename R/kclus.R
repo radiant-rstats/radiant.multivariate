@@ -31,7 +31,7 @@ kclus <- function(
 ) {
   
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
 
   if (fun == "median" && length(vars) < 2) {
     stop("K-medians requires at least two variables as input")
@@ -143,25 +143,25 @@ summary.kclus <- function(object, dec = 2, ...) {
     cat("HC method    :", object$method, "\n")
     cat("HC distance  :", object$distance, "\n")
   }
-  cat("Observations :", formatnr(object$nr_obs, dec = 0), "\n")
-  cat("Generated    :", object$nr_clus, "clusters of sizes", paste0(formatnr(object$km_out$size, dec = 0), collapse = " | "), "\n\n")
+  cat("Observations :", format_nr(object$nr_obs, dec = 0), "\n")
+  cat("Generated    :", object$nr_clus, "clusters of sizes", paste0(format_nr(object$km_out$size, dec = 0), collapse = " | "), "\n\n")
 
   # cat(paste0("Cluster ", object$fun,"s:\n"))
   cat(paste0("Cluster means:\n"))
   cm <- object$clus_means
   cm <- cbind(data.frame(" " = paste0("Cluster ", 1:nrow(cm)), check.names = FALSE), cm)
-  print(formatdf(cm, dec = dec), row.names = FALSE)
+  print(format_df(cm, dec = dec), row.names = FALSE)
 
   ## percentage of within cluster heterogeneity accounted for by each cluster
   cat("\nPercentage of within cluster heterogeneity accounted for by each cluster:\n")
   data.frame(wcv = object$km_out$withinss / object$km_out$tot.withinss, stringsAsFactors = FALSE) %>%
-    formatdf(perc = TRUE, dec = dec) %>%
+    format_df(perc = TRUE, dec = dec) %>%
     set_rownames(object$clus_names) %>%
     set_colnames("") %>%
     print()
 
   ## percentage of between cluster heterogeneity versus the total, higher is better
-  formatnr(object$km_out$betweenss / object$km_out$totss, perc = TRUE, dec = dec) %>%
+  format_nr(object$km_out$betweenss / object$km_out$totss, perc = TRUE, dec = dec) %>%
     paste0("\nBetween cluster heterogeneity accounts for ", ., " of the\ntotal heterogeneity in the data (higher is better).") %>%
     cat()
 }
@@ -173,7 +173,7 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @param x Return value from \code{\link{kclus}}
 #' @param plots One of "density", "bar", or "scatter")
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

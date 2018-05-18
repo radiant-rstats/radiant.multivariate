@@ -27,7 +27,7 @@ hc_inputs <- reactive({
 # Hierarchical clustering
 ###############################################################
 output$ui_hc_vars <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "hc_vars", label = "Variables:", choices = vars,

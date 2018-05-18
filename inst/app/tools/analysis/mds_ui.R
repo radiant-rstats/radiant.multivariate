@@ -32,7 +32,7 @@ mds_plot_inputs <- reactive({
 })
 
 output$ui_mds_id1 <- renderUI({
-  isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .get_class() | "factor" == .get_class()
   vars <- varnames()[isLabel]
   selectInput(
     inputId = "mds_id1", label = "ID 1:", choices = vars,
@@ -41,7 +41,7 @@ output$ui_mds_id1 <- renderUI({
 })
 
 output$ui_mds_id2 <- renderUI({
-  isLabel <- "character" == .getclass() | "factor" == .getclass()
+  isLabel <- "character" == .get_class() | "factor" == .get_class()
   vars <- varnames()[isLabel]
   if (length(vars) > 0) vars <- vars[-which(vars == input$mds_id1)]
   selectInput(
@@ -51,7 +51,7 @@ output$ui_mds_id2 <- renderUI({
 })
 
 output$ui_mds_dis <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "mds_dis", label = "Dissimilarity:", choices = vars,
@@ -62,7 +62,7 @@ output$ui_mds_dis <- renderUI({
 output$ui_mds_rev_dim <- renderUI({
   # req(input$mds_nr_dim, input$mds_fontsz)
   rev_list <- list()
-  # nr_dim <- ncol(.getdata())
+  # nr_dim <- ncol(.get_data())
   rev_list[paste("dimension", 1:input$mds_nr_dim)] <- 1:input$mds_nr_dim
   checkboxGroupInput(
     "mds_rev_dim", "Reverse:", rev_list,

@@ -29,7 +29,7 @@ full_factor <- function(
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
 
   nrObs <- nrow(dataset)
   if (nrObs <= ncol(dataset)) {
@@ -117,7 +117,7 @@ summary.full_factor <- function(
   cat("Factors     :", object$nr_fact, "\n")
   cat("Method      :", object$method, "\n")
   cat("Rotation    :", object$rotation, "\n")
-  cat("Observations:", formatnr(object$nrObs, dec = 0), "\n")
+  cat("Observations:", format_nr(object$nrObs, dec = 0), "\n")
 
   cat("\nFactor loadings:\n")
 
@@ -131,7 +131,7 @@ summary.full_factor <- function(
     rbind(., . / nrow(object$floadings)) %>%
     rbind(., cumsum(.[2, ])) %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
-    formatdf(dec = dec) %>%
+    format_df(dec = dec) %>%
     set_rownames(c("Eigenvalues", "Variance %", "Cumulative %")) %>%
     print()
 
@@ -142,7 +142,7 @@ summary.full_factor <- function(
 
   cat("\nAttribute communalities:")
   data.frame(1 - object$fres$uniqueness, stringsAsFactors = FALSE) %>%
-    formatdf(dec = dec, perc = TRUE) %>%
+    format_df(dec = dec, perc = TRUE) %>%
     set_rownames(object$vars) %>%
     set_colnames("") %>%
     print()
@@ -150,7 +150,7 @@ summary.full_factor <- function(
   cat("\nFactor scores (max 10 shown):\n")
   as.data.frame(object$fres$scores, stringsAsFactors = FALSE) %>%
     .[1:min(nrow(.), 10), , drop = FALSE] %>%
-    formatdf(dec = dec) %>%
+    format_df(dec = dec) %>%
     print(row.names = FALSE)
 }
 
@@ -160,7 +160,7 @@ summary.full_factor <- function(
 #'
 #' @param x Return value from \code{\link{full_factor}}
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

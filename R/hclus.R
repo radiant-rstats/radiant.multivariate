@@ -25,7 +25,7 @@ hclus <- function(
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
   if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))
@@ -71,7 +71,7 @@ summary.hclus <- function(object, ...) {
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
   cat("Method      :", object$method, "\n")
   cat("Distance    :", object$distance, "\n")
-  cat("Observations:", formatnr(length(object$hc_out$order), dec = 0), "\n")
+  cat("Observations:", format_nr(length(object$hc_out$order), dec = 0), "\n")
 }
 
 #' Plot method for the hclus function
@@ -82,7 +82,7 @@ summary.hclus <- function(object, ...) {
 #' @param plots Plots to return. "change" shows the percentage change in within-cluster heterogeneity as respondents are grouped into different number of clusters, "dendro" shows the dendrogram, "scree" shows a scree plot of within-cluster heterogeneity
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., 0.05 percent) the initial steps in hierachical cluster analysis are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

@@ -22,7 +22,7 @@ ff_inputs <- reactive({
 # Factor analysis
 ###############################
 output$ui_ff_vars <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "ff_vars", label = "Variables:", choices = vars,

@@ -32,7 +32,7 @@ mds <- function(
 
   nr_dim <- as.numeric(nr_dim)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, c(id1, id2, dis), filt = data_filter)
+  dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter)
 
   d <- dataset[[dis]]
   id1_dat <- as.character(dataset[[id1]])
@@ -139,7 +139,7 @@ summary.mds <- function(object, dec = 2, ...) {
 #' @param rev_dim Flip the axes in plots
 #' @param fontsz Font size to use in plots
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

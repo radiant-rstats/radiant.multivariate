@@ -20,7 +20,7 @@
 pre_factor <- function(dataset, vars, data_filter = "") {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- getdata(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter)
   nrObs <- nrow(dataset)
 
   if (nrObs <= ncol(dataset)) {
@@ -94,7 +94,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
-  cat("Observations:", formatnr(object$nrObs, dec = 0), "\n")
+  cat("Observations:", format_nr(object$nrObs, dec = 0), "\n")
 
   btest <- object$btest
   cat("\nBartlett test\n")
@@ -114,7 +114,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 
   cat("\nVariable collinearity:\n")
   data.frame(Rsq = object$pre_r2, KMO = object$pre_kmo$MSAi, stringsAsFactors = FALSE) %>%
-    formatdf(dec = dec) %>%
+    format_df(dec = dec) %>%
     set_rownames(rownames(object$pre_r2)) %>%
     print()
 
@@ -131,7 +131,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
         stringsAsFactors = FALSE
       )
     } %>%
-    formatdf(dec = dec) %>%
+    format_df(dec = dec) %>%
     print(row.names = FALSE)
 }
 
@@ -142,7 +142,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @param plots Plots to return. "change" shows the change in eigenvalues as variables are grouped into different number of factors, "scree" shows a scree plot of eigenvalues
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., eigenvalues of .8 or higher) factors with the least explanatory power are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This opion can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples

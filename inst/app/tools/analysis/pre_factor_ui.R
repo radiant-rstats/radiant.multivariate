@@ -18,7 +18,7 @@ pf_inputs <- reactive({
 })
 
 output$ui_pf_vars <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "pf_vars", label = "Variables:", choices = vars,

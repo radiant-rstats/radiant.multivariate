@@ -89,7 +89,7 @@ ca_pred_plot_inputs <- reactive({
 })
 
 output$ui_ca_rvar <- renderUI({
-  isNum <- "numeric" == .getclass() | "integer" == .getclass()
+  isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
   selectInput(
     inputId = "ca_rvar", label = "Profile evaluations:", choices = vars,
@@ -98,7 +98,7 @@ output$ui_ca_rvar <- renderUI({
 })
 
 output$ui_ca_evar <- renderUI({
-  hasLevs <- .getclass() %in% c("factor", "logical", "character")
+  hasLevs <- .get_class() %in% c("factor", "logical", "character")
   vars <- varnames()[hasLevs]
   selectInput(
     inputId = "ca_evar", label = "Attributes:", choices = vars,
@@ -148,7 +148,7 @@ output$ui_ca_by <- renderUI({
 output$ui_ca_show <- renderUI({
   levs <- c()
   if (available(input$ca_by)) {
-    levs <- .getdata()[[input$ca_by]] %>% as_factor() %>% levels()
+    levs <- .get_data()[[input$ca_by]] %>% as_factor() %>% levels()
   }
   selectInput(
     inputId = "ca_show", label = "Show:", choices = levs,
