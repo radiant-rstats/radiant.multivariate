@@ -19,7 +19,7 @@ pm_inputs <- reactive({
 pm_plot_args <- as.list(if (exists("plot.prmap")) {
   formals(plot.prmap)
 } else {
-  formals(radiant:::plot.prmap)
+  formals(radiant.multivariate:::plot.prmap)
 } )
 
 ## list of function inputs selected by user

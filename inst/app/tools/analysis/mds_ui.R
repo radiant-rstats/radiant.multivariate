@@ -20,8 +20,8 @@ mds_inputs <- reactive({
 mds_plot_args <- as.list(if (exists("plot.mds")) {
   formals(plot.mds)
 } else {
-  formals(radiant:::plot.mds)
-} )
+  formals(radiant.multivariate:::plot.mds)
+})
 
 ## list of function inputs selected by user
 mds_plot_inputs <- reactive({
@@ -80,7 +80,7 @@ observe({
   ## notify user when the model needs to be updated
   ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
   if (pressed(input$mds_run)) {
-    if (is.null(input$mds_id1)) { 
+    if (is.null(input$mds_id1)) {
       updateTabsetPanel(session, "tabs_mds", selected = "Summary")
       updateActionButton(session, "mds_run", "Estimate model", icon = icon("play"))
     } else if (isTRUE(attr(mds_inputs, "observable")$.invalidated)) {
@@ -153,7 +153,7 @@ output$mds <- renderUI({
   mds_output_panels <- tabsetPanel(
     id = "tabs_mds",
     tabPanel(
-      "Summary", 
+      "Summary",
       download_link("dl_mds_coord"), br(),
       verbatimTextOutput("summary_mds")
     ),
@@ -176,7 +176,7 @@ output$mds <- renderUI({
   if (not_pressed(input$mds_run)) {
     "** Press the Estimate button to generate maps **"
   } else if (not_available(input$mds_id1) || not_available(input$mds_id2) || not_available(input$mds_dis)) {
-    "This analysis requires two id-variables of type character or factor and a measure\nof dissimilarity of type numeric or interval. Please select another dataset\n\n" %>% 
+    "This analysis requires two id-variables of type character or factor and a measure\nof dissimilarity of type numeric or interval. Please select another dataset\n\n" %>%
       suggest_data("city")
   } else {
     "available"
@@ -203,7 +203,7 @@ output$mds <- renderUI({
   if (is.character(robj)) return(robj)
   withProgress(message = "Generating brand maps", value = 1, {
     do.call(plot, c(list(x = robj), mds_plot_inputs(), shiny = TRUE))
-  }) 
+  })
 })
 
 observeEvent(input$mds_report, {
@@ -211,10 +211,11 @@ observeEvent(input$mds_report, {
   inp_out <- list(list(dec = 2), "")
   inp <- mds_inputs()
   inp$nr_dim <- as.integer(inp$nr_dim)
+
   inp_out[[2]] <- clean_args(mds_plot_inputs(), mds_plot_args[-1])
   update_report(
     inp_main = clean_args(inp, mds_args),
-    fun_name = "mds", 
+    fun_name = "mds",
     inp_out = inp_out,
     fig.width = mds_plot_width(),
     fig.height = mds_plot_height()
@@ -232,15 +233,15 @@ dl_mds_coord <- function(path) {
 }
 
 download_handler(
-  id = "dl_mds_coord", 
-  fun = dl_mds_coord, 
+  id = "dl_mds_coord",
+  fun = dl_mds_coord,
   fn = paste0(input$dataset, "_mds_coordinates.csv"),
   caption = "Download MDS coordinates"
 )
 
 download_handler(
-  id = "dlp_mds", 
-  fun = download_handler_plot, 
+  id = "dlp_mds",
+  fun = download_handler_plot,
   fn = paste0(input$dataset, "_mds.png"),
   caption = "Download MDS plot",
   plot = .plot_mds,

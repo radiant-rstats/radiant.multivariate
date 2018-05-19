@@ -533,7 +533,7 @@ observeEvent(input$conjoint_report, {
         if (is_empty(input$ca_by, "none")) {
           name <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*|\\s+)")) %>%
             gsub("\\s", "", .) %>%
-            deparse(., control = "keepNA", width.cutoff = 500L)
+            deparse(., control = getOption("dctrl"), width.cutoff = 500L)
           xcmd <- paste0(xcmd, "\n", input$ca_pred_data , " <- store(", 
             input$ca_pred_data, ", pred, name = ", name, ")"
           )
