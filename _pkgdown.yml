@@ -1,0 +1,120 @@
+url: https://radiant-rstats.github.io/radiant.multivariate
+
+template:
+  params:
+    docsearch:
+      api_key: 1234
+      index_name: radiant_multivariate
+
+navbar:
+  title: "radiant.multivariate"
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Articles"
+      href: articles/index.html
+    - text: "Changelog"
+      href: news/index.html
+    - text: "Other Packages"
+      menu:
+        - text: "radiant"
+          href: https://radiant-rstats.github.io/radiant/
+        - text: "radiant.data"
+          href: https://radiant-rstats.github.io/radiant.data/
+        - text: "radiant.design"
+          href: https://radiant-rstats.github.io/radiant.design/
+        - text: "radiant.basics"
+          href: https://radiant-rstats.github.io/radiant.basics/
+        - text: "radiant.model"
+          href: https://radiant-rstats.github.io/radiant.model/
+        - text: "radiant.multivariate"
+          href: https://radiant-rstats.github.io/radiant.multivariate/
+        - text: "docker"
+          href: https://github.com/radiant-rstats/docker
+  right:
+   - icon: fa-twitter fa-lg
+     href: https://twitter.com/vrnijs
+   - icon: fa-github fa-lg
+     href: https://github.com/radiant-rstats
+
+
+reference:
+- title: Multivariate > Map
+  desc: Create brand maps based on (dis)similarity or attribute data
+  contents:
+    - mds
+    - summary.mds
+    - plot.mds
+    - prmap
+    - summary.prmap
+    - plot.prmap
+- title: Multivariate > Factor
+  desc: Conduct PCA or Factor analysis on numeric data
+  contents:
+    - pre_factor
+    - summary.pre_factor
+    - plot.pre_factor
+    - full_factor
+    - summary.full_factor
+    - plot.full_factor
+    - store.full_factor
+    - clean_loadings
+- title: Multivariate > Cluster
+  desc: Conduct cluster analysis 
+  contents:
+    - hclus
+    - summary.hclus
+    - plot.hclus
+    - kclus
+    - summary.kclus
+    - plot.kclus
+    - store.kclus
+- title: Multivariate > Conjoint
+  desc: Estimate conjoint models
+  contents:
+    - conjoint
+    - summary.conjoint
+    - predict.conjoint
+    - plot.conjoint
+    - predict_conjoint_by
+    - print.conjoint.predict
+    - store.conjoint.predict 
+    - the_table
+- title: Starting radiant.multivariate
+  desc: Functions used to start radiant shiny apps
+  contents:
+    - radiant.multivariate
+    - radiant.multivariate_viewer
+    - radiant.multivariate_window
+- title: Data sets
+  desc: Data sets bundled with radiant.multivariate
+  contents:
+    - carpet
+    - city
+    - city2
+    - computer
+    - mp3
+    - movie
+    - shopping
+    - toothpaste
+    - tpbrands
+    - retailers
+- title: Deprecated
+  desc: Deprecated
+  contents:
+    - pmap
+    - store.conjoint
+articles:
+- title: Multivariate Menu
+  desc: >
+    These vignettes provide an introduction to the Multivariate menu in radiant
+  contents:
+    - pkgdown/mds
+    - pkgdown/prmap
+    - pkgdown/pre_factor
+    - pkgdown/full_factor
+    - pkgdown/hclus
+    - pkgdown/kclus
+    - pkgdown/conjoint
