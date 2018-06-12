@@ -25,7 +25,7 @@ output$ui_km_vars <- renderUI({
     isVars <- .get_class() %in% c("integer", "numeric", "factor")
     isFct <- {.get_class() == "factor"} %>% 
       {names(.[.])} %>% 
-      setdiff(., dum)
+      base::setdiff(., dum)
     vars <- varnames()[isVars] %>% .[!. %in% isFct]
   } else {
     isVars <- .get_class() %in% c("integer", "numeric")
@@ -114,7 +114,6 @@ output$ui_kclus <- renderUI({
           condition = "input.km_vars != null",
           HTML("<label>Store recommendations:</label>"), 
           tags$table(
-            # tags$td(textInput("km_store_name", "Store membership:", state_init("km_store_name", "kclus"))),
             tags$td(uiOutput("ui_km_store_name")),
             tags$td(actionButton("km_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
           )
@@ -205,8 +204,6 @@ output$kclus <- renderUI({
 })
 
 .plot_kclus <- eventReactive(c(input$km_run, input$km_plots), {
-# .plot_kclus <- reactive({
-  # if (not_pressed(input$km_run)) return("** Press the Estimate button to generate the cluster solution **")
   if (.km_available() != "available") {
     .km_available()
   } else if (is_empty(input$km_plots, "none")) {

@@ -211,8 +211,9 @@ observeEvent(input$mds_report, {
   inp_out <- list(list(dec = 2), "")
   inp <- mds_inputs()
   inp$nr_dim <- as.integer(inp$nr_dim)
-
-  inp_out[[2]] <- clean_args(mds_plot_inputs(), mds_plot_args[-1])
+  mpi <- mds_plot_inputs()
+  if (length(mpi$rev_dim) > 0) mpi$rev_dim <- as.integer(mpi$rev_dim)
+  inp_out[[2]] <- clean_args(mpi, mds_plot_args[-1])
   update_report(
     inp_main = clean_args(inp, mds_args),
     fun_name = "mds",
