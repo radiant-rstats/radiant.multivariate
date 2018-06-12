@@ -21,3 +21,9 @@ Store predicted values generated in predict.conjoint
 \details{
 See \url{https://radiant-rstats.github.io/docs/multivariate/conjoint.html} for an example in Radiant
 }
+\examples{
+conjoint(mp3, rvar = "Rating", evar = "Memory:Shape") \%>\%
+  predict(mp3) \%>\%
+  store(mp3, ., name = "pred_pref")
+
+}

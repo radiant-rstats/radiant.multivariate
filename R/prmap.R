@@ -12,7 +12,7 @@
 #' @return A list of all variables defined in the function as an object of class prmap
 #'
 #' @examples
-#' result <- prmap(computer, brand = "brand", attr = "high_end:business")
+#' prmap(computer, brand = "brand", attr = "high_end:business") %>% str()
 #'
 #' @seealso \code{\link{summary.prmap}} to summarize results
 #' @seealso \code{\link{plot.prmap}} to plot results
@@ -76,17 +76,10 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
 #' result <- prmap(computer, brand = "brand", attr = "high_end:business")
 #' summary(result)
 #' summary(result, cutoff = .3)
-#' result <- prmap(
+#' prmap(
 #'   computer, brand = "brand", attr = "high_end:dated",
 #'   pref = c("innovative","business")
-#' )
-#' summary(result)
-#' computer %>%
-#'   prmap(
-#'     brand = "brand", attr = "high_end:dated",
-#'     pref = c("innovative","business")
-#'   ) %>%
-#'   summary()
+#' ) %>% summary()
 #'
 #' @seealso \code{\link{prmap}} to calculate results
 #' @seealso \code{\link{plot.prmap}} to plot results
@@ -159,7 +152,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
 #' @param fontsz Font size to use in plots
 #' @param seed Random seed
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -167,12 +160,11 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
 #' plot(result, plots = "brand")
 #' plot(result, plots = c("brand", "attr"))
 #' plot(result, scaling = 1, plots = c("brand", "attr"))
-#' result <- prmap(
+#' prmap(
 #'   retailers, brand = "retailer",
 #'   attr = "good_value:cluttered",
 #'   pref = c("segment1", "segment2")
-#' )
-#' plot(result, plots = c("brand", "attr", "pref"))
+#' ) %>% plot(plots = c("brand", "attr", "pref"))
 #'
 #' @seealso \code{\link{prmap}} to calculate results
 #' @seealso \code{\link{summary.prmap}} to plot results
@@ -184,13 +176,6 @@ plot.prmap <- function(
   x, plots = "", scaling = 2, fontsz = 5, seed = 1234,
   shiny = FALSE, custom = FALSE, ...
 ) {
-
-  # x <- prmap(computer, brand = "brand", attr = "high_end:business")
-  # plots = "brand"
-  # plots = c("brand", "attr")
-  # scaling = 2
-  # fontsz = 5
-  # seed = 1234
 
   if (is.character(x)) return(x)
 
@@ -211,7 +196,7 @@ plot.prmap <- function(
       {. * scaling} %>%
       mutate(rnames = rownames(.), type = "pref")
   } else {
-    plots <- setdiff(plots, "pref")
+    plots <- base::setdiff(plots, "pref")
   }
 
   ## attribute coordinates
@@ -260,7 +245,7 @@ plot.prmap <- function(
         }
 
         if (any(c("attr", "pref") %in% plots)) {
-          pm_arrows <- filter(pm_dat, !! as.symbol("type") %in% setdiff(plots, "brand"))
+          pm_arrows <- filter(pm_dat, !! as.symbol("type") %in% base::setdiff(plots, "brand"))
           pm_arrows[, isNum] <- pm_arrows[, isNum] * 0.9
           p <- p + geom_segment(
             data = pm_arrows, aes_string(x = 0, y = 0, xend = i_name, yend = j_name, color = "type"),

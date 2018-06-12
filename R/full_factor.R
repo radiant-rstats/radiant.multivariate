@@ -12,9 +12,7 @@
 #' @return A list with all variables defined in the function as an object of class full_factor
 #'
 #' @examples
-#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
-#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"), method = "maxlik")
-#' result <- diamonds %>% full_factor(c("price", "carat", "table", "x", "y"), method = "maxlik")
+#' full_factor(shopping, "v1:v6") %>% str()
 #'
 #' @seealso \code{\link{summary.full_factor}} to summarize results
 #' @seealso \code{\link{plot.full_factor}} to plot results
@@ -87,13 +85,9 @@ full_factor <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor(diamonds , c("price", "carat", "depth", "table", "x"))
+#' result <- full_factor(shopping , "v1:v6", nr_fact = 2)
 #' summary(result)
-#' summary(result, cutoff = 0, fsort = FALSE)
-#' summary(result, cutoff = 0, fsort = TRUE)
 #' summary(result, cutoff = .5, fsort = TRUE)
-#' diamonds %>% full_factor(c("price", "carat", "depth", "table", "x")) %>% summary()
-#' diamonds %>% full_factor(c("price", "carat", "depth", "table", "x")) %>% summary(cutoff = .5)
 #'
 #' @seealso \code{\link{full_factor}} to calculate results
 #' @seealso \code{\link{plot.full_factor}} to plot results
@@ -122,7 +116,7 @@ summary.full_factor <- function(
   cat("\nFactor loadings:\n")
 
   ## show only the loadings > cutoff
-  with(object, clean_loadings(floadings, cutoff, fsort, dec, "")) %>% 
+  clean_loadings(object$floadings, cutoff = cutoff, fsort = fsort, dec = dec, repl = "") %>% 
     print()
 
   ## fit measures
@@ -160,14 +154,12 @@ summary.full_factor <- function(
 #'
 #' @param x Return value from \code{\link{full_factor}}
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor(diamonds, c("price", "carat", "table"))
+#' result <- full_factor(shopping , "v1:v6", nr_fact = 2)
 #' plot(result)
-#' result <- full_factor(computer, "high_end:business")
-#' summary(result)
 #'
 #' @seealso \code{\link{full_factor}} to calculate results
 #' @seealso \code{\link{plot.full_factor}} to plot results
@@ -232,9 +224,9 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
 #' @param ... Additional arguments
 #'
 #' @examples
-#'  full_factor(shopping, "v1:v6", nr_fact = 3) %>%
-#'    store(shopping, .) %>%
-#'    head()
+#' full_factor(shopping, "v1:v6", nr_fact = 3) %>%
+#'   store(shopping, .) %>%
+#'   head()
 #'
 #' @seealso \code{\link{full_factor}} to generate results
 #' @seealso \code{\link{summary.full_factor}} to summarize results
@@ -262,8 +254,8 @@ store.full_factor <- function(dataset, object, name = "", ...) {
 #' @param repl Replace loadings below the cutoff by NA (or "")
 #'
 #' @examples
-#' result <- full_factor(diamonds, c("price", "carat", "table", "x", "y"))
-#' clean_loadings(result$floadings, TRUE, .5, 2)
+#' result <- full_factor(shopping, "v1:v6", nr_fact = 2)
+#' clean_loadings(result$floadings, fsort = TRUE, cutoff = .5, dec = 2)
 #'
 #' @importFrom psych fa.sort
 #'
@@ -272,8 +264,9 @@ clean_loadings <- function(
   floadings, cutoff = 0, fsort = FALSE, dec = 8, repl = NA
 ) {
 
-  floadings %<>% 
-    {if (fsort) select(psych::fa.sort(.), -order) else .}
+  if (fsort) {
+    floadings <- select(psych::fa.sort(floadings), -order)
+  }
 
   if (cutoff == 0) {
     floadings %<>% round(dec)

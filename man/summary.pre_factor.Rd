@@ -20,11 +20,9 @@ Summary method for the pre_factor function
 See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 }
 \examples{
-result <- pre_factor(diamonds, c("price", "carat", "table"))
+result <- pre_factor(shopping, "v1:v6")
 summary(result)
-diamonds \%>\% pre_factor(c("price", "carat", "table")) \%>\% summary()
-result <- pre_factor(computer, "high_end:business")
-summary(result)
+pre_factor(computer, "high_end:business") \%>\% summary()
 
 }
 \seealso{

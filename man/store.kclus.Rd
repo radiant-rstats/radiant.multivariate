@@ -22,8 +22,8 @@ Add a cluster membership variable to the active dataset
 See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 }
 \examples{
-kclus(shopping, vars = "v1:v6") \%>\% 
-  store(shopping, .) \%>\% 
+kclus(shopping, vars = "v1:v6", nr_clus = 3) \%>\%
+  store(shopping, .) \%>\%
   head()
 
 }

@@ -13,8 +13,7 @@
 #' @return A list with all variables defined in the function as an object of class conjoint
 #'
 #' @examples
-#' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
-#' result <- mp3 %>% conjoint(rvar = "Rating", evar = "Memory:Shape")
+#' conjoint(mp3, rvar = "Rating", evar = "Memory:Shape") %>% str()
 #'
 #' @seealso \code{\link{summary.conjoint}} to summarize results
 #' @seealso \code{\link{plot.conjoint}} to plot results
@@ -36,8 +35,8 @@ conjoint <- function(
   ## in case : was used to select a range of variables
   # evar <- colnames(dataset)[-1]
   if (!is_empty(by, "none")) {
-    evar <- setdiff(evar, by)
-    vars <- setdiff(vars, by)
+    evar <- base::setdiff(evar, by)
+    vars <- base::setdiff(vars, by)
     bylevs <- dataset[[by]] %>%
       as_factor() %>%
       levels()
@@ -52,7 +51,7 @@ conjoint <- function(
   for (i in seq_along(bylevs)) {
     if (!by == "none") {
       cdat <- filter(dataset, .data[[by]] == bylevs[i]) %>%
-        select_at(.vars = setdiff(colnames(dataset), by))
+        select_at(.vars = base::setdiff(colnames(dataset), by))
     } else {
       cdat <- dataset
     }
@@ -127,7 +126,6 @@ conjoint <- function(
 #' @examples
 #' result <- conjoint(mp3, rvar = "Rating", evar = "Memory:Shape")
 #' summary(result, mc_diag = TRUE)
-#' mp3 %>% conjoint(rvar = "Rating", evar = "Memory:Shape") %>% summary(mc_diag = TRUE)
 #'
 #' @seealso \code{\link{conjoint}} to generate results
 #' @seealso \code{\link{plot.conjoint}} to plot results
@@ -382,7 +380,7 @@ print.conjoint.predict <- function(x, ..., n = 20)
 #' @param show Level in by variable to analyse (e.g., a specific respondent)
 #' @param scale_plot Scale the axes of the part-worth plots to the same range
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
@@ -420,8 +418,8 @@ plot.conjoint <- function(
       PW.var$Levels <- factor(PW.var$Levels, levels = PW.var$Levels, ordered = FALSE)
 
       p <- ggplot(PW.var, aes_string(x = "Levels", y = "PW", group = 1)) +
-        geom_line(colour = "blue", linetype = "dotdash", size = .7) +
-        geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
+        geom_line(color = "blue", linetype = "dotdash", size = .7) +
+        geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
         labs(title = paste("Part-worths for", var, lab), x = "") +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -567,6 +565,11 @@ store.conjoint <- function(dataset, object, name, ...) {
 #' @param object Return value from model predict function
 #' @param name Variable name(s) assigned to predicted values
 #' @param ... Additional arguments
+#'
+#' @examples
+#' conjoint(mp3, rvar = "Rating", evar = "Memory:Shape") %>%
+#'   predict(mp3) %>%
+#'   store(mp3, ., name = "pred_pref")
 #'
 #' @export
 store.conjoint.predict <- function(dataset, object, name = "prediction", ...) {

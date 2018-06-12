@@ -21,9 +21,7 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an exa
 }
 \examples{
 result <- mds(city, "from", "to", "distance")
-summary(result)
-summary(result, dec = 2)
-city \%>\% mds("from", "to", "distance") \%>\% summary()
+summary(result, dec = 1)
 
 }
 \seealso{

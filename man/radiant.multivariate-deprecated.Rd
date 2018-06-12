@@ -3,13 +3,11 @@
 \docType{package}
 \name{radiant.multivariate-deprecated}
 \alias{radiant.multivariate-deprecated}
-\alias{kmeans_clus}
-\alias{hier_clus}
 \alias{pmap}
 \alias{radiant.multivariate-deprecated-package}
 \title{Deprecated function(s) in the radiant.multivariate package}
 \usage{
-kmeans_clus(...)
+pmap(...)
 }
 \arguments{
 \item{...}{Parameters to be passed to the updated functions}
@@ -21,9 +19,7 @@ radiant. They will eventually be  removed.
 \section{Details}{
 
 \itemize{
-  \item \code{kmeans_clus} is now a synonym for \code{\link{kclus}}
-  \item \code{hier_clus} is now a synonym for \code{\link{hclus}}
-  \item \code{pmap} is now a synonym for \code{\link{prmap}}
+  \item Replace \code{pmap} by \code{\link{prmap}}
 }
 }
 

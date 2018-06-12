@@ -25,17 +25,10 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an e
 result <- prmap(computer, brand = "brand", attr = "high_end:business")
 summary(result)
 summary(result, cutoff = .3)
-result <- prmap(
+prmap(
   computer, brand = "brand", attr = "high_end:dated",
   pref = c("innovative","business")
-)
-summary(result)
-computer \%>\%
-  prmap(
-    brand = "brand", attr = "high_end:dated",
-    pref = c("innovative","business")
-  ) \%>\%
-  summary()
+) \%>\% summary()
 
 }
 \seealso{

@@ -6,13 +6,13 @@
 #' @param vars Vector of variables to include in the analysis
 #' @param distance Distance
 #' @param method Method
-#' @param max_cases Maximum number of cases allowed (default is 1000)
+#' @param max_cases Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
 #' @return A list of all variables used in hclus as an object of class hclus
 #'
 #' @examples
-#' result <- hclus(shopping, vars = "v1:v6")
+#' hclus(shopping, vars = "v1:v6") %>% str()
 #'
 #' @seealso \code{\link{summary.hclus}} to summarize results
 #' @seealso \code{\link{plot.hclus}} to plot results
@@ -27,7 +27,7 @@ hclus <- function(
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter)
   if (nrow(dataset) > max_cases) {
-    return("The number of cases to cluster exceed the maxium set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
+    return("The number of cases to cluster exceed the maximum set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))
   }
 
@@ -82,14 +82,13 @@ summary.hclus <- function(object, ...) {
 #' @param plots Plots to return. "change" shows the percentage change in within-cluster heterogeneity as respondents are grouped into different number of clusters, "dendro" shows the dendrogram, "scree" shows a scree plot of within-cluster heterogeneity
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., 0.05 percent) the initial steps in hierachical cluster analysis are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
 #' result <- hclus(shopping, vars = c("v1:v6"))
 #' plot(result, plots = c("change", "scree"), cutoff = .05)
 #' plot(result, plots = "dendro", cutoff = 0)
-#' shopping %>% hclus(vars = c("v1:v6")) %>% plot
 #'
 #' @seealso \code{\link{hclus}} to generate results
 #' @seealso \code{\link{summary.hclus}} to summarize results
@@ -116,8 +115,8 @@ plot.hclus <- function(
         stringsAsFactors = FALSE
       ) %>%
       ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = height, group = 1)) +
-      geom_line(colour = "blue", linetype = "dotdash", size = .7) +
-      geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
+      geom_line(color = "blue", linetype = "dotdash", size = .7) +
+      geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
       scale_y_continuous(labels = scales::percent) +
       labs(
         title = "Scree plot",

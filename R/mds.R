@@ -14,10 +14,8 @@
 #' @return A list of all variables defined in the function as an object of class mds
 #'
 #' @examples
-#' result <- mds(city, "from", "to", "distance")
-#' summary(result)
-#' result <- mds(diamonds, "clarity", "cut", "price")
-#' summary(result)
+#' mds(city, "from", "to", "distance") %>% str()
+#' mds(diamonds, "clarity", "cut", "price") %>% str()
 #'
 #' @seealso \code{\link{summary.mds}} to summarize results
 #' @seealso \code{\link{plot.mds}} to plot results
@@ -91,9 +89,7 @@ mds <- function(
 #'
 #' @examples
 #' result <- mds(city, "from", "to", "distance")
-#' summary(result)
-#' summary(result, dec = 2)
-#' city %>% mds("from", "to", "distance") %>% summary()
+#' summary(result, dec = 1)
 #'
 #' @seealso \code{\link{mds}} to calculate results
 #' @seealso \code{\link{plot.mds}} to plot results
@@ -139,14 +135,13 @@ summary.mds <- function(object, dec = 2, ...) {
 #' @param rev_dim Flip the axes in plots
 #' @param fontsz Font size to use in plots
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
 #' result <- mds(city, "from", "to", "distance")
-#' plot(result)
+#' plot(result, fontsz = 7)
 #' plot(result, rev_dim = 1:2)
-#' plot(result, rev_dim = 1:2, fontsz = 8)
 #'
 #' @seealso \code{\link{mds}} to calculate results
 #' @seealso \code{\link{summary.mds}} to plot results
@@ -180,7 +175,6 @@ plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALS
       plot_list[[paste0("dim", i, "_dim", j)]] <- ggplot(tbl, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
         geom_point() +
         ggrepel::geom_text_repel(size = fontsz) +
-        # geom_segment(aes_string(x = 0, y = 0, xend = i_name, yend = j_name)) +
         theme(legend.position = "none") +
         coord_cartesian(xlim = c(-lim, lim), ylim = c(-lim, lim)) +
         geom_vline(xintercept = 0, size = 0.3) +

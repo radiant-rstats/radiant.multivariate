@@ -34,10 +34,8 @@ A list of all variables defined in the function as an object of class mds
 See \url{https://radiant-rstats.github.io/docs/multivariate/mds.html} for an example in Radiant
 }
 \examples{
-result <- mds(city, "from", "to", "distance")
-summary(result)
-result <- mds(diamonds, "clarity", "cut", "price")
-summary(result)
+mds(city, "from", "to", "distance") \%>\% str()
+mds(diamonds, "clarity", "cut", "price") \%>\% str()
 
 }
 \seealso{

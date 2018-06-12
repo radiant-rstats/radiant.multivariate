@@ -37,7 +37,7 @@ K-clustering
 See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 }
 \examples{
-result <- kclus(shopping, c("v1:v6"))
+kclus(shopping, c("v1:v6"), nr_clus = 3) \%>\% str()
 
 }
 \seealso{

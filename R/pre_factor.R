@@ -9,7 +9,7 @@
 #' @return A list with all variables defined in the function as an object of class pre_factor
 #'
 #' @examples
-#' result <- pre_factor(diamonds, c("price", "carat", "table"))
+#' pre_factor(shopping, "v1:v6") %>% str()
 #'
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #' @seealso \code{\link{plot.pre_factor}} to plot results
@@ -47,7 +47,7 @@ pre_factor <- function(dataset, vars, data_filter = "") {
     pre_r2 <- err_mess
   }
 
-  rm(dataset)
+  rm(dataset, err_mess)
 
   as.list(environment()) %>% add_class("pre_factor")
 }
@@ -70,11 +70,9 @@ pre_factor <- function(dataset, vars, data_filter = "") {
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pre_factor(diamonds, c("price", "carat", "table"))
+#' result <- pre_factor(shopping, "v1:v6")
 #' summary(result)
-#' diamonds %>% pre_factor(c("price", "carat", "table")) %>% summary()
-#' result <- pre_factor(computer, "high_end:business")
-#' summary(result)
+#' pre_factor(computer, "high_end:business") %>% summary()
 #'
 #' @seealso \code{\link{pre_factor}} to calculate results
 #' @seealso \code{\link{plot.pre_factor}} to plot results
@@ -142,12 +140,11 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @param plots Plots to return. "change" shows the change in eigenvalues as variables are grouped into different number of factors, "scree" shows a scree plot of eigenvalues
 #' @param cutoff For large datasets plots can take time to render and become hard to interpret. By selection a cutoff point (e.g., eigenvalues of .8 or higher) factors with the least explanatory power are removed from the plot
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- pre_factor(diamonds, c("price", "carat", "table"))
-#' plot(result)
+#' result <- pre_factor(shopping, "v1:v6")
 #' plot(result, plots = c("change", "scree"), cutoff = .05)
 #'
 #' @seealso \code{\link{pre_factor}} to calculate results
@@ -172,8 +169,8 @@ plot.pre_factor <- function(
   plot_list <- list()
   if ("scree" %in% plots) {
     plot_list[[which("scree" == plots)]] <- ggplot(dat, aes(x = x, y = y, group = 1)) +
-      geom_line(colour = "blue", linetype = "dotdash", size = .7) +
-      geom_point(colour = "blue", size = 4, shape = 21, fill = "white") +
+      geom_line(color = "blue", linetype = "dotdash", size = .7) +
+      geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
       geom_hline(yintercept = 1, color = "black", linetype = "solid", size = .5) +
       labs(list(title = "Screeplot", x = "# factors", y = "Eigenvalues")) +
       scale_x_continuous(breaks = dat[["x"]])

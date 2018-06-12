@@ -16,7 +16,7 @@ hclus(dataset, vars, distance = "sq.euclidian", method = "ward.D",
 
 \item{method}{Method}
 
-\item{max_cases}{Maximum number of cases allowed (default is 1000)}
+\item{max_cases}{Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 }
@@ -30,7 +30,7 @@ Hierarchical cluster analysis
 See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
 }
 \examples{
-result <- hclus(shopping, vars = "v1:v6")
+hclus(shopping, vars = "v1:v6") \%>\% str()
 
 }
 \seealso{

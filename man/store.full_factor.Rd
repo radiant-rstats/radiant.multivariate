@@ -22,9 +22,9 @@ Store factor scores to active dataset
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
- full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%
-   store(shopping, .) \%>\%
-   head()
+full_factor(shopping, "v1:v6", nr_fact = 3) \%>\%
+  store(shopping, .) \%>\%
+  head()
 
 }
 \seealso{

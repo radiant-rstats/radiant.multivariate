@@ -23,7 +23,7 @@ Evaluate if data are appropriate for PCA / Factor analysis
 See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for an example in Radiant
 }
 \examples{
-result <- pre_factor(diamonds, c("price", "carat", "table"))
+pre_factor(shopping, "v1:v6") \%>\% str()
 
 }
 \seealso{

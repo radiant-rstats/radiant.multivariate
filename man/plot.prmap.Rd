@@ -20,7 +20,7 @@
 
 \item{shiny}{Did the function call originate inside a shiny app}
 
-\item{custom}{Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.}
+\item{custom}{Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.}
 
 \item{...}{further arguments passed to or from other methods}
 }
@@ -35,12 +35,11 @@ result <- prmap(computer, brand = "brand", attr = "high_end:business")
 plot(result, plots = "brand")
 plot(result, plots = c("brand", "attr"))
 plot(result, scaling = 1, plots = c("brand", "attr"))
-result <- prmap(
+prmap(
   retailers, brand = "retailer",
   attr = "good_value:cluttered",
   pref = c("segment1", "segment2")
-)
-plot(result, plots = c("brand", "attr", "pref"))
+) \%>\% plot(plots = c("brand", "attr", "pref"))
 
 }
 \seealso{

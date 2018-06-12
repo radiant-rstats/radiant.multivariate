@@ -2,7 +2,7 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an example in Radiant
 #'
-#' @param dataset Dataset 
+#' @param dataset Dataset
 #' @param vars Vector of variables to include in the analysis
 #' @param fun Function to use: "mean" or "median"
 #' @param hc_init Use centers from hclus as the starting point
@@ -15,7 +15,7 @@
 #' @return A list of all variables used in kclus as an object of class kclus
 #'
 #' @examples
-#' result <- kclus(shopping, c("v1:v6"))
+#' kclus(shopping, c("v1:v6"), nr_clus = 3) %>% str()
 #'
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{plot.kclus}} to plot results
@@ -29,7 +29,7 @@ kclus <- function(
   distance = "sq.euclidian", method = "ward.D",
   seed = 1234, nr_clus = 2, data_filter = ""
 ) {
-  
+
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter)
 
@@ -122,9 +122,8 @@ kclus <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- kclus(shopping, vars = c("v1:v6"))
+#' result <- kclus(shopping, vars = c("v1:v6"), nr_clus = 3)
 #' summary(result)
-#' shopping %>% kclus(vars = c("v1:v6"), nr_clus = 3) %>% summary()
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{plot.kclus}} to plot results
@@ -173,13 +172,12 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @param x Return value from \code{\link{kclus}}
 #' @param plots One of "density", "bar", or "scatter")
 #' @param shiny Did the function call originate inside a shiny app
-#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org/} for options.
+#' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- kclus(shopping, vars = "v1:v6")
+#' result <- kclus(shopping, vars = "v1:v6", nr_clus = 3)
 #' plot(result)
-#' shopping %>% kclus(vars = c("v1:v6")) %>% plot()
 #'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
@@ -231,7 +229,7 @@ plot.kclus <- function(
         ggplot(dat_summary, aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
         geom_bar(stat = "identity") +
         geom_errorbar(width = .1, aes(ymin = cent - ci, ymax = cent + ci)) +
-        geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), colour = "blue") +
+        geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), color = "blue") +
         theme(legend.position = "none") +
         labs(y = paste0(var, " (", x$fun, ")"))
     }
@@ -252,7 +250,7 @@ plot.kclus <- function(
 
   if (custom) {
     if (length(plot_list) == 1) {
-      return(plot_list[[1]]) 
+      return(plot_list[[1]])
     } else {
       return(plot_list)
     }
@@ -273,8 +271,8 @@ plot.kclus <- function(
 #' @param ... Additional arguments
 #'
 #' @examples
-#' kclus(shopping, vars = "v1:v6") %>% 
-#'   store(shopping, .) %>% 
+#' kclus(shopping, vars = "v1:v6", nr_clus = 3) %>%
+#'   store(shopping, .) %>%
 #'   head()
 #'
 #' @seealso \code{\link{kclus}} to generate results

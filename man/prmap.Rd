@@ -29,7 +29,7 @@ Attribute based brand maps
 See \url{https://radiant-rstats.github.io/docs/multivariate/prmap.html} for an example in Radiant
 }
 \examples{
-result <- prmap(computer, brand = "brand", attr = "high_end:business")
+prmap(computer, brand = "brand", attr = "high_end:business") \%>\% str()
 
 }
 \seealso{
