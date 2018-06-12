@@ -41,7 +41,7 @@ navbar:
 
 
 reference:
-- title: Multivariate > Map
+- title: Multivariate > Maps
   desc: Create brand maps based on (dis)similarity or attribute data
   contents:
     - mds

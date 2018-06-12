@@ -12,7 +12,7 @@
 
 \item{plots}{Show either the part-worth ("pw") or importance-weights ("iw") plot}
 
-\item{show}{Level in by variable to analyse (e.g., a specific respondent)}
+\item{show}{Level in by variable to analyze (e.g., a specific respondent)}
 
 \item{scale_plot}{Scale the axes of the part-worth plots to the same range}
 

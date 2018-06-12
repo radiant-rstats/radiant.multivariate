@@ -10,7 +10,7 @@
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}
 
-\item{show}{Level in by variable to analyse (e.g., a specific respondent)}
+\item{show}{Level in by variable to analyze (e.g., a specific respondent)}
 
 \item{mc_diag}{Shows multicollinearity diagnostics.}
 
