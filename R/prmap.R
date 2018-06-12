@@ -56,6 +56,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
     pref_cor <- get_data(dataset, pref) %>%
       cor(fres$scores) %>%
       data.frame(stringsAsFactors = FALSE)
+    pref <- colnames(pref_cor)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
   }
 

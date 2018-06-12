@@ -23,6 +23,10 @@ pre_factor <- function(dataset, vars, data_filter = "") {
   dataset <- get_data(dataset, vars, filt = data_filter)
   nrObs <- nrow(dataset)
 
+  ## in case : is used
+  if (length(vars) < ncol(dataset))
+    vars <- colnames(dataset)
+
   if (nrObs <= ncol(dataset)) {
     return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
       add_class("pre_factor"))

@@ -29,6 +29,10 @@ full_factor <- function(
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter)
 
+  ## in case : is used
+  if (length(vars) < ncol(dataset))
+    vars <- colnames(dataset)
+
   nrObs <- nrow(dataset)
   if (nrObs <= ncol(dataset)) {
     return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
@@ -116,7 +120,7 @@ summary.full_factor <- function(
   cat("\nFactor loadings:\n")
 
   ## show only the loadings > cutoff
-  clean_loadings(object$floadings, cutoff = cutoff, fsort = fsort, dec = dec, repl = "") %>% 
+  clean_loadings(object$floadings, cutoff = cutoff, fsort = fsort, dec = dec, repl = "") %>%
     print()
 
   ## fit measures
@@ -192,7 +196,7 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
         geom_point() +
         ggrepel::geom_text_repel() +
         geom_segment(
-          aes_string(x = 0, y = 0, xend = i_name, yend = j_name), 
+          aes_string(x = 0, y = 0, xend = i_name, yend = j_name),
           size = 0.5, linetype = "dashed", alpha = 0.5
         ) +
         theme(legend.position = "none") +
@@ -210,14 +214,14 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
     }
   }
 
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>% 
+  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>%
     {if (shiny) . else print(.)}
 }
 
 #' Store factor scores to active dataset
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
-#'  
+#'
 #' @param dataset Dataset to append to factor scores to
 #' @param object Return value from \code{\link{full_factor}}
 #' @param name Name of factor score variables

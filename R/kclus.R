@@ -33,6 +33,10 @@ kclus <- function(
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter)
 
+  ## in case : is used
+  if (length(vars) < ncol(dataset))
+    vars <- colnames(dataset)
+
   if (fun == "median" && length(vars) < 2) {
     stop("K-medians requires at least two variables as input")
   }
@@ -122,7 +126,7 @@ kclus <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- kclus(shopping, vars = c("v1:v6"), nr_clus = 3)
+#' result <- kclus(shopping, vars = "v1:v6", nr_clus = 3)
 #' summary(result)
 #'
 #' @seealso \code{\link{kclus}} to generate results

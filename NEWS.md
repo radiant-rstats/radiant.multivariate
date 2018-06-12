@@ -1,4 +1,4 @@
-# radiant.multivariate 0.9.4.3
+# radiant.multivariate 0.9.5.0
 
 * Fix to accomodate changes in `deparse` in R 3.5
 

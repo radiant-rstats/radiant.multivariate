@@ -31,6 +31,10 @@ hclus <- function(
       add_class("hclus"))
   }
 
+  ## in case : is used
+  if (length(vars) < ncol(dataset))
+    vars <- colnames(dataset)
+
   dataset %>%
     scale() %>%
     {
@@ -160,8 +164,8 @@ plot.hclus <- function(
     # install.packages("ggraph")
     # library(ggraph)
     # https://www.r-graph-gallery.com/335-custom-ggraph-dendrogram/
-    # plot_list[["dendro"]] <- ggraph(hc, 'dendrogram', circular = FALSE) + 
-      # geom_edge_elbow() 
+    # plot_list[["dendro"]] <- ggraph(hc, 'dendrogram', circular = FALSE) +
+      # geom_edge_elbow()
 
     if (cutoff == 0) {
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
@@ -176,7 +180,7 @@ plot.hclus <- function(
 
   if (custom) {
     if (length(plot_list) == 1) {
-      return(plot_list[[1]]) 
+      return(plot_list[[1]])
     } else {
       return(plot_list)
     }
