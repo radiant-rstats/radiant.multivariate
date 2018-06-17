@@ -1,3 +1,8 @@
+# radiant.multivariate 0.9.6.0
+
+* Replace non-ASCII characters in example datasets
+* Remove `rstudioapi` as a direct import
+
 # radiant.multivariate 0.9.5.0
 
 * Fix to accomodate changes in `deparse` in R 3.5
