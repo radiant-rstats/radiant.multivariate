@@ -3,7 +3,7 @@ url: https://radiant-rstats.github.io/radiant.multivariate
 template:
   params:
     docsearch:
-      api_key: 1234
+      api_key: 2038ba9d97ecd78525ca0ca8e051bec0
       index_name: radiant_multivariate
 
 navbar:
@@ -62,7 +62,7 @@ reference:
     - store.full_factor
     - clean_loadings
 - title: Multivariate > Cluster
-  desc: Conduct cluster analysis 
+  desc: Conduct cluster analysis
   contents:
     - hclus
     - summary.hclus
@@ -80,7 +80,7 @@ reference:
     - plot.conjoint
     - predict_conjoint_by
     - print.conjoint.predict
-    - store.conjoint.predict 
+    - store.conjoint.predict
     - the_table
 - title: Starting radiant.multivariate
   desc: Functions used to start radiant shiny apps
