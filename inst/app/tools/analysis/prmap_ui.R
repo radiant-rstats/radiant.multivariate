@@ -279,15 +279,17 @@ dl_pm_loadings <- function(path) {
 download_handler(
   id = "dl_pm_loadings",
   fun = dl_pm_loadings,
-  fn = paste0(input$dataset, "_prmap_loadings.csv"),
-  caption = "Download factor loadings"
+  fn = function() paste0(input$dataset, "_prmap_loadings"),
+  type = "csv",
+  caption = "Save factor loadings"
 )
 
 download_handler(
   id = "dlp_prmap",
   fun = download_handler_plot,
-  fn = paste0(input$dataset, "_prmap.png"),
-  caption = "Download preceptual map plot",
+  fn = function() paste0(input$dataset, "_prmap"),
+  type = "png",
+  caption = "Save preceptual map plot",
   plot = .plot_prmap,
   width = pm_plot_width,
   height = pm_plot_height

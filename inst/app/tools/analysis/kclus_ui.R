@@ -283,15 +283,17 @@ dl_km_means <- function(path) {
 download_handler(
   id = "dl_km_means", 
   fun = dl_km_means, 
-  fn = paste0(input$dataset, "_kclus.csv"),
-  caption = "Download clustering results "
+  fn = function() paste0(input$dataset, "_kclus"),
+  type = "csv",
+  caption = "Save clustering results "
 )
 
 download_handler(
   id = "dlp_kclus", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_kclustering.png"),
-  caption = "Download k-cluster plots",
+  fn = function() paste0(input$dataset, "_kclustering"),
+  type = "png",
+  caption = "Save k-cluster plots",
   plot = .plot_kclus,
   width = km_plot_width,
   height = km_plot_height

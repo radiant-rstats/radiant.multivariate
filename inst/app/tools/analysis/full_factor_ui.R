@@ -258,15 +258,17 @@ dl_ff_loadings <- function(path) {
 download_handler(
   id = "dl_ff_loadings", 
   fun = dl_ff_loadings, 
-  fn = paste0(input$dataset, "_loadings.csv"),
-  caption = "Download factor loadings"
+  fn = function() paste0(input$dataset, "_loadings"),
+  type = "csv",
+  caption = "Save factor loadings"
 )
  
 download_handler(
   id = "dlp_full_factor", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_factor.png"),
-  caption = "Download factor plots",
+  fn = function() paste0(input$dataset, "_factor"),
+  type = "png",
+  caption = "Save factor plots",
   plot = .plot_full_factor,
   width = ff_plot_width,
   height = ff_plot_height

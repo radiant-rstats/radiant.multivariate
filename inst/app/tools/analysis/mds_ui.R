@@ -236,15 +236,17 @@ dl_mds_coord <- function(path) {
 download_handler(
   id = "dl_mds_coord",
   fun = dl_mds_coord,
-  fn = paste0(input$dataset, "_mds_coordinates.csv"),
-  caption = "Download MDS coordinates"
+  fn = function() paste0(input$dataset, "_mds_coordinates"),
+  type = "csv",
+  caption = "Save MDS coordinates"
 )
 
 download_handler(
   id = "dlp_mds",
   fun = download_handler_plot,
-  fn = paste0(input$dataset, "_mds.png"),
-  caption = "Download MDS plot",
+  fn = function() paste0(input$dataset, "_mds"),
+  type = "png",
+  caption = "Save MDS plot",
   plot = .plot_mds,
   width = mds_plot_width,
   height = mds_plot_height

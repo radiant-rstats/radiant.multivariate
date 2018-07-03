@@ -209,8 +209,9 @@ observeEvent(input$hclus_report, {
 download_handler(
   id = "dlp_hclus", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_hclustering.png"),
-  caption = "Download hierarchical cluster plots",
+  fn = function() paste0(input$dataset, "_hclustering"),
+  type = "png",
+  caption = "Save hierarchical cluster plots",
   plot = .plot_hclus,
   width = hc_plot_width,
   height = hc_plot_height

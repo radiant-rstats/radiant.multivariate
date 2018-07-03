@@ -607,7 +607,12 @@ observeEvent(input$ca_store_pred, {
 
 dl_ca_PWs <- function(path) {
   if (pressed(input$ca_run)) {
-    store(.conjoint(), df = TRUE) %>% write.csv(file = path, row.names = FALSE)
+    if (is_empty(input$ca_show)) {
+      tab <- .conjoint()$model_list[["full"]]$tab
+    } else {
+      tab <- .conjoint()$model_list[[input$ca_show]]$tab
+    }
+    write.csv(tab$PW, file = path, row.names = FALSE)
   } else {
     cat("No output available. Press the Estimate button to generate results", file = path)
   }
@@ -616,8 +621,9 @@ dl_ca_PWs <- function(path) {
 download_handler(
   id = "dl_ca_PWs", 
   fun = dl_ca_PWs, 
-  fn = paste0(input$dataset, "_PWs.csv"),
-  caption = "Download part worths"
+  fn = function() paste0(input$dataset, "_PWs"),
+  type = "csv",
+  caption = "Save part worths"
 )
 
 dl_ca_pred <- function(path) {
@@ -631,15 +637,17 @@ dl_ca_pred <- function(path) {
 download_handler(
   id = "dl_ca_pred", 
   fun = dl_ca_pred, 
-  fn = paste0(input$dataset, "_ca_pred.csv"),
-  caption = "Download predictions"
+  fn = function() paste0(input$dataset, "_conjoint_pred"),
+  type = "csv",
+  caption = "Save predictions"
 )
 
 download_handler(
   id = "dlp_ca_pred", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_conjoint_pred.png"),
-  caption = "Download conjoint prediction plot",
+  fn = function() paste0(input$dataset, "_conjoint_pred"),
+  type = "png",
+  caption = "Save conjoint prediction plot",
   plot = .predict_plot_conjoint,
   width = plot_width,
   height = ca_pred_plot_height
@@ -648,8 +656,9 @@ download_handler(
 download_handler(
   id = "dlp_conjoint", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_conjoint.png"),
-  caption = "Download conjoint plot",
+  fn = function() paste0(input$dataset, "_conjoint"),
+  type = "png",
+  caption = "Save conjoint plot",
   plot = .plot_conjoint,
   width = ca_plot_width,
   height = ca_plot_height

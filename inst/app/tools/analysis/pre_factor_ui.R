@@ -174,8 +174,9 @@ observeEvent(input$pre_factor_report, {
 download_handler(
   id = "dlp_pre_factor", 
   fun = download_handler_plot, 
-  fn = paste0(input$dataset, "_pre_factor.png"),
-  caption = "Download pre-factor plot",
+  fn = function() paste0(input$dataset, "_pre_factor"),
+  type = "png",
+  caption = "Save pre-factor plot",
   plot = .plot_pre_factor,
   width = pf_plot_width,
   height = pf_plot_height
