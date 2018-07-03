@@ -56,7 +56,7 @@ full_factor <- function(
       dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,
       oblique.scores = FALSE, fm = "ml"
     ), silent = TRUE)
-    if (is(fres, "try-error")) {
+    if (inherits(fres, "try-error")) {
       return(
         "An error occured. Increase the number of variables or reduce the number of factors" %>%
           add_class("full_factor")

@@ -40,7 +40,7 @@ pre_factor <- function(dataset, vars, data_filter = "") {
   err_mess <- "The selected variables are perfectly collinear. Please check the correlations\nand remove any variable with a correlation of 1 or -1 from the analysis"
   if (det(cmat) > 0) {
     scmat <- try(solve(cmat), silent = TRUE)
-    if (is(scmat, "try-error")) {
+    if (inherits(scmat, "try-error")) {
       pre_r2 <- err_mess
     } else {
       pre_r2 <- {1 - (1 / diag(scmat))} %>%

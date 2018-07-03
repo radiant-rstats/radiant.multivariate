@@ -277,7 +277,7 @@ predict.conjoint <- function(
         silent = TRUE
       )
 
-    if (!is(pred_val, "try-error")) {
+    if (!inherits(pred_val, "try-error")) {
       if (se) {
         pred_val %<>% data.frame(stringsAsFactors = FALSE) %>% mutate(diff = .[, 3] - .[, 1])
         ci_perc <- ci_label(cl = conf_lev)
