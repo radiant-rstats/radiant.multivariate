@@ -4,8 +4,7 @@
 \alias{store.conjoint.predict}
 \title{Store predicted values generated in predict.conjoint}
 \usage{
-\method{store}{conjoint.predict}(dataset, object, name = "prediction",
-  ...)
+\method{store}{conjoint.predict}(dataset, object, name = "prediction", ...)
 }
 \arguments{
 \item{dataset}{Dataset to add predictions to}
