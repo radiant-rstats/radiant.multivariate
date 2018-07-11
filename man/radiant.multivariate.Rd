@@ -4,7 +4,6 @@
 \name{radiant.multivariate}
 \alias{radiant.multivariate}
 \alias{radiant.multivariate-package}
-\alias{radiant.multivariate}
 \title{radiant.multivariate}
 \usage{
 radiant.multivariate()

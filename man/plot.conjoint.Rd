@@ -4,8 +4,8 @@
 \alias{plot.conjoint}
 \title{Plot method for the conjoint function}
 \usage{
-\method{plot}{conjoint}(x, plots = "pw", show = "", scale_plot = FALSE,
-  shiny = FALSE, custom = FALSE, ...)
+\method{plot}{conjoint}(x, plots = "pw", show = "",
+  scale_plot = FALSE, shiny = FALSE, custom = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{conjoint}}}
