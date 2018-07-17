@@ -3,8 +3,8 @@
 .Rapp.history
 .RData
 .Ruserdata
-radiant.multivariate.sublime-project
 radiant.multivariate.Rproj
 .DS_Store
-^revdep$
+revdep/
+docs/
 cran-comments.md
