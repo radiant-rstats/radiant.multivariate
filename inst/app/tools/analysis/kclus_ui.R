@@ -112,7 +112,7 @@ output$ui_kclus <- renderUI({
         ),
         conditionalPanel(
           condition = "input.km_vars != null",
-          HTML("<label>Store recommendations:</label>"), 
+          HTML("<label>Store cluster membership:</label>"), 
           tags$table(
             tags$td(uiOutput("ui_km_store_name")),
             tags$td(actionButton("km_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
