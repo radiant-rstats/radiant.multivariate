@@ -4,6 +4,7 @@
 #'
 #' @param dataset Dataset
 #' @param vars Vector of variables to include in the analysis
+#' @param labels A vector of labels for the leaves of the tree
 #' @param distance Distance
 #' @param method Method
 #' @param max_cases Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface
@@ -19,13 +20,13 @@
 #'
 #' @export
 hclus <- function(
-  dataset, vars, distance = "sq.euclidian",
+  dataset, vars, labels = "none", distance = "sq.euclidian",
   method = "ward.D", max_cases = 5000,
   data_filter = ""
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, if (labels == "none") vars else c(labels, vars), filt = data_filter)
   if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maximum set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))
@@ -35,16 +36,15 @@ hclus <- function(
   if (length(vars) < ncol(dataset))
     vars <- colnames(dataset)
 
-  dataset %>%
+  if (labels != "none") {
+    rownames(dataset) <- dataset[[1]]
+    dataset <- select(dataset, -1)
+  }
+
+  hc_out <- dataset %>%
     scale() %>%
-    {
-      if (distance == "sq.euclidian") {
-        dist(., method = "euclidean") ^ 2
-      } else {
-        dist(., method = distance)
-      }
-    } %>%
-    hclust(d = ., method = method) -> hc_out
+    {if (distance == "sq.euclidian") dist(., method = "euclidean") ^ 2 else dist(., method = distance)} %>%
+    hclust(d = ., method = method)
 
   as.list(environment()) %>% add_class("hclus")
 }
@@ -100,8 +100,8 @@ summary.hclus <- function(object, ...) {
 #' @export
 plot.hclus <- function(
   x, plots = c("scree", "change"),
-  cutoff = 0.05, shiny = FALSE,
-  custom = FALSE, ...
+  cutoff = 0.05,
+  shiny = FALSE, custom = FALSE, ...
 ) {
 
   if (is_empty(plots)) return(invisible())
@@ -168,6 +168,7 @@ plot.hclus <- function(
       # geom_edge_elbow()
 
     if (cutoff == 0) {
+      # plot(hc, labels = labels, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
     } else {
       plot(

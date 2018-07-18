@@ -26,6 +26,15 @@ hc_inputs <- reactive({
 ###############################################################
 # Hierarchical clustering
 ###############################################################
+output$ui_hc_labels <- renderUI({
+  vars <- c(None = "none", varnames())
+  selectInput(
+    inputId = "hc_labels", label = "Labels:", choices = vars,
+    selected = state_single("hc_labels", vars, "none"),
+    multiple = FALSE
+  )
+})
+
 output$ui_hc_vars <- renderUI({
   isNum <- "numeric" == .get_class() | "integer" == .get_class()
   vars <- varnames()[isNum]
@@ -60,6 +69,7 @@ output$ui_hclus <- renderUI({
       actionButton("hc_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     wellPanel(
+      uiOutput("ui_hc_labels"),
       uiOutput("ui_hc_vars"),
       selectInput(
         "hc_distance", label = "Distance measure:", choices = hc_distance,
@@ -79,18 +89,17 @@ output$ui_hclus <- renderUI({
           plugins = list("remove_button", "drag_drop")
         )
       ),
-
       with(tags, table(
         tr(
           td(numericInput(
             "hc_cutoff", "Plot cutoff:", min = 0, max = 1,
-            value = state_init("hc_cutoff", 0.05), step = .02, width = "117px"
-          )),
+            value = state_init("hc_cutoff", 0.05), step = .02
+          ), width = "50%"),
           td(numericInput(
             "hc_max_cases", "Max cases:", min = 100, max = 100000, step = 100,
             value = state_init("hc_max_cases", 5000) 
-          ))
-        )
+          ), width = "50%")
+        ), width = "100%"
       ))
     ),
     help_and_report(

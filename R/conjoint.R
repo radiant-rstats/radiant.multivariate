@@ -61,7 +61,7 @@ conjoint <- function(
     }
 
     model <- sshhr(lm(formula, data = cdat))
-    coeff <- tidy(model)
+    coeff <- tidy(model) %>% as.data.frame()
     tab <- the_table(coeff, cdat, evar)
 
     coeff$sig_star <- sig_stars(coeff$p.value) %>%
