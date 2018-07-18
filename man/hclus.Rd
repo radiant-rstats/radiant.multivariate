@@ -4,13 +4,15 @@
 \alias{hclus}
 \title{Hierarchical cluster analysis}
 \usage{
-hclus(dataset, vars, distance = "sq.euclidian", method = "ward.D",
-  max_cases = 5000, data_filter = "")
+hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
+  method = "ward.D", max_cases = 5000, data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset}
 
 \item{vars}{Vector of variables to include in the analysis}
+
+\item{labels}{A vector of labels for the leaves of the tree}
 
 \item{distance}{Distance}
 
