@@ -33,11 +33,17 @@ hclus <- function(
   }
 
   ## in case : is used
-  if (length(vars) < ncol(dataset))
+  if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
 
   if (labels != "none") {
-    rownames(dataset) <- dataset[[1]]
+    if (length(unique(dataset[[1]])) == nrow(dataset)) {
+      rownames(dataset) <- dataset[[1]]
+    } else {
+      message("\nThe provided labels are not unique. Please select another labels variable\n")
+      rownames(dataset) <- seq_len(nrow(dataset))
+    }
     dataset <- select(dataset, -1)
   }
 

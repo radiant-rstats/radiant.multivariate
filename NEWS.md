@@ -1,4 +1,4 @@
-# radiant.multivariate 0.9.6.2
+# radiant.multivariate 0.9.6.4
 
 ## Major changes
 
