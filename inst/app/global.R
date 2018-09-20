@@ -14,5 +14,5 @@ addResourcePath("www_multivariate", file.path(getOption("radiant.path.multivaria
 if (is.null(getOption("radiant.path.model"))) options(radiant.path.model = system.file(package = "radiant.model"))
 
 ## loading urls and ui
-source("init.R", encoding = getOption("radiant.encoding"), local = TRUE)
+source("init.R", encoding = getOption("radiant.encoding", "UTF-8"), local = TRUE)
 options(radiant.url.patterns = make_url_patterns())
