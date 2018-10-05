@@ -5,7 +5,8 @@
 \title{Predict method for the conjoint function}
 \usage{
 \method{predict}{conjoint}(object, pred_data = NULL, pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, interval = "confidence", dec = 3, ...)
+  conf_lev = 0.95, se = FALSE, interval = "confidence", dec = 3,
+  ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}

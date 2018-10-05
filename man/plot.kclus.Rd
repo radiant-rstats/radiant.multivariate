@@ -4,8 +4,8 @@
 \alias{plot.kclus}
 \title{Plot method for kclus}
 \usage{
-\method{plot}{kclus}(x, plots = "density", shiny = FALSE, custom = FALSE,
-  ...)
+\method{plot}{kclus}(x, plots = "density", shiny = FALSE,
+  custom = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{kclus}}}

@@ -4,8 +4,8 @@
 \alias{mds}
 \title{(Dis)similarity based brand maps (MDS)}
 \usage{
-mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2, seed = 1234,
-  data_filter = "")
+mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2,
+  seed = 1234, data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset}
