@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.6.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.7</span>
       </span>
     </div>
 
@@ -200,13 +200,15 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>full_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>, <span class='kw'>nr_fact</span> <span class='kw'>=</span> <span class='fl'>3</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>store</span>(<span class='no'>shopping</span>, <span class='no'>.</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>head</span>()</div><div class='output co'>#&gt;   id v1 v2 v3 v4 v5 v6    factor1    factor2    factor3
-#&gt; 1  1  6  4  7  3  2  3  1.1749063 -1.0215411  0.2783358
-#&gt; 2  2  2  3  1  4  5  4 -1.1434907  0.1228027 -0.8994808
-#&gt; 3  3  7  2  6  4  1  3  1.4484724  0.1113457 -1.8669389
-#&gt; 4  4  4  6  4  5  3  6  0.1339521  0.6145524  1.2564168
-#&gt; 5  5  1  3  2  2  6  4 -1.3466238 -1.0522252 -0.1605092
-#&gt; 6  6  6  4  6  3  3  4  0.8480561 -0.7054350  0.2605840</div><div class='input'>
+  <span class='fu'>head</span>()</div><div class='output co'>#&gt; # A tibble: 6 x 10
+#&gt;      id    v1    v2    v3    v4    v5    v6 factor1 factor2 factor3
+#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+#&gt; 1     1     6     4     7     3     2     3   1.17   -1.02    0.278
+#&gt; 2     2     2     3     1     4     5     4  -1.14    0.123  -0.899
+#&gt; 3     3     7     2     6     4     1     3   1.45    0.111  -1.87 
+#&gt; 4     4     4     6     4     5     3     6   0.134   0.615   1.26 
+#&gt; 5     5     1     3     2     2     6     4  -1.35   -1.05   -0.161
+#&gt; 6     6     6     4     6     3     3     4   0.848  -0.705   0.261</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.6.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.7</span>
       </span>
     </div>
 
@@ -163,7 +163,8 @@
     </div>
 
     <pre class="usage"><span class='co'># S3 method for conjoint.predict</span>
-<span class='fu'>store</span>(<span class='no'>dataset</span>, <span class='no'>object</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>store</span>(<span class='no'>dataset</span>, <span class='no'>object</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"prediction"</span>,
+  <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -194,25 +195,27 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>conjoint</span>(<span class='no'>mp3</span>, <span class='kw'>rvar</span> <span class='kw'>=</span> <span class='st'>"Rating"</span>, <span class='kw'>evar</span> <span class='kw'>=</span> <span class='st'>"Memory:Shape"</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'>predict</span>(<span class='no'>mp3</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'>store</span>(<span class='no'>mp3</span>, <span class='no'>.</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"pred_pref"</span>)</div><div class='output co'>#&gt;    Rating Memory Radio   Size Price       Shape pred_pref
-#&gt; 1      53    4GB    No  Small   $50      Square 53.277778
-#&gt; 2      65    6GB   Yes Medium   $50      Square 64.888889
-#&gt; 3      50    4GB   Yes Medium  $100      Square 50.388889
-#&gt; 4      68    8GB    No  Large  $100      Square 67.611111
-#&gt; 5      49    8GB    No  Small  $150      Square 49.111111
-#&gt; 6      25    6GB   Yes  Large  $150      Square 24.722222
-#&gt; 7      75    6GB    No  Small   $50    Circular 74.277778
-#&gt; 8      95    8GB   Yes  Large   $50    Circular 93.888889
-#&gt; 9      66    4GB   Yes  Small  $100    Circular 65.888889
-#&gt; 10     65    6GB    No Medium  $100    Circular 65.277778
-#&gt; 11     59    8GB    No Medium  $150    Circular 60.277778
-#&gt; 12     30    4GB   Yes  Large  $150    Circular 30.388889
-#&gt; 13     72    8GB   Yes Medium   $50 Rectangular 72.388889
-#&gt; 14     29    4GB    No  Large   $50 Rectangular 30.277778
-#&gt; 15     68    8GB   Yes  Small  $100 Rectangular 67.722222
-#&gt; 16     31    6GB    No  Large  $100 Rectangular 31.111111
-#&gt; 17     18    6GB   Yes  Small  $150 Rectangular 18.722222
-#&gt; 18      5    4GB    No Medium  $150 Rectangular  2.777778</div><div class='input'>
+  <span class='fu'>store</span>(<span class='no'>mp3</span>, <span class='no'>.</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"pred_pref"</span>)</div><div class='output co'>#&gt; # A tibble: 18 x 7
+#&gt;    Rating Memory Radio Size   Price Shape       pred_pref
+#&gt;     &lt;int&gt; &lt;fct&gt;  &lt;fct&gt; &lt;fct&gt;  &lt;fct&gt; &lt;fct&gt;           &lt;dbl&gt;
+#&gt;  1     53 4GB    No    Small  $50   Square          53.3 
+#&gt;  2     65 6GB    Yes   Medium $50   Square          64.9 
+#&gt;  3     50 4GB    Yes   Medium $100  Square          50.4 
+#&gt;  4     68 8GB    No    Large  $100  Square          67.6 
+#&gt;  5     49 8GB    No    Small  $150  Square          49.1 
+#&gt;  6     25 6GB    Yes   Large  $150  Square          24.7 
+#&gt;  7     75 6GB    No    Small  $50   Circular        74.3 
+#&gt;  8     95 8GB    Yes   Large  $50   Circular        93.9 
+#&gt;  9     66 4GB    Yes   Small  $100  Circular        65.9 
+#&gt; 10     65 6GB    No    Medium $100  Circular        65.3 
+#&gt; 11     59 8GB    No    Medium $150  Circular        60.3 
+#&gt; 12     30 4GB    Yes   Large  $150  Circular        30.4 
+#&gt; 13     72 8GB    Yes   Medium $50   Rectangular     72.4 
+#&gt; 14     29 4GB    No    Large  $50   Rectangular     30.3 
+#&gt; 15     68 8GB    Yes   Small  $100  Rectangular     67.7 
+#&gt; 16     31 6GB    No    Large  $100  Rectangular     31.1 
+#&gt; 17     18 6GB    Yes   Small  $150  Rectangular     18.7 
+#&gt; 18      5 4GB    No    Medium $150  Rectangular      2.78</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

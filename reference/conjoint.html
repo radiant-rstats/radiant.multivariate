@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.6.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.7</span>
       </span>
     </div>
 
@@ -214,17 +214,16 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'>conjoint</span>(<span class='no'>mp3</span>, <span class='kw'>rvar</span> <span class='kw'>=</span> <span class='st'>"Rating"</span>, <span class='kw'>evar</span> <span class='kw'>=</span> <span class='st'>"Memory:Shape"</span>) <span class='kw'>%&gt;%</span> <span class='fu'>str</span>()</div><div class='output co'>#&gt; List of 14
-#&gt;  $ cdat       :'data.frame':	18 obs. of  6 variables:
+#&gt;  $ cdat       :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	18 obs. of  6 variables:
 #&gt;   ..$ Rating: int [1:18] 53 65 50 68 49 25 75 95 66 65 ...
 #&gt;   ..$ Memory: Factor w/ 3 levels "4GB","6GB","8GB": 1 2 1 3 3 2 2 3 1 2 ...
 #&gt;   ..$ Radio : Factor w/ 2 levels "No","Yes": 1 2 2 1 1 2 1 2 2 1 ...
 #&gt;   ..$ Size  : Factor w/ 3 levels "Large","Medium",..: 3 2 2 1 3 1 3 1 3 2 ...
 #&gt;   ..$ Price : Factor w/ 3 levels "$50","$100","$150": 1 1 2 2 3 3 1 1 2 2 ...
 #&gt;   ..$ Shape : Factor w/ 3 levels "Circular","Rectangular",..: 3 3 3 3 3 3 1 1 1 1 ...
-#&gt;   ..- attr(*, "description")= chr "## MP3 player\n\n### Description\n\nConjoint data from one respondent. Ratings reflect the evaluation of 18 alt"| __truncated__
 #&gt;  $ i          : int 1
 #&gt;  $ formula    :Class 'formula'  language Rating ~ Memory + Radio + Size + Price + Shape
-#&gt;   .. ..- attr(*, ".Environment")=&lt;environment: 0xd96d958&gt; 
+#&gt;   .. ..- attr(*, ".Environment")=&lt;environment: 0xc8dfde8&gt; 
 #&gt;  $ model_list :List of 1
 #&gt;   ..$ full:List of 3
 #&gt;   .. ..$ model:List of 13
@@ -279,7 +278,7 @@
 #&gt;   .. .. .. .. ..- attr(*, "order")= int [1:5] 1 1 1 1 1
 #&gt;   .. .. .. .. ..- attr(*, "intercept")= int 1
 #&gt;   .. .. .. .. ..- attr(*, "response")= int 1
-#&gt;   .. .. .. .. ..- attr(*, ".Environment")=&lt;environment: 0xd96d958&gt; 
+#&gt;   .. .. .. .. ..- attr(*, ".Environment")=&lt;environment: 0xc8dfde8&gt; 
 #&gt;   .. .. .. .. ..- attr(*, "predvars")= language list(Rating, Memory, Radio, Size, Price, Shape)
 #&gt;   .. .. .. .. ..- attr(*, "dataClasses")= Named chr [1:6] "numeric" "factor" "factor" "factor" ...
 #&gt;   .. .. .. .. .. ..- attr(*, "names")= chr [1:6] "Rating" "Memory" "Radio" "Size" ...
@@ -300,7 +299,7 @@
 #&gt;   .. .. .. .. .. ..- attr(*, "order")= int [1:5] 1 1 1 1 1
 #&gt;   .. .. .. .. .. ..- attr(*, "intercept")= int 1
 #&gt;   .. .. .. .. .. ..- attr(*, "response")= int 1
-#&gt;   .. .. .. .. .. ..- attr(*, ".Environment")=&lt;environment: 0xd96d958&gt; 
+#&gt;   .. .. .. .. .. ..- attr(*, ".Environment")=&lt;environment: 0xc8dfde8&gt; 
 #&gt;   .. .. .. .. .. ..- attr(*, "predvars")= language list(Rating, Memory, Radio, Size, Price, Shape)
 #&gt;   .. .. .. .. .. ..- attr(*, "dataClasses")= Named chr [1:6] "numeric" "factor" "factor" "factor" ...
 #&gt;   .. .. .. .. .. .. ..- attr(*, "names")= chr [1:6] "Rating" "Memory" "Radio" "Size" ...
@@ -326,14 +325,13 @@
 #&gt;  $ bylevs     : chr "full"
 #&gt;  $ df_name    : chr "mp3"
 #&gt;  $ vars       : chr [1:5] "Memory" "Radio" "Size" "Price" ...
-#&gt;  $ dataset    :'data.frame':	18 obs. of  6 variables:
+#&gt;  $ dataset    :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	18 obs. of  6 variables:
 #&gt;   ..$ Rating: int [1:18] 53 65 50 68 49 25 75 95 66 65 ...
 #&gt;   ..$ Memory: Factor w/ 3 levels "4GB","6GB","8GB": 1 2 1 3 3 2 2 3 1 2 ...
 #&gt;   ..$ Radio : Factor w/ 2 levels "No","Yes": 1 2 2 1 1 2 1 2 2 1 ...
 #&gt;   ..$ Size  : Factor w/ 3 levels "Large","Medium",..: 3 2 2 1 3 1 3 1 3 2 ...
 #&gt;   ..$ Price : Factor w/ 3 levels "$50","$100","$150": 1 1 2 2 3 3 1 1 2 2 ...
 #&gt;   ..$ Shape : Factor w/ 3 levels "Circular","Rectangular",..: 3 3 3 3 3 3 1 1 1 1 ...
-#&gt;   ..- attr(*, "description")= chr "## MP3 player\n\n### Description\n\nConjoint data from one respondent. Ratings reflect the evaluation of 18 alt"| __truncated__
 #&gt;  $ rvar       : chr "Rating"
 #&gt;  $ evar       : chr [1:5] "Memory" "Radio" "Size" "Price" ...
 #&gt;  $ int        : chr ""
