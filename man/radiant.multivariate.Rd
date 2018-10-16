@@ -6,7 +6,10 @@
 \alias{radiant.multivariate-package}
 \title{radiant.multivariate}
 \usage{
-radiant.multivariate()
+radiant.multivariate(state)
+}
+\arguments{
+\item{state}{Path to state file to load}
 }
 \description{
 radiant.multivariate
