@@ -1,4 +1,4 @@
-# radiant.multivariate 0.9.7.2
+# radiant.multivariate 0.9.7.3
 
 * Load a state file on startup by providing a (relative) file path or a url
 
