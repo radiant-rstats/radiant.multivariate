@@ -19,7 +19,7 @@ A respondent was presented with 18 product profiles for a carpet cleaning produc
 
 Design characteristics:
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_carpet_design.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_carpet_design.png"></p>
 
 Based on the attributes, 108 possible profiles could be created (i.e., 3x3x3x2x2 = 108). The respondent was given a set of 18 and was asked to rank the profiles from most preferred (rank 1) to least preferred (rank 18).  The first five columns represent the five attributes and the last column is the respondent's ranking.
 
@@ -34,8 +34,8 @@ The VIF scores displayed below indicate that the attributes are perfectly orthog
 
 b. Estimate a conjoint model using the respondent's evaluations as the dependent variable and the attributes as the predictors. Show the complete list of part-worths and importance weights.
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_summary.png"></p>
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_plot.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_summary.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_plot.png"></p>
 
 c. Calculate the predicted utilities for the following options:
 
@@ -55,15 +55,15 @@ We can confirm this results in three steps: (1) Create a new dataset with all 36
 
 #### Step 1: Create dataset
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_expand.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_expand.png"></p>
 
 #### Step 2: Predict utilities
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_predict.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_predict.png"></p>
 
 #### Step 3: Sort predictions
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/conjoint_view.png"></p>
+<p align="center"><img src="figures_multivariate/conjoint_view.png"></p>
 
 ## Multiple respondents
 

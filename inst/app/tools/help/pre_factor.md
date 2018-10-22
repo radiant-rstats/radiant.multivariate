@@ -14,7 +14,7 @@ As can be seen in the output from _Multivariate > Factor > Pre-factor_ below, Ba
 
 To replicate the results shown in the screenshot make sure you have the `toothpaste` data loaded. Then select variables `v1` through `v6` and click the `Estimate` button or press `CTRL-enter` (`CMD-enter` on mac) to generate results.
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/pre_factor_summary.png"></p>
+<p align="center"><img src="figures_multivariate/pre_factor_summary.png"></p>
 
 The next step is to determine the number of factors needed to capture the structure underlying the data. Factors that do not capture even as much variance as could be expected by chance are generally omitted from further consideration. These factors have eigenvalues < 1 in the output.
 
@@ -22,7 +22,7 @@ A further criteria that is often used to determine the number of factors is the 
 
 At first glance the scree-plot of the Eigenvalues shown below seems to suggest that 3 factors should be extracted (i.e., look for the _elbow_). The bar plot confirms this insight, i.e., the change in Eigenvalues between factors 1 and 2 is small but the drop-off from 2 to 3 is much larger. However, because the value for the third factor is less than one we will extract only 2 factors.
 
-<p align="center"><img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate/pre_factor_plot.png"></p>
+<p align="center"><img src="figures_multivariate/pre_factor_plot.png"></p>
 
 The increase in cumulative % explained variance is relatively small going from 2 to 3 factors (i.e., from 82% to 90%). This is confirmed by the fact that the eigenvalue for factor 3 is smaller than 1 (0.44). Again, we choose 2 factors. The first 2 factors capture 82% of the variance in the original data which is excellent.
 
