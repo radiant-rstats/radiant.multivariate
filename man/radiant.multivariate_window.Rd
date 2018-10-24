@@ -4,7 +4,10 @@
 \alias{radiant.multivariate_window}
 \title{Launch radiant.multivariate in an Rstudio window}
 \usage{
-radiant.multivariate_window()
+radiant.multivariate_window(state)
+}
+\arguments{
+\item{state}{Path to state file to load}
 }
 \description{
 Launch radiant.multivariate in an Rstudio window

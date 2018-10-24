@@ -2,6 +2,8 @@
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
+#' @param state Path to state file to load
+#'
 #' @importFrom radiant.data launch
 #'
 #' @examples
@@ -9,11 +11,13 @@
 #' radiant.multivariate()
 #' }
 #' @export
-radiant.multivariate <- function() radiant.data::launch(package = "radiant.multivariate", run = "browser")
+radiant.multivariate <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "browser", state)
 
 #' Launch radiant.multivariate in an Rstudio window
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#'
+#' @param state Path to state file to load
 #'
 #' @importFrom radiant.data launch
 #'
@@ -22,12 +26,13 @@ radiant.multivariate <- function() radiant.data::launch(package = "radiant.multi
 #' radiant.multivariate_window()
 #' }
 #' @export
-radiant.multivariate_window <- function() radiant.data::launch(package = "radiant.multivariate", run = "window")
-
+radiant.multivariate_window <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "window", state)
 
 #' Launch radiant.multivariate in the Rstudio viewer
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#'
+#' @param state Path to state file to load
 #'
 #' @importFrom radiant.data launch
 #'
@@ -36,4 +41,4 @@ radiant.multivariate_window <- function() radiant.data::launch(package = "radian
 #' radiant.multivariate_viewer()
 #' }
 #' @export
-radiant.multivariate_viewer <- function() radiant.data::launch(package = "radiant.multivariate", run = "viewer")
+radiant.multivariate_viewer <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "viewer", state)

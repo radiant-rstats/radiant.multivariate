@@ -212,7 +212,7 @@ plot.kclus <- function(
     }
   }
   if ("bar" %in% plots) {
-    ci_calc <- function(se, n, conf.lev = .95)
+    me_calc <- function(se, n, conf.lev = .95)
       se * qt(conf.lev / 2 + .5, n - 1)
 
     for (var in vars) {
@@ -225,14 +225,14 @@ plot.kclus <- function(
             n = length(.),
             sd,
             se = sd / sqrt(n),
-            ci = ci_calc(se, n, .95)
+            me = me_calc(se, n, .95)
           )
         )
 
       plot_list[[paste0("bar_", var)]] <-
         ggplot(dat_summary, aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
         geom_bar(stat = "identity") +
-        geom_errorbar(width = .1, aes(ymin = cent - ci, ymax = cent + ci)) +
+        geom_errorbar(width = .1, aes(ymin = cent - me, ymax = cent + me)) +
         geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), color = "blue") +
         theme(legend.position = "none") +
         labs(y = paste0(var, " (", x$fun, ")"))
