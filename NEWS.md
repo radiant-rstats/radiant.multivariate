@@ -1,5 +1,6 @@
-# radiant.multivariate 0.9.7.3
+# radiant.multivariate 0.9.7.4
 
+* Avoid generatign `pred_data = ""` for conjoint predictions
 * Load a state file on startup by providing a (relative) file path or a url
 
 # radiant.multivariate 0.9.7.0
