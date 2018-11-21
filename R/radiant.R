@@ -3,6 +3,7 @@
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
 #' @param state Path to state file to load
+#' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)
 #'
 #' @importFrom radiant.data launch
 #'
@@ -11,13 +12,14 @@
 #' radiant.multivariate()
 #' }
 #' @export
-radiant.multivariate <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "browser", state)
+radiant.multivariate <- function(state, ...) radiant.data::launch(package = "radiant.multivariate", run = "browser", state, ...)
 
 #' Launch radiant.multivariate in an Rstudio window
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
 #' @param state Path to state file to load
+#' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)
 #'
 #' @importFrom radiant.data launch
 #'
@@ -26,13 +28,14 @@ radiant.multivariate <- function(state) radiant.data::launch(package = "radiant.
 #' radiant.multivariate_window()
 #' }
 #' @export
-radiant.multivariate_window <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "window", state)
+radiant.multivariate_window <- function(state, ...) radiant.data::launch(package = "radiant.multivariate", run = "window", state, ...)
 
 #' Launch radiant.multivariate in the Rstudio viewer
 #'
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
 #' @param state Path to state file to load
+#' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)
 #'
 #' @importFrom radiant.data launch
 #'
@@ -41,4 +44,4 @@ radiant.multivariate_window <- function(state) radiant.data::launch(package = "r
 #' radiant.multivariate_viewer()
 #' }
 #' @export
-radiant.multivariate_viewer <- function(state) radiant.data::launch(package = "radiant.multivariate", run = "viewer", state)
+radiant.multivariate_viewer <- function(state, ...) radiant.data::launch(package = "radiant.multivariate", run = "viewer", state, ...)

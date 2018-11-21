@@ -4,10 +4,12 @@
 \alias{radiant.multivariate_window}
 \title{Launch radiant.multivariate in an Rstudio window}
 \usage{
-radiant.multivariate_window(state)
+radiant.multivariate_window(state, ...)
 }
 \arguments{
 \item{state}{Path to state file to load}
+
+\item{...}{additional arguments to pass to shiny::runApp (e.g, port = 8080)}
 }
 \description{
 Launch radiant.multivariate in an Rstudio window

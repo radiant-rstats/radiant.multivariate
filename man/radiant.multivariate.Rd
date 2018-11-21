@@ -6,10 +6,12 @@
 \alias{radiant.multivariate-package}
 \title{radiant.multivariate}
 \usage{
-radiant.multivariate(state)
+radiant.multivariate(state, ...)
 }
 \arguments{
 \item{state}{Path to state file to load}
+
+\item{...}{additional arguments to pass to shiny::runApp (e.g, port = 8080)}
 }
 \description{
 radiant.multivariate
