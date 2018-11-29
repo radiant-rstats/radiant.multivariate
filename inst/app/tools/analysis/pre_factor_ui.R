@@ -36,7 +36,7 @@ observe({
   ## notify user when the model needs to be updated
   ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
   if (pressed(input$pf_run)) {
-    if (is.null(input$pf_vars)) { 
+    if (is.null(input$pf_vars)) {
       updateTabsetPanel(session, "tabs_pre_factor", selected = "Summary")
       updateActionButton(session, "pf_run", "Estimate model", icon = icon("play"))
     } else if (isTRUE(attr(pf_inputs, "observable")$.invalidated)) {
@@ -80,7 +80,8 @@ output$ui_pre_factor <- renderUI({
   )
 })
 
-pf_plot <- reactive({
+# pf_plot <- reactive({
+pf_plot <- eventReactive(input$pf_plots, {
   list(plot_width = 600, plot_height = length(input$pf_plots) * 400)
 })
 
@@ -136,18 +137,17 @@ output$pre_factor <- renderUI({
   summary(.pre_factor())
 })
 
-.plot_pre_factor <- reactive({
-  if (not_pressed(input$pf_run)) return("** Press the Estimate button to generate factor analysis diagnostics **")
-  isolate({
-    if (not_available(input$pf_vars)) {
-      return("This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>% suggest_data("toothpaste"))
-    } else if (length(input$pf_vars) < 2) {
-      return("Please select two or more numeric variables\nin the Summary tab and re-estimate the model")
-    }
-  })
-  withProgress(message = "Generating factor plots", value = 1, {
-    plot(.pre_factor(), plots = input$pf_plots, cutoff = input$pf_cutoff, shiny = TRUE)
-  })
+.plot_pre_factor <- eventReactive(c(input$pf_run, input$pf_plots), {
+  if (not_available(input$pf_vars)) {
+    "This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>%
+        suggest_data("toothpaste")
+  } else if (length(input$pf_vars) < 2) {
+    "Please select two or more numeric variables\nin the Summary tab and re-estimate the model"
+  } else {
+    withProgress(message = "Generating factor plots", value = 1, {
+      plot(.pre_factor(), plots = input$pf_plots, cutoff = input$pf_cutoff, shiny = TRUE)
+    })
+  }
 })
 
 observeEvent(input$pre_factor_report, {
@@ -162,9 +162,9 @@ observeEvent(input$pre_factor_report, {
   }
   update_report(
     inp_main = clean_args(pf_inputs(), pf_args),
-    fun_name = "pre_factor", 
+    fun_name = "pre_factor",
     inp_out = inp_out,
-    outputs = outputs, 
+    outputs = outputs,
     figs = figs,
     fig.width = pf_plot_width(),
     fig.height = pf_plot_height()
@@ -172,8 +172,8 @@ observeEvent(input$pre_factor_report, {
 })
 
 download_handler(
-  id = "dlp_pre_factor", 
-  fun = download_handler_plot, 
+  id = "dlp_pre_factor",
+  fun = download_handler_plot,
   fn = function() paste0(input$dataset, "_pre_factor"),
   type = "png",
   caption = "Save pre-factor plot",

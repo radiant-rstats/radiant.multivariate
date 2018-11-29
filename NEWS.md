@@ -1,5 +1,8 @@
-# radiant.multivariate 0.9.7.6
+# radiant.multivariate 0.9.7.7
 
+* Fix initial plot size for `kclus` in the browser interface
+* Fix labels in `pre_factor` after a ggplot2 update
+* Avoid a warning in the `pre_factor` Plot tab on refresh
 * Option to pass additional arguments to `shiny::runApp` when starting radiant such as the port to use. For example, radiant.multivariate::radiant.multivariate("https://github.com/radiant-rstats/docs/raw/gh-pages/examples/demo-dvd-rnd.state.rda", port = 8080) 
 * Avoid generatign `pred_data = ""` for conjoint predictions
 * Load a state file on startup by providing a (relative) file path or a url
