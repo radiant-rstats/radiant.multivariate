@@ -160,24 +160,21 @@ plot.pre_factor <- function(
   shiny = FALSE, custom = FALSE, ...
 ) {
 
-  if (is.character(x) || is.character(x$pre_r2) ||
-    length(plots) == 0) {
-    return(invisible())
-  }
+  if (is.character(x) || is.character(x$pre_r2) || length(plots) == 0) return("")
 
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
-
   pre_eigen <- with(x, pre_eigen[pre_eigen > cutoff])
   dat <- data.frame(y = pre_eigen, x = as.integer(1:length(pre_eigen)), stringsAsFactors = FALSE)
 
   plot_list <- list()
   if ("scree" %in% plots) {
-    plot_list[[which("scree" == plots)]] <- ggplot(dat, aes(x = x, y = y, group = 1)) +
-      geom_line(color = "blue", linetype = "dotdash", size = .7) +
-      geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
-      geom_hline(yintercept = 1, color = "black", linetype = "solid", size = .5) +
-      labs(list(title = "Screeplot", x = "# factors", y = "Eigenvalues")) +
-      scale_x_continuous(breaks = dat[["x"]])
+    plot_list[[which("scree" == plots)]] <-
+      ggplot(dat, aes(x = x, y = y, group = 1)) +
+        geom_line(color = "blue", linetype = "dotdash", size = .7) +
+        geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
+        geom_hline(yintercept = 1, color = "black", linetype = "solid", size = .5) +
+        labs(title = "Screeplot", x = "# factors", y = "Eigenvalues") +
+        scale_x_continuous(breaks = dat[["x"]])
   }
 
   if ("change" %in% plots) {
@@ -192,10 +189,10 @@ plot.pre_factor <- function(
       na.omit() %>%
       ggplot(aes(x = factor(nr_fact, levels = nr_fact), y = bump)) +
       geom_bar(stat = "identity", alpha = 0.5, fill = "blue") +
-      labs(list(
+      labs(
         title = paste("Change in Eigenvalues"),
         x = "# factors", y = "Rate of change index"
-      ))
+      )
   }
 
   if (custom) {
