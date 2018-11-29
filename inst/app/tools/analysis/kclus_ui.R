@@ -23,8 +23,8 @@ output$ui_km_vars <- renderUI({
   dum <- two_level_vars()
   if (length(dum) > 0) {
     isVars <- .get_class() %in% c("integer", "numeric", "factor")
-    isFct <- {.get_class() == "factor"} %>% 
-      {names(.[.])} %>% 
+    isFct <- {.get_class() == "factor"} %>%
+      {names(.[.])} %>%
       base::setdiff(., dum)
     vars <- varnames()[isVars] %>% .[!. %in% isFct]
   } else {
@@ -57,7 +57,7 @@ observe({
   ## notify user when the model needs to be updated
   ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
   if (pressed(input$km_run)) {
-    if (is.null(input$km_vars)) { 
+    if (is.null(input$km_vars)) {
       updateTabsetPanel(session, "tabs_kclus ", selected = "Summary")
       updateActionButton(session, "km_run", "Estimate model", icon = icon("play"))
     } else if (isTRUE(attr(km_inputs, "observable")$.invalidated)) {
@@ -112,7 +112,7 @@ output$ui_kclus <- renderUI({
         ),
         conditionalPanel(
           condition = "input.km_vars != null",
-          HTML("<label>Store cluster membership:</label>"), 
+          HTML("<label>Store cluster membership:</label>"),
           tags$table(
             tags$td(uiOutput("ui_km_store_name")),
             tags$td(actionButton("km_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
@@ -136,17 +136,16 @@ output$ui_kclus <- renderUI({
   )
 })
 
-# km_plot <- reactive({
-km_plot <- eventReactive(input$km_run, {
-  if (.km_available() != "available") return()
-  if (is_empty(input$km_plots, "none")) return()
-  list(plot_width = 750, plot_height = 300 * ceiling(length(input$km_vars) / 2))
+km_plot <- eventReactive(c(input$km_run, input$km_plots), {
+  if (.km_available() == "available" && !is_empty(input$km_plots, "none")) {
+    list(plot_width = 750, plot_height = 300 * ceiling(length(input$km_vars) / 2))
+  }
 })
 
-km_plot_width <- function() 
+km_plot_width <- function()
   km_plot() %>% {if (is.list(.)) .$plot_width else 650}
 
-km_plot_height <- function() 
+km_plot_height <- function()
   km_plot() %>% {if (is.list(.)) .$plot_height else 400}
 
 # output is called from the main radiant ui.R
@@ -184,7 +183,7 @@ output$kclus <- renderUI({
   if (not_pressed(input$km_run)) {
     "** Press the Estimate button to generate the cluster solution **"
   } else if (not_available(input$km_vars)) {
-    "This analysis requires one or more variables of type numeric or integer.\nIf these variable types are not available please select another dataset.\n\n" %>% 
+    "This analysis requires one or more variables of type numeric or integer.\nIf these variable types are not available please select another dataset.\n\n" %>%
       suggest_data("toothpaste")
   } else {
     "available"
@@ -217,7 +216,6 @@ output$kclus <- renderUI({
 
 observeEvent(input$kclus_report, {
   inp_out <- list(list(dec = 2), "")
-  # if (length(input$km_plots) > 0) {
   if (!is_empty(input$km_plots)) {
     figs <- TRUE
     outputs <- c("summary", "plot")
@@ -228,35 +226,24 @@ observeEvent(input$kclus_report, {
   }
 
   if (!is_empty(input$km_store_name)) {
-    # xcmd <- paste0("store(result, name = \"", input$ff_store_name, "\")\n")
-    xcmd <- paste0(input$dataset, " <- store(", 
+    xcmd <- paste0(input$dataset, " <- store(",
       input$dataset, ", result, name = \"", input$km_store_name, "\")"
     )
   } else {
     xcmd <- ""
   }
 
-  # xcmd <- paste0("# store(result, name = \"", input$km_store_name, "\")")
-  # xcmd <- paste0(xcmd, "\n# write.csv(result$clus_means, file = \"~/kclus.csv\")")
-
   update_report(
     inp_main = clean_args(km_inputs(), km_args),
-    fun_name = "kclus", 
+    fun_name = "kclus",
     inp_out = inp_out,
-    outputs = outputs, 
+    outputs = outputs,
     figs = figs,
     fig.width = km_plot_width(),
     fig.height = km_plot_height(),
-    xcmd = 
+    xcmd =
   )
 })
-
-# observeEvent(input$km_store, {
-#   if (pressed(input$km_run)) {
-#     .kclus() %>% 
-#       {if (is.list(.)) store(., name = input$km_store_name)}
-#   }
-# })
 
 ## store cluster membership
 observeEvent(input$km_store, {
@@ -266,14 +253,13 @@ observeEvent(input$km_store, {
     withProgress(
       message = "Storing cluster membership", value = 1,
       r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$km_store_name)
-      # store(robj, name = input$km_store_name)
     )
   }
 })
 
 dl_km_means <- function(path) {
   if (pressed(input$km_run)) {
-    .kclus() %>% 
+    .kclus() %>%
       {if (is.list(.)) write.csv(.$clus_means, file = path)}
   } else {
     cat("No output available. Press the Estimate button to generate the cluster solution", file = path)
@@ -281,16 +267,16 @@ dl_km_means <- function(path) {
 }
 
 download_handler(
-  id = "dl_km_means", 
-  fun = dl_km_means, 
+  id = "dl_km_means",
+  fun = dl_km_means,
   fn = function() paste0(input$dataset, "_kclus"),
   type = "csv",
   caption = "Save clustering results "
 )
 
 download_handler(
-  id = "dlp_kclus", 
-  fun = download_handler_plot, 
+  id = "dlp_kclus",
+  fun = download_handler_plot,
   fn = function() paste0(input$dataset, "_kclustering"),
   type = "png",
   caption = "Save k-cluster plots",
