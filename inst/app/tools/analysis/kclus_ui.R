@@ -226,9 +226,9 @@ observeEvent(input$kclus_report, {
   }
 
   if (!is_empty(input$km_store_name)) {
-    xcmd <- paste0(input$dataset, " <- store(",
-      input$dataset, ", result, name = \"", input$km_store_name, "\")"
-    )
+    fixed <- fix_names(input$km_store_name)
+    updateTextInput(session, "km_store_name", value = fixed)
+    xcmd <- glue('{input$dataset} <- store({input$dataset}, result, name = "{fixed}")')
   } else {
     xcmd <- ""
   }
@@ -241,18 +241,20 @@ observeEvent(input$kclus_report, {
     figs = figs,
     fig.width = km_plot_width(),
     fig.height = km_plot_height(),
-    xcmd =
+    xcmd = xcmd
   )
 })
 
 ## store cluster membership
 observeEvent(input$km_store, {
   req(input$km_store_name, input$km_run)
+  fixed <- fix_names(input$km_store_name)
+  updateTextInput(session, "km_store_name", value = fixed)
   robj <- .kclus()
   if (!is.character(robj)) {
     withProgress(
       message = "Storing cluster membership", value = 1,
-      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$km_store_name)
+      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = fixed)
     )
   }
 })

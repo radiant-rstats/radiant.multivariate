@@ -216,7 +216,6 @@ output$ui_ca_store_pred <- renderUI({
   tags$table(
     if (!input$ca_pred_plot) tags$br(),
     HTML(lab),
-    # tags$td(textInput("ca_store_pred_name", NULL, state_init("ca_store_pred_name", name))),
     tags$td(textInput("ca_store_pred_name", NULL, name, placeholder = "Provide data name")),
     tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), style = "padding-top:5px;")
   )
@@ -502,10 +501,14 @@ observeEvent(input$conjoint_report, {
 
   if (input$ca_by != "none") {
     if (!is_empty(input$ca_store_pw_name)) {
-      xcmd <- paste0(xcmd, input$ca_store_pw_name, " <- result$PW; register(\"", input$ca_store_pw_name, "\")\n")
+      fixed <- fix_names(input$ca_store_pw_name)
+      updateTextInput(session, "ca_store_pw_name", value = fixed)
+      xcmd <- glue('{xcmd}{fixed} <- result$PW\nregister("{fixed}")\n\n')
     }
     if (!is_empty(input$ca_store_iw_name)) {
-      xcmd <- paste0(xcmd, input$ca_store_iw_name, " <- result$IW; register(\"", input$ca_store_iw_name, "\")\n")
+      fixed <- fix_names(input$ca_store_iw_name)
+      updateTextInput(session, "ca_store_iw_name", value = fixed)
+      xcmd <- glue('{xcmd}{fixed} <- result$IW\nregister("{fixed}")\n\n')
     }
   }
 
@@ -526,21 +529,22 @@ observeEvent(input$conjoint_report, {
     }
 
     inp_out[[2 + figs]] <- pred_args
-    pred_name <- "pred"
+    fixed <- "pred"
     if (!is_empty(input$ca_by, "none") && !is_empty(input$ca_store_pred_name)) {
-      pred_name <- input$ca_store_pred_name
-      outputs <- c(outputs, paste0(pred_name, " <- predict"))
-      xcmd <- paste0(xcmd, pred_name %>% paste0("register(\"", ., "\")\nprint(", . ,", n = 10)"))
+      fixed <- fix_names(input$ca_store_pred_name)
+      updateTextInput(session, "ca_store_pred_name", value = fixed)
+      outputs <- c(outputs, paste0(fixed, " <- predict"))
+      xcmd <- paste0(xcmd, fixed %>% paste0("register(\"", ., "\")\nprint(", . ,", n = 10)"))
     } else {
       outputs <- c(outputs, "pred <- predict")
       xcmd <- paste0(xcmd, "print(pred, n = 10)")
       if (input$ca_predict %in% c("data", "datacmd")) {
         if (is_empty(input$ca_by, "none")) {
-          name <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*|\\s+)")) %>%
-            gsub("\\s", "", .) %>%
+          fixed <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*)")) %>%
+            fix_names() %>%
             deparse(., control = getOption("dctrl"), width.cutoff = 500L)
           xcmd <- paste0(xcmd, "\n", input$ca_pred_data , " <- store(",
-            input$ca_pred_data, ", pred, name = ", name, ")"
+            input$ca_pred_data, ", pred, name = ", fixed, ")"
           )
         }
       }
@@ -568,43 +572,49 @@ observeEvent(input$conjoint_report, {
 observeEvent(input$ca_store_pw, {
   name <- input$ca_store_pw_name
   req(pressed(input$ca_run), name)
+  fixed <- fix_names(input$ca_store_pw_name)
+  updateTextInput(session, "ca_store_pw_name", value = fixed)
   robj <- .conjoint()
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing PWs", value = 1,
-    r_data[[name]] <- robj$PW
+    r_data[[fixed]] <- robj$PW
   )
-  register(name)
+  register(fixed)
 })
 
 observeEvent(input$ca_store_iw, {
   name <- input$ca_store_iw_name
   req(pressed(input$ca_run), name)
+  fixed <- fix_names(input$ca_store_iw_name)
+  updateTextInput(session, "ca_store_iw_name", value = fixed)
   robj <- .conjoint()
   if (!is.list(robj)) return()
   withProgress(
     message = "Storing IWs", value = 1,
-    r_data[[name]] <- robj$IW
+    r_data[[fixed]] <- robj$IW
   )
-  register(name)
+  register(fixed)
 })
 
 observeEvent(input$ca_store_pred, {
   req(!is_empty(input$ca_pred_data), pressed(input$ca_run))
   pred <- .predict_conjoint()
   if (is.null(pred)) return()
+  fixed <- fix_names(input$ca_store_pred_name)
+  updateTextInput(session, "ca_store_pred_name", value = fixed)
   if ("conjoint.predict.by" %in% class(pred)) {
     withProgress(
       message = "Storing predictions in new dataset", value = 1,
-        r_data[[input$ca_store_pred_name]] <- pred,
+        r_data[[fixed]] <- pred,
     )
-    register(input$ca_store_pred_name)
+    register(fixed)
   } else {
     withProgress(
       message = "Storing predictions", value = 1,
       r_data[[input$ca_pred_data]] <- radiant.model:::store.model.predict(
         r_data[[input$ca_pred_data]], pred,
-        name = input$ca_store_pred_name
+        name = fixed
       )
     )
   }

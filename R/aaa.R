@@ -1,6 +1,6 @@
 # to avoid 'no visible binding for global variable' NOTE
 globalVariables(c(
-  ".", "y", "nr_clus", "nr_fact", "height", "bump", "n", "se", "ci",
+  ".", "y", "nr_clus", "nr_fact", "height", "bump", "n", "se", "me",
   "cent", "r_environment"
 ))
 

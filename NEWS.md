@@ -1,5 +1,6 @@
-# radiant.multivariate 0.9.7.7
+# radiant.multivariate 0.9.7.8
 
+* Ensure variable and dataset names are valid for R (i.e., no spaces or symbols), "fixing" the input as needed
 * Fix initial plot size for `kclus` in the browser interface
 * Fix labels in `pre_factor` after a ggplot2 update
 * Avoid a warning in the `pre_factor` Plot tab on refresh

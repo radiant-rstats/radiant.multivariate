@@ -237,9 +237,9 @@ observeEvent(input$prmap_report, {
   inp <- clean_args(pm_inputs(), pm_args)
   if (!is_empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
   if (!is_empty(input$pm_store_name)) {
-    xcmd <- paste0(input$dataset, " <- store(",
-      input$dataset, ", result, name = \"", input$pm_store_name, "\")"
-    )
+    fixed <- fix_names(input$pm_store_name)
+    updateTextInput(session, "pm_store_name", value = fixed)
+    xcmd <- glue('{input$dataset} <- store({input$dataset}, result, name = "{fixed}")')
   } else {
     xcmd <- ""
   }
@@ -256,11 +256,13 @@ observeEvent(input$prmap_report, {
 ## store factor scores
 observeEvent(input$pm_store, {
   req(input$pm_store_name, input$pm_run)
+  fixed <- fix_names(input$pm_store_name)
+  updateTextInput(session, "pm_store_name", value = fixed)
   robj <- .prmap()
   if (!is.character(robj)) {
     withProgress(
       message = "Storing factor scores", value = 1,
-      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = input$pm_store_name)
+      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, name = fixed)
     )
   }
 })
