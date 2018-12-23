@@ -1,4 +1,4 @@
-# radiant.multivariate 0.9.7.8
+# radiant.multivariate 0.9.8.0
 
 * Ensure variable and dataset names are valid for R (i.e., no spaces or symbols), "fixing" the input as needed
 * Fix initial plot size for `kclus` in the browser interface
