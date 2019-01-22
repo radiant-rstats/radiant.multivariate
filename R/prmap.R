@@ -52,6 +52,14 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
   fres$scores <- scale(as.matrix(f_data), center = TRUE, scale = TRUE) %*% cscm
   rownames(fres$scores) <- brands
 
+  scores <- data.frame(fres$scores) %>%
+    mutate(brands = brands) %>%
+    group_by_at("brands") %>%
+    summarize_all(mean) %>%
+    as.data.frame() %>%
+    set_rownames(.[["brands"]]) %>%
+    select(-1)
+
   if (!is_empty(pref)) {
     pref_cor <- get_data(dataset, pref) %>%
       cor(fres$scores) %>%
@@ -104,7 +112,10 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   cat("Observations:", object$nrObs, "\n")
 
   cat("\nBrand - Factor scores:\n")
-  round(object$fres$scores, dec) %>% print()
+  # round(object$fres$scores, dec) %>% print()
+  # rownames(object$scores) <- object$scores[["brands"]]
+  # round(object$scores[, -1, drop = FALSE], dec) %>% print()
+  round(object$scores, dec) %>% print()
 
   cat("\nAttribute - Factor loadings:\n")
 
@@ -185,7 +196,8 @@ plot.prmap <- function(
 
   pm_dat <- list()
   ## brand coordinates
-  pm_dat$brand <- as.data.frame(x$fres$scores) %>%
+  # pm_dat$brand <- as.data.frame(x$fres$scores) %>%
+  pm_dat$brand <- as.data.frame(x$scores) %>%
     set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
     mutate(rnames = rownames(.), type = "brand")
 

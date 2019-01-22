@@ -197,12 +197,12 @@ output$prmap <- renderUI({
     "Please select two or more attribute variables"
   } else {
     brand <- .get_data()[[input$pm_brand]]
-    if (length(unique(brand)) < length(brand)) {
-      "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
-        suggest_data("retailers")
-    } else {
+    # if (length(unique(brand)) < length(brand)) {
+      # "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
+        # suggest_data("retailers")
+    # } else {
       "available"
-    }
+    # }
   }
 })
 
