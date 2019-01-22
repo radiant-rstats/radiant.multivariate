@@ -210,14 +210,17 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>prmap</span>(<span class='no'>computer</span>, <span class='kw'>brand</span> <span class='kw'>=</span> <span class='st'>"brand"</span>, <span class='kw'>attr</span> <span class='kw'>=</span> <span class='st'>"high_end:business"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 11
+    <pre class="examples"><div class='input'><span class='fu'>prmap</span>(<span class='no'>computer</span>, <span class='kw'>brand</span> <span class='kw'>=</span> <span class='st'>"brand"</span>, <span class='kw'>attr</span> <span class='kw'>=</span> <span class='st'>"high_end:business"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 12
+#&gt;  $ scores     :'data.frame':	5 obs. of  2 variables:
+#&gt;   ..$ RC1: num [1:5] 1.299 -0.318 -1.187 -0.522 0.728
+#&gt;   ..$ RC2: num [1:5] 0.0937 -0.2089 -0.9343 1.6481 -0.5986
 #&gt;  $ fres       :List of 29
 #&gt;   ..$ values      : num [1:7] 5.36 1.15 3.27e-01 1.59e-01 4.51e-16 ...
 #&gt;   ..$ rotation    : chr "varimax"
 #&gt;   ..$ n.obs       : logi NA
 #&gt;   ..$ communality : Named num [1:7] 0.908 0.965 0.975 0.939 0.986 ...
 #&gt;   .. ..- attr(*, "names")= chr [1:7] "high_end" "stylish" "modern" "value" ...
-#&gt;   ..$ loadings    : 'loadings' num [1:7, 1:2] 0.939 0.98 0.987 -0.928 -0.972 ...
+#&gt;   ..$ loadings    : loadings [1:7, 1:2] 0.939 0.98 0.987 -0.928 -0.972 ...
 #&gt;   .. ..- attr(*, "dimnames")=List of 2
 #&gt;   .. .. ..$ : chr [1:7] "high_end" "stylish" "modern" "value" ...
 #&gt;   .. .. ..$ : chr [1:2] "RC1" "RC2"
@@ -259,7 +262,7 @@
 #&gt;   .. ..- attr(*, "dimnames")=List of 2
 #&gt;   .. .. ..$ : chr [1:5] "SS loadings" "Proportion Var" "Cumulative Var" "Proportion Explained" ...
 #&gt;   .. .. ..$ : chr [1:2] "RC1" "RC2"
-#&gt;   ..$ Structure   : 'loadings' num [1:7, 1:2] 0.939 0.98 0.987 -0.928 -0.972 ...
+#&gt;   ..$ Structure   : loadings [1:7, 1:2] 0.939 0.98 0.987 -0.928 -0.972 ...
 #&gt;   .. ..- attr(*, "dimnames")=List of 2
 #&gt;   .. .. ..$ : chr [1:7] "high_end" "stylish" "modern" "value" ...
 #&gt;   .. .. ..$ : chr [1:2] "RC1" "RC2"
@@ -281,6 +284,7 @@
 #&gt;   ..$ dated     : num [1:5] 3.15 4.29 5.08 4.88 3.27
 #&gt;   ..$ innovative: num [1:5] 4.76 2.56 2.27 2.87 2.97
 #&gt;   ..$ business  : num [1:5] 4.02 4.07 2.93 5.63 3.53
+#&gt;   ..- attr(*, "description")= chr "## Computer positioning\n\n### Description\n\nThe data represent consumer evaluations for a set of computers on"| __truncated__
 #&gt;  $ brand      : chr "brand"
 #&gt;  $ attr       : chr [1:7] "high_end" "stylish" "modern" "value" ...
 #&gt;  $ pref       : chr ""
