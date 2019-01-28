@@ -4,10 +4,13 @@
 \alias{plot.full_factor}
 \title{Plot method for the full_factor function}
 \usage{
-\method{plot}{full_factor}(x, shiny = FALSE, custom = FALSE, ...)
+\method{plot}{full_factor}(x, plots = "attr", shiny = FALSE,
+  custom = FALSE, ...)
 }
 \arguments{
 \item{x}{Return value from \code{\link{full_factor}}}
+
+\item{plots}{Include attribute ("attr"), respondents ("resp") or both in the plot}
 
 \item{shiny}{Did the function call originate inside a shiny app}
 

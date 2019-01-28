@@ -36,6 +36,15 @@ output$ui_ff_store_name <- renderUI({
   textInput("ff_store_name", "Store factor scores:", "", placeholder = "Provide single variable name")
 })
 
+output$ui_ff_plots <- renderUI({
+  plot_list <- c("Respondents" = "resp", "Attributes" = "attr")
+  checkboxGroupInput(
+    "ff_plots", NULL, plot_list,
+    selected = state_group("ff_plots", "attr"),
+    inline = TRUE
+  )
+})
+
 observe({
   ## dep on most inputs
   input$data_filter
@@ -63,6 +72,12 @@ output$ui_full_factor <- renderUI({
       actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
     ),
     conditionalPanel(
+      condition = "input.tabs_full_factor == 'Plot'",
+      wellPanel(
+        uiOutput("ui_ff_plots")
+      )
+    ),
+    conditionalPanel(
       condition = "input.tabs_full_factor == 'Summary'",
       wellPanel(
         uiOutput("ui_ff_vars"),
@@ -74,10 +89,7 @@ output$ui_full_factor <- renderUI({
           tags$td(numericInput("ff_nr_fact", label = "Nr. of factors:", min = 1, value = state_init("ff_nr_fact", 1))),
           tags$td(numericInput("ff_cutoff", label = "Cutt-off:", min = 0, max = 1, value = state_init("ff_cutoff", 0), step = .05, width = "117px"))
         ),
-        conditionalPanel(
-          condition = "input.tabs_full_factor == 'Summary'",
-          checkboxInput("ff_fsort", "Sort factor loadings", value = state_init("ff_fsort", FALSE))
-        ),
+        checkboxInput("ff_fsort", "Sort factor loadings", value = state_init("ff_fsort", FALSE)),
         selectInput(
           "ff_rotation", label = "rotation:", ff_rotation,
           selected = state_single("ff_rotation", ff_rotation, "varimax")
@@ -177,9 +189,7 @@ output$full_factor <- renderUI({
 })
 
 .summary_full_factor <- eventReactive({
-  input$ff_run
-  input$ff_cutoff
-  input$ff_fsort
+  c(input$ff_run, input$ff_cutoff, input$ff_fsort)
 }, {
   if (not_pressed(input$ff_run)) return("** Press the Estimate button to generate factor analysis results **")
   if (.ff_available() != "available") return(.ff_available())
@@ -187,15 +197,20 @@ output$full_factor <- renderUI({
   summary(.full_factor(), cutoff = input$ff_cutoff, fsort = input$ff_fsort)
 })
 
-.plot_full_factor <- reactive({
-  if (not_pressed(input$ff_run)) return("** Press the Estimate button to generate factor analysis results **")
-  isolate({
-    if (.ff_available() != "available") return(.ff_available())
-    if (is_not(input$ff_nr_fact) || input$ff_nr_fact < 2) return("Plot requires 2 or more factors.\nChange the number of factors in the Summary tab and re-estimate")
+.plot_full_factor <- eventReactive({
+  c(input$ff_run, input$ff_plots)
+}, {
+  if (not_pressed(input$ff_run)) {
+    "** Press the Estimate button to generate factor analysis results **"
+  } else if (.ff_available() != "available") {
+    .ff_available()
+  } else if (is_not(input$ff_nr_fact) || input$ff_nr_fact < 2) {
+    "Plot requires 2 or more factors.\nChange the number of factors in the Summary tab and re-estimate"
+  } else {
     withProgress(message = "Generating factor plots", value = 1, {
-      plot(.full_factor(), shiny = TRUE)
+      plot(.full_factor(), plots = input$ff_plots, shiny = TRUE)
     })
-  })
+  }
 })
 
 observeEvent(input$full_factor_report, {

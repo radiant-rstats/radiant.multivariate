@@ -55,7 +55,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
   scores <- data.frame(fres$scores) %>%
     mutate(brands = brands) %>%
     group_by_at("brands") %>%
-    summarize_all(mean) %>%
+    summarise_all(mean) %>%
     as.data.frame() %>%
     set_rownames(.[["brands"]]) %>%
     select(-1)
@@ -112,9 +112,6 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   cat("Observations:", object$nrObs, "\n")
 
   cat("\nBrand - Factor scores:\n")
-  # round(object$fres$scores, dec) %>% print()
-  # rownames(object$scores) <- object$scores[["brands"]]
-  # round(object$scores[, -1, drop = FALSE], dec) %>% print()
   round(object$scores, dec) %>% print()
 
   cat("\nAttribute - Factor loadings:\n")
@@ -194,9 +191,11 @@ plot.prmap <- function(
   ## set seed for ggrepel label positioning
   set.seed(seed)
 
+  ## need for dplyr as.symbol
+  type <- rnames <- NULL
+
   pm_dat <- list()
   ## brand coordinates
-  # pm_dat$brand <- as.data.frame(x$fres$scores) %>%
   pm_dat$brand <- as.data.frame(x$scores) %>%
     set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
     mutate(rnames = rownames(.), type = "brand")

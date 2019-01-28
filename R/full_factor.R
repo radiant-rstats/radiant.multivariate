@@ -157,6 +157,7 @@ summary.full_factor <- function(
 #' @details See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 #'
 #' @param x Return value from \code{\link{full_factor}}
+#' @param plots Include attribute ("attr"), respondents ("resp") or both in the plot
 #' @param shiny Did the function call originate inside a shiny app
 #' @param custom Logical (TRUE, FALSE) to indicate if ggplot object (or list of ggplot objects) should be returned. This option can be used to customize plots (e.g., add a title, change x and y labels, etc.). See examples and \url{http://docs.ggplot2.org} for options.
 #' @param ... further arguments passed to or from other methods
@@ -171,19 +172,19 @@ summary.full_factor <- function(
 #' @importFrom ggrepel geom_text_repel
 #'
 #' @export
-plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
+plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, ...) {
 
   ## when no analysis was conducted (e.g., no variables selected)
   if (is.character(x)) {
     return(plot(x = 1, type = "n", main = x, axes = FALSE, xlab = "", ylab = ""))
-  }
-
-  if (x$fres$factors < 2) {
+  } else if (x$fres$factors < 2) {
     x <- "Plots require two or more factors"
     return(plot(x = 1, type = "n", main = x, axes = FALSE, xlab = "", ylab = ""))
   }
 
   df <- x$floadings
+  scores <- as.data.frame(x$fres$scores)
+  plot_scale <- if ("resp" %in% plots) max(scores) else 1
   rnames <- rownames(df)
   cnames <- colnames(df)
   plot_list <- list()
@@ -192,17 +193,27 @@ plot.full_factor <- function(x, shiny = FALSE, custom = FALSE, ...) {
       i_name <- cnames[i]
       j_name <- cnames[j]
       df2 <- cbind(df[, c(i_name, j_name)], rnames)
-      plot_list[[paste0(i_name, "_", j_name)]] <- ggplot(df2, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
-        geom_point() +
-        ggrepel::geom_text_repel() +
-        geom_segment(
-          aes_string(x = 0, y = 0, xend = i_name, yend = j_name),
-          size = 0.5, linetype = "dashed", alpha = 0.5
-        ) +
+
+      p <- ggplot(df2, aes_string(x = i_name, y = j_name)) +
         theme(legend.position = "none") +
-        coord_cartesian(xlim = c(-1, 1), ylim = c(-1, 1)) +
+        coord_cartesian(xlim = c(-plot_scale, plot_scale), ylim = c(-plot_scale, plot_scale)) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
+
+      if ("resp" %in% plots) {
+        p <- p + geom_point(data = scores, aes_string(x = i_name, y = j_name), alpha = 0.5)
+      }
+
+      if ("attr" %in% plots) {
+        p <- p + geom_point(aes_string(color = "rnames")) +
+          ggrepel::geom_text_repel(aes_string(color = "rnames", label = "rnames")) +
+          geom_segment(
+            aes_string(x = 0, y = 0, xend = i_name, yend = j_name),
+            size = 0.5, linetype = "dashed", alpha = 0.5
+          )
+      }
+
+      plot_list[[paste0(i_name, "_", j_name)]] <- p
     }
   }
 
