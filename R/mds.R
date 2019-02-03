@@ -101,7 +101,7 @@ summary.mds <- function(object, dec = 2, ...) {
 
   cat("(Dis)similarity based brand map (MDS)\n")
   cat("Data        :", object$df_name, "\n")
-  if (object$data_filter %>% gsub("\\s", "", .) != "") {
+  if (!is_empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")

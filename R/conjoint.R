@@ -140,7 +140,7 @@ summary.conjoint <- function(
 
   cat("Conjoint analysis\n")
   cat("Data                 :", object$df_name, "\n")
-  if (object$data_filter %>% gsub("\\s", "", .) != "") {
+  if (!is_empty(object$data_filter)) {
     cat("Filter               :", gsub("\\n", "", object$data_filter), "\n")
   }
   if (object$by != "none") {
@@ -294,13 +294,13 @@ predict.conjoint <- function(
   if (is_empty(object$by, "none")) {
     object$model <- object$model_list[["full"]]$model
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec) %>%
-      set_attr("interval", interval) %>%
-      set_attr("pred_data", df_name)
+      set_attr("radiant_interval", interval) %>%
+      set_attr("radiant_pred_data", df_name)
 
   } else {
     predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec) %>%
-      set_attr("interval", interval) %>%
-      set_attr("pred_data", df_name)
+      set_attr("radiant_interval", interval) %>%
+      set_attr("radiant_pred_data", df_name)
   }
 }
 
@@ -333,7 +333,7 @@ predict_conjoint_by <- function(
   if (is.character(object)) return(object)
   ## ensure you have a name for the prediction dataset
   if (is.data.frame(pred_data)) {
-    attr(pred_data, "pred_data") <- deparse(substitute(pred_data))
+    attr(pred_data, "radiant_pred_data") <- deparse(substitute(pred_data))
   }
 
   pred <- list()
