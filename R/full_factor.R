@@ -208,7 +208,7 @@ plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, .
         p <- p + geom_point(aes_string(color = "rnames")) +
           ggrepel::geom_text_repel(aes_string(color = "rnames", label = "rnames")) +
           geom_segment(
-            aes_string(x = 0, y = 0, xend = i_name, yend = j_name),
+            aes_string(x = 0, y = 0, xend = i_name, yend = j_name, color = "rnames"),
             size = 0.5, linetype = "dashed", alpha = 0.5
           )
       }

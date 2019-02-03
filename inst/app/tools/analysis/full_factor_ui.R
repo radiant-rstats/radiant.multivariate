@@ -75,6 +75,14 @@ output$ui_full_factor <- renderUI({
       condition = "input.tabs_full_factor == 'Plot'",
       wellPanel(
         uiOutput("ui_ff_plots")
+        # conditionalPanel(
+        #   condition = "input.tabs_full_factor == 'Plot'",
+        #   tags$table(
+        #     tags$td(numericInput("ff_scaling", "Respondent scale:", state_init("ff_scaling", 0.5), .5, 4, .1, width = "117px")),
+        #     tags$td(numericInput("ff_fontsz", "Font size:", state_init("ff_fontsz", 5), 1, 20, 1, width = "117px")),
+        #     width = "100%"
+        #   )
+        # )
       )
     ),
     conditionalPanel(

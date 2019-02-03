@@ -130,7 +130,7 @@ output$ui_prmap <- renderUI({
         condition = "input.tabs_prmap == 'Plot'",
         uiOutput("ui_pm_plots"),
         tags$table(
-          tags$td(numericInput("pm_scaling", "Arrow scale:", state_init("pm_scaling", 2), .5, 4, .1, width = "117px")),
+          tags$td(numericInput("pm_scaling", "Attribute scale:", state_init("pm_scaling", 2), .5, 4, .1, width = "117px")),
           tags$td(numericInput("pm_fontsz", "Font size:", state_init("pm_fontsz", 5), 1, 20, 1, width = "117px")),
           width = "100%"
         )
