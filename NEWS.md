@@ -1,4 +1,4 @@
-# radiant.multivariate 0.9.8.2
+# radiant.multivariate 0.9.8.3
 
 * Fixes to accommodate breaking changes in dplyr 0.8.0
 
