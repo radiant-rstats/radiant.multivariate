@@ -1,5 +1,6 @@
-# radiant.multivariate 0.9.8.3
+# radiant.multivariate 0.9.9.0
 
+* Create bi-plots in _Multivariate > Factor_
 * Fixes to accommodate breaking changes in dplyr 0.8.0
 
 # radiant.multivariate 0.9.8.0
