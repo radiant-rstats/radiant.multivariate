@@ -63,7 +63,7 @@ output$ui_pm_pref <- renderUI({
 
 output$ui_pm_plots <- renderUI({
   plot_list <- c("Brands" = "brand", "Attributes" = "attr")
-  if (!is.null(input$pm_pref)) plot_list <- c(plot_list, c("Preferences" = "pref"))
+  if (!is_empty(input$pm_pref)) plot_list <- c(plot_list, c("Preferences" = "pref"))
   checkboxGroupInput(
     "pm_plots", NULL, plot_list,
     selected = state_group("pm_plots"),

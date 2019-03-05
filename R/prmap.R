@@ -104,7 +104,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Attributes  :", paste0(object$attr, collapse = ", "), "\n")
-  if (!is.null(object$pref) && object$pref != "") {
+  if (!is_empty(object$pref)) {
     cat("Preferences :", paste0(object$pref, collapse = ", "), "\n")
   }
   cat("Dimensions:", object$nr_dim, "\n")
@@ -130,7 +130,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   print_lds[ind] <- ""
   print(print_lds)
 
-  if (!is.null(object$pref) && object$pref != "") {
+  if (!is_empty(object$pref)) {
     cat("\nPreference correlations:\n")
     print(round(object$pref_cor, dec), digits = dec)
   }
@@ -201,7 +201,7 @@ plot.prmap <- function(
     mutate(rnames = rownames(.), type = "brand")
 
   ## preference coordinates
-  if (!is.null(x$pref_cor)) {
+  if (!is_empty(x$pref_cor)) {
     pm_dat$pref <- x$pref_cor %>%
       select(-ncol(.)) %>%
       set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
