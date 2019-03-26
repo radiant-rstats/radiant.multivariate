@@ -83,26 +83,28 @@ conjoint <- function(
     cn <- gsub("\\|", "_", model_list[[1]]$coeff$label) %>%
       gsub("[^A-z0-9_\\.]", "", .)
 
-    PW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1) %>%
+    PW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 2) %>%
       as.data.frame(stringsAsFactors = FALSE) %>%
-      set_colnames(c(by, cn))
+      set_colnames(c(by, ".Rsq", cn))
     PW[[by]] <- bylevs
 
     for (i in seq_along(bylevs)) {
-      PW[i, 2:ncol(PW)] <- model_list[[bylevs[i]]]$coeff$coefficient
+      PW[i, 2] <- glance(model_list[[bylevs[i]]]$model)$r.squared
+      PW[i, 3:ncol(PW)] <- model_list[[bylevs[i]]]$coeff$coefficient
     }
 
     ## creating IW data.frame
     cn <- model_list[[1]]$tab$IW$Attribute %>%
       gsub("[^A-z0-9_\\.]", "", .)
 
-    IW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 1) %>%
+    IW <- matrix(NA, nrow = length(bylevs), ncol = length(cn) + 2) %>%
       as.data.frame(stringsAsFactors = FALSE) %>%
-      set_colnames(c(by, cn))
+      set_colnames(c(by, ".Rsq", cn))
     IW[[by]] <- bylevs
 
     for (i in seq_along(bylevs)) {
-      IW[i, 2:ncol(IW)] <- model_list[[bylevs[i]]]$tab$IW$IW
+      IW[i, 2] <- glance(model_list[[bylevs[i]]]$model)$r.squared
+      IW[i, 3:ncol(IW)] <- model_list[[bylevs[i]]]$tab$IW$IW
     }
     rm(cn)
   }
