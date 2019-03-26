@@ -8,6 +8,7 @@
 #' @param distance Distance
 #' @param method Method
 #' @param max_cases Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface
+#' @param standardize Standardized data (TRUE or FALSE)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
 #' @return A list of all variables used in hclus as an object of class hclus
@@ -22,7 +23,7 @@
 hclus <- function(
   dataset, vars, labels = "none", distance = "sq.euclidian",
   method = "ward.D", max_cases = 5000,
-  data_filter = ""
+  standardize = TRUE, data_filter = ""
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
@@ -48,7 +49,7 @@ hclus <- function(
   }
 
   hc_out <- dataset %>%
-    scale() %>%
+    {if (standardize) scale(.) else .} %>%
     {if (distance == "sq.euclidian") dist(., method = "euclidean") ^ 2 else dist(., method = distance)} %>%
     hclust(d = ., method = method)
 
@@ -81,6 +82,7 @@ summary.hclus <- function(object, ...) {
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
   cat("Method      :", object$method, "\n")
   cat("Distance    :", object$distance, "\n")
+  cat("Standardize :", object$standardize, "\n")
   cat("Observations:", format_nr(length(object$hc_out$order), dec = 0), "\n")
 }
 

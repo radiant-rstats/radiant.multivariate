@@ -6,7 +6,7 @@
 \usage{
 kclus(dataset, vars, fun = "mean", hc_init = TRUE,
   distance = "sq.euclidian", method = "ward.D", seed = 1234,
-  nr_clus = 2, data_filter = "")
+  nr_clus = 2, standardize = TRUE, data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -24,6 +24,8 @@ kclus(dataset, vars, fun = "mean", hc_init = TRUE,
 \item{seed}{Random see to use for k-clustering if hc_init is FALSE}
 
 \item{nr_clus}{Number of clusters to extract}
+
+\item{standardize}{Standardize data (TRUE or FALSE)}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 }

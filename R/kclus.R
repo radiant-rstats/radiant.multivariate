@@ -10,6 +10,7 @@
 #' @param method Method for hclus
 #' @param seed Random see to use for k-clustering if hc_init is FALSE
 #' @param nr_clus Number of clusters to extract
+#' @param standardize Standardize data (TRUE or FALSE)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #'
 #' @return A list of all variables used in kclus as an object of class kclus
@@ -27,7 +28,8 @@
 kclus <- function(
   dataset, vars, fun = "mean", hc_init = TRUE,
   distance = "sq.euclidian", method = "ward.D",
-  seed = 1234, nr_clus = 2, data_filter = ""
+  seed = 1234, nr_clus = 2, standardize = TRUE,
+  data_filter = ""
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
@@ -46,14 +48,17 @@ kclus <- function(
   dataset <- mutate_if(dataset, is.factor, convert)
 
   if (hc_init) {
-    init <- hclus(dataset, vars, distance = distance, method = method, max_cases = Inf)
+    init <- hclus(
+      dataset, vars, distance = distance, method = method,
+      max_cases = Inf, standardize = standardize
+    )
 
     clus_var <- cutree(init$hc_out, k = nr_clus)
     hc_cent <- c()
     km_out <- dataset %>%
       mutate(clus_var = clus_var) %>%
-      mutate_all(~ as.vector(scale(.))) %T>% {
-        hc_cent <<-
+      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %T>%
+      { hc_cent <<-
           group_by(., clus_var) %>%
           summarise_all(mean) %>%
           select(-clus_var) %>%
@@ -74,7 +79,7 @@ kclus <- function(
       if (!is_empty(.)) set.seed(seed)
     }
     km_out <- dataset %>%
-      mutate_all(~ as.vector(scale(.))) %>%
+      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %>%
       {
         if (fun == "median") {
           km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
@@ -87,7 +92,7 @@ kclus <- function(
 
   ## same calculations of SST etc. as for kmeans (verified)
   if (fun == "median") {
-    sdat <- mutate_all(dataset, ~ as.vector(scale(.)))
+    sdat <- dataset %>% {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .}
     km_out$withinss <-
       mutate(sdat, clus_var = km_out$cluster) %>%
       group_by(clus_var) %>%
@@ -146,6 +151,7 @@ summary.kclus <- function(object, dec = 2, ...) {
     cat("HC method    :", object$method, "\n")
     cat("HC distance  :", object$distance, "\n")
   }
+  cat("Standardize  :", object$standardize, "\n")
   cat("Observations :", format_nr(object$nr_obs, dec = 0), "\n")
   cat("Generated    :", object$nr_clus, "clusters of sizes", paste0(format_nr(object$km_out$size, dec = 0), collapse = " | "), "\n\n")
 
@@ -165,7 +171,7 @@ summary.kclus <- function(object, dec = 2, ...) {
 
   ## percentage of between cluster heterogeneity versus the total, higher is better
   format_nr(object$km_out$betweenss / object$km_out$totss, perc = TRUE, dec = dec) %>%
-    paste0("\nBetween cluster heterogeneity accounts for ", ., " of the\ntotal heterogeneity in the data (higher is better).") %>%
+    paste0("\nBetween cluster heterogeneity accounts for ", ., " of the\ntotal heterogeneity in the data (higher is better)") %>%
     cat()
 }
 

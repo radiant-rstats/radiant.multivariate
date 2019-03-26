@@ -108,7 +108,8 @@ output$ui_hclus <- renderUI({
             value = state_init("hc_max_cases", 5000)
           ), width = "50%")
         ), width = "100%"
-      ))
+      )),
+      checkboxInput("hc_standardize", "Standardize", state_init("hc_standardize", TRUE))
     ),
     help_and_report(
       modal_title = "Hierarchical cluster analysis",

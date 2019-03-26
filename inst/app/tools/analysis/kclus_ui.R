@@ -82,6 +82,7 @@ output$ui_kclus <- renderUI({
           selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE
         ),
         uiOutput("ui_km_vars"),
+        checkboxInput("km_standardize", "Standardize", state_init("km_standardize", TRUE)),
         checkboxInput(
           inputId = "km_hc_init", label = "Initial centers from HC",
           value = state_init("km_hc_init", FALSE)
@@ -216,7 +217,7 @@ output$kclus <- renderUI({
 
 observeEvent(input$kclus_report, {
   inp_out <- list(list(dec = 2), "")
-  if (!is_empty(input$km_plots)) {
+  if (!is_empty(input$km_plots, "none")) {
     figs <- TRUE
     outputs <- c("summary", "plot")
     inp_out[[2]] <- list(plots = input$km_plots, custom = FALSE)

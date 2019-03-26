@@ -5,7 +5,8 @@
 \title{Hierarchical cluster analysis}
 \usage{
 hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
-  method = "ward.D", max_cases = 5000, data_filter = "")
+  method = "ward.D", max_cases = 5000, standardize = TRUE,
+  data_filter = "")
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -19,6 +20,8 @@ hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
 \item{method}{Method}
 
 \item{max_cases}{Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface}
+
+\item{standardize}{Standardized data (TRUE or FALSE)}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 }
