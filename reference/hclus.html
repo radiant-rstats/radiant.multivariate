@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.9.1</span>
       </span>
     </div>
 
@@ -165,7 +165,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>hclus</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='st'>"none"</span>, <span class='kw'>distance</span> <span class='kw'>=</span> <span class='st'>"sq.euclidian"</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"ward.D"</span>, <span class='kw'>max_cases</span> <span class='kw'>=</span> <span class='fl'>5000</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"ward.D"</span>, <span class='kw'>max_cases</span> <span class='kw'>=</span> <span class='fl'>5000</span>, <span class='kw'>standardize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -195,6 +196,10 @@
       <td><p>Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface</p></td>
     </tr>
     <tr>
+      <th>standardize</th>
+      <td><p>Standardized data (TRUE or FALSE)</p></td>
+    </tr>
+    <tr>
       <th>data_filter</th>
       <td><p>Expression entered in, e.g., Data &gt; View to filter the dataset in Radiant. The expression should be a string (e.g., "price &gt; 10000")</p></td>
     </tr>
@@ -215,7 +220,7 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>hclus</span>(<span class='no'>shopping</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 9
+    <pre class="examples"><div class='input'><span class='fu'>hclus</span>(<span class='no'>shopping</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 10
 #&gt;  $ hc_out     :List of 7
 #&gt;   ..$ merge      : int [1:19, 1:2] -10 -6 -3 -4 -5 -2 -12 -9 -1 1 ...
 #&gt;   ..$ height     : num [1:19] 0.693 0.78 1.196 1.203 1.203 ...
@@ -239,6 +244,7 @@
 #&gt;  $ distance   : chr "sq.euclidian"
 #&gt;  $ method     : chr "ward.D"
 #&gt;  $ max_cases  : num 5000
+#&gt;  $ standardize: logi TRUE
 #&gt;  $ data_filter: chr ""
 #&gt;  - attr(*, "class")= chr [1:2] "hclus" "list"</div><div class='input'>
 </div></pre>
