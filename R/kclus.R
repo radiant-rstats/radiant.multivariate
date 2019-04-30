@@ -17,7 +17,6 @@
 #'
 #' @examples
 #' kclus(shopping, c("v1:v6"), nr_clus = 3) %>% str()
-#'
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{plot.kclus}} to plot results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
@@ -25,19 +24,14 @@
 #' @importFrom Gmedian Gmedian kGmedian
 #'
 #' @export
-kclus <- function(
-  dataset, vars, fun = "mean", hc_init = TRUE,
-  distance = "sq.euclidian", method = "ward.D",
-  seed = 1234, nr_clus = 2, standardize = TRUE,
-  data_filter = ""
-) {
-
+kclus <- function(dataset, vars, fun = "mean", hc_init = TRUE, distance = "sq.euclidian", method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, data_filter = "") {
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter)
 
   ## in case : is used
-  if (length(vars) < ncol(dataset))
+  if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
 
   if (fun == "median" && length(vars) < 2) {
     stop("K-medians requires at least two variables as input")
@@ -49,7 +43,8 @@ kclus <- function(
 
   if (hc_init) {
     init <- hclus(
-      dataset, vars, distance = distance, method = method,
+      dataset, vars,
+      distance = distance, method = method,
       max_cases = Inf, standardize = standardize
     )
 
@@ -57,8 +52,8 @@ kclus <- function(
     hc_cent <- c()
     km_out <- dataset %>%
       mutate(clus_var = clus_var) %>%
-      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %T>%
-      { hc_cent <<-
+      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %T>% {
+        hc_cent <<-
           group_by(., clus_var) %>%
           summarise_all(mean) %>%
           select(-clus_var) %>%
@@ -78,30 +73,32 @@ kclus <- function(
     seed %>% gsub("[^0-9]", "", .) %>% {
       if (!is_empty(.)) set.seed(seed)
     }
-    km_out <- dataset %>%
-      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %>%
-      {
-        if (fun == "median") {
-          km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
-          Gmedian::kGmedian(., ncenters = km_cent)
-        } else {
-          kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
-        }
+    km_out <- dataset %>% {
+      if (standardize) mutate_all(., ~ as.vector(scale(.))) else .
+    } %>% {
+      if (fun == "median") {
+        km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
+        Gmedian::kGmedian(., ncenters = km_cent)
+      } else {
+        kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
       }
+    }
   }
 
   ## same calculations of SST etc. as for kmeans (verified)
   if (fun == "median") {
-    sdat <- dataset %>% {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .}
+    sdat <- dataset %>% {
+      if (standardize) mutate_all(., ~ as.vector(scale(.))) else .
+    }
     km_out$withinss <-
       mutate(sdat, clus_var = km_out$cluster) %>%
       group_by(clus_var) %>%
-      summarise_all(~ sum((. - mean(.)) ^ 2)) %>%
+      summarise_all(~ sum((. - mean(.))^2)) %>%
       select(-clus_var) %>%
       rowSums()
     km_out$tot.withinss <- sum(km_out$withinss)
     km_out$totss <-
-      summarise_all(sdat, ~ sum((. - mean(.)) ^ 2)) %>%
+      summarise_all(sdat, ~ sum((. - mean(.))^2)) %>%
       sum(.)
     km_out$betweenss <- km_out$totss - km_out$tot.withinss
     rm(sdat)
@@ -133,7 +130,6 @@ kclus <- function(
 #' @examples
 #' result <- kclus(shopping, vars = "v1:v6", nr_clus = 3)
 #' summary(result)
-#'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{plot.kclus}} to plot results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
@@ -188,17 +184,14 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @examples
 #' result <- kclus(shopping, vars = "v1:v6", nr_clus = 3)
 #' plot(result)
-#'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
 #' @export
 plot.kclus <- function(
-  x, plots = "density", shiny = FALSE,
-  custom = FALSE, ...
-) {
-
+                       x, plots = "density", shiny = FALSE,
+                       custom = FALSE, ...) {
   x$dataset$Cluster <- as.factor(x$km_out$cluster)
   vars <- colnames(x$dataset) %>% .[-length(.)]
 
@@ -227,7 +220,7 @@ plot.kclus <- function(
         group_by_at(.vars = "Cluster") %>%
         summarise_all(
           list(
-            cent = ~ fun,
+            cent = ~fun,
             n = length,
             sd = sd,
             se = se,
@@ -248,7 +241,8 @@ plot.kclus <- function(
     for (var in vars) {
       plot_list[[paste0("scatter_", var)]] <-
         visualize(
-          x$dataset, xvar = "Cluster", yvar = var,
+          x$dataset,
+          xvar = "Cluster", yvar = var,
           check = "jitter",
           type = "scatter",
           linecol = "blue",
@@ -284,7 +278,6 @@ plot.kclus <- function(
 #' kclus(shopping, vars = "v1:v6", nr_clus = 3) %>%
 #'   store(shopping, .) %>%
 #'   head()
-#'
 #' @seealso \code{\link{kclus}} to generate results
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{plot.kclus}} to plot results

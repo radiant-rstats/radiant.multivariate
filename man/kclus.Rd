@@ -40,7 +40,6 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an e
 }
 \examples{
 kclus(shopping, c("v1:v6"), nr_clus = 3) \%>\% str()
-
 }
 \seealso{
 \code{\link{summary.kclus}} to summarize results

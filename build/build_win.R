@@ -9,7 +9,7 @@ if (grepl("[nN]", rvprompt))
 ## build for windows
 app <- basename(getwd())
 path <- "../"
-devtools::install(file.path(path, app))
+devtools::install(file.path(path, app), upgrade = "never")
 f <- devtools::build(file.path(path, app))
 curr <- getwd(); setwd(path)
 system(paste0("R CMD INSTALL --build ", f))

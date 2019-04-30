@@ -25,7 +25,6 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/kclus.html} for an e
 kclus(shopping, vars = "v1:v6", nr_clus = 3) \%>\%
   store(shopping, .) \%>\%
   head()
-
 }
 \seealso{
 \code{\link{kclus}} to generate results
