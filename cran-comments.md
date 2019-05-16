@@ -2,14 +2,14 @@
 
 This is a resubmission. In this version I have tried to address an issue with building a vignette in the radiant package, brought to my attention by an email from Prof Ripley (see below). I was able to trace the problem to a function in radiant.multivariate that was affected by the recent release of dplyr 0.8.1.
 
-The fix in this package (radiant.multivariate) should address the issue seen building the vignette in the radiant packages
+Once on CRAN, the fix in this package (radiant.multivariate) should address the issue seen building the vignette in the radiant package
 
 ## Test environments
 
 * local OS X install, R 3.6.0
 * local Windows install, R 3.6.0
-* ubuntu "trusty" (on travis-ci), R release and devel
-* win-builder
+* ubuntu "trusty" (on travis-ci), R old, release, and devel
+* win-builder (release and devel)
 
 ## R CMD check results
 
