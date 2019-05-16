@@ -1,5 +1,6 @@
 # radiant.multivariate 0.9.9.1
 
+* Fix for kmeans bar-plot after dplyr 0.8.1 release
 * Add information on R-squared when storing PW and IW tables for conjoint analysis with individual level data
 * Added option to (not) standardize data for K-clustering or Hierarchical clustering. 
 
