@@ -1,5 +1,45 @@
 ## Resubmission
 
+This is a resubmission. In this version I have tried to address an issue with building a vignette in the radiant package, brought to my attention by an email from Prof Ripley (see below). I was able to trace the problem to a function in radiant.multivariate that was affected by the recent release of dplyr 0.8.1.
+
+The fix in this package (radiant.multivariate) should address the issue seen building the vignette in the radiant packages
+
+## Test environments
+
+* local OS X install, R 3.6.0
+* local Windows install, R 3.6.0
+* ubuntu "trusty" (on travis-ci), R release and devel
+* win-builder
+
+## R CMD check results
+
+There were no ERRORs, WARNINGs, or NOTEs. 
+
+
+Date: Wed, May 15, 2019 at 12:43 AM
+Subject: CRAN package radiant
+To: Vincent Nijs <radiant@rady.ucsd.edu>
+Cc: CRAN <CRAN@r-project.org>
+
+
+See https://cran.r-project.org/web/checks/check_results_radiant.html .
+
+This is using a ridiculous amount of RAM for its vignettes: on a larger 
+machine I saw a peak allocation of 313Gb, 260 of which was in memory.
+
+Please correct ASAP (using a maximum of 5GB) and before May 22 to safely 
+retain the package on CRAN.  Meanwhile we will exclude checking the 
+vignettes.
+
+-- 
+Brian D. Ripley,                  ripley@stats.ox.ac.uk
+Emeritus Professor of Applied Statistics, University of Oxford
+
+
+## R CMD check results
+
+## Resubmission
+
 This is a resubmission. In this version I have fixed several bugs and added several new features (see NEWS.md for details).
 
 ## Test environments

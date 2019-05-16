@@ -17,7 +17,7 @@ globalVariables(c(
 #' @importFrom import from
 #' @importFrom grDevices rainbow
 #' @importFrom graphics abline arrows par plot points text title
-#' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd as.formula predict
+#' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd as.formula predict median
 #' @importFrom utils head
 NULL
 

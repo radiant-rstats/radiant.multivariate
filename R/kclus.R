@@ -189,16 +189,13 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
 #' @export
-plot.kclus <- function(
-                       x, plots = "density", shiny = FALSE,
-                       custom = FALSE, ...) {
+plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...) {
   x$dataset$Cluster <- as.factor(x$km_out$cluster)
   vars <- colnames(x$dataset) %>% .[-length(.)]
 
   ## what to report?
-  # fun <- if (x$fun == "mean") mean else median
-  fun <- mean
   x$fun <- "mean"
+  fun <- if (x$fun == "mean") mean else median
 
   plot_list <- list()
 
@@ -211,8 +208,9 @@ plot.kclus <- function(
     }
   }
   if ("bar" %in% plots) {
-    me_calc <- function(se, n, conf.lev = .95)
+    me_calc <- function(se, n, conf.lev = .95) {
       se * qt(conf.lev / 2 + .5, n - 1)
+    }
 
     for (var in vars) {
       dat_summary <-
@@ -220,7 +218,7 @@ plot.kclus <- function(
         group_by_at(.vars = "Cluster") %>%
         summarise_all(
           list(
-            cent = ~fun,
+            cent = fun,
             n = length,
             sd = sd,
             se = se,
