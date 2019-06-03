@@ -254,7 +254,7 @@ store.full_factor <- function(dataset, object, name = "", ...) {
   indr <- indexr(dataset, object$vars, object$data_filter)
   fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)), stringsAsFactors = FALSE)
   fs[indr$ind, ] <- fscores
-  dataset[, paste0(name, 1:ncol(fscores))] <- fs
+  dataset[, sub("^[a-zA-Z]+([0-9]+)$", paste0(name, "\\1"), colnames(fscores))] <- fs
   dataset
 }
 

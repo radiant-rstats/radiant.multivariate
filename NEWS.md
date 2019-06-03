@@ -1,5 +1,6 @@
-# radiant.multivariate 0.9.9.1
+# radiant.multivariate 0.9.9.2
 
+* Label numbers for stored factor scores from factor analysis will now always correspond to the numbers used in the summary output
 * Fix for kmeans bar-plot after dplyr 0.8.1 release
 * Add information on R-squared when storing PW and IW tables for conjoint analysis with individual level data
 * Added option to (not) standardize data for K-clustering or Hierarchical clustering. 
