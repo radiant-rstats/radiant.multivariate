@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Authors • radiant.multivariate</title>
+<title>Hierarchical cluster analysis — hclus • radiant.multivariate</title>
 
 
 <!-- jquery -->
@@ -27,19 +27,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 <!-- docsearch -->
-<script src="docsearch.js"></script>
+<script src="../docsearch.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
-<link href="docsearch.css" rel="stylesheet">
+<link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
 
-<meta property="og:title" content="Authors" />
+<meta property="og:title" content="Hierarchical cluster analysis — hclus" />
+<meta property="og:description" content="Hierarchical cluster analysis" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -57,7 +59,7 @@
   </head>
 
   <body>
-    <div class="container template-authors">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -69,7 +71,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">radiant.multivariate</a>
+        <a class="navbar-link" href="../index.html">radiant.multivariate</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.9.2</span>
       </span>
     </div>
@@ -77,19 +79,19 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="articles/index.html">Articles</a>
+  <a href="../articles/index.html">Articles</a>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -151,22 +153,111 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Authors</h1>
+    <h1>Hierarchical cluster analysis</h1>
+    <small class="dont-index">Source: <a href='https://github.com/radiant-rstats/radiant.multivariate/blob/master/R/hclus.R'><code>R/hclus.R</code></a></small>
+    <div class="hidden name"><code>hclus.Rd</code></div>
     </div>
 
-    <ul class="list-unstyled">
-      <li>
-        <p><strong>Vincent Nijs</strong>. Author, maintainer. 
-        </p>
-      </li>
+    <div class="ref-description">
+    <p>Hierarchical cluster analysis</p>
+    </div>
+
+    <pre class="usage"><span class='fu'>hclus</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='st'>"none"</span>, <span class='kw'>distance</span> <span class='kw'>=</span> <span class='st'>"sq.euclidian"</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"ward.D"</span>, <span class='kw'>max_cases</span> <span class='kw'>=</span> <span class='fl'>5000</span>, <span class='kw'>standardize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>dataset</th>
+      <td><p>Dataset</p></td>
+    </tr>
+    <tr>
+      <th>vars</th>
+      <td><p>Vector of variables to include in the analysis</p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>A vector of labels for the leaves of the tree</p></td>
+    </tr>
+    <tr>
+      <th>distance</th>
+      <td><p>Distance</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>Method</p></td>
+    </tr>
+    <tr>
+      <th>max_cases</th>
+      <td><p>Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface</p></td>
+    </tr>
+    <tr>
+      <th>standardize</th>
+      <td><p>Standardized data (TRUE or FALSE)</p></td>
+    </tr>
+    <tr>
+      <th>data_filter</th>
+      <td><p>Expression entered in, e.g., Data &gt; View to filter the dataset in Radiant. The expression should be a string (e.g., "price &gt; 10000")</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list of all variables used in hclus as an object of class hclus</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>See <a href='https://radiant-rstats.github.io/docs/multivariate/hclus.html'>https://radiant-rstats.github.io/docs/multivariate/hclus.html</a> for an example in Radiant</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>summary.hclus</code> to summarize results</p>
+<p><code>plot.hclus</code> to plot results</p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>hclus</span>(<span class='no'>shopping</span>, <span class='kw'>vars</span> <span class='kw'>=</span> <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 10
+#&gt;  $ hc_out     :List of 7
+#&gt;   ..$ merge      : int [1:19, 1:2] -10 -6 -3 -4 -5 -2 -12 -9 -1 1 ...
+#&gt;   ..$ height     : num [1:19] 0.693 0.78 1.196 1.203 1.203 ...
+#&gt;   ..$ order      : int [1:20] 3 8 15 17 1 12 6 7 2 13 ...
+#&gt;   ..$ labels     : NULL
+#&gt;   ..$ method     : chr "ward.D"
+#&gt;   ..$ call       : language hclust(d = ., method = method)
+#&gt;   ..$ dist.method: chr "euclidean"
+#&gt;   ..- attr(*, "class")= chr "hclust"
+#&gt;  $ df_name    : chr "shopping"
+#&gt;  $ dataset    :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	20 obs. of  6 variables:
+#&gt;   ..$ v1: int [1:20] 6 2 7 4 1 6 5 7 2 3 ...
+#&gt;   ..$ v2: int [1:20] 4 3 2 6 3 4 3 3 4 5 ...
+#&gt;   ..$ v3: int [1:20] 7 1 6 4 2 6 6 7 3 3 ...
+#&gt;   ..$ v4: int [1:20] 3 4 4 5 2 3 3 4 3 6 ...
+#&gt;   ..$ v5: int [1:20] 2 5 1 3 6 3 3 1 6 4 ...
+#&gt;   ..$ v6: int [1:20] 3 4 3 6 4 4 4 4 3 6 ...
+#&gt;   ..- attr(*, "description")= chr "## Shopping attitudes\n\n### Description\n\n20 consumers were asked to respond to six questions to determine th"| __truncated__
+#&gt;  $ vars       : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ labels     : chr "none"
+#&gt;  $ distance   : chr "sq.euclidian"
+#&gt;  $ method     : chr "ward.D"
+#&gt;  $ max_cases  : num 5000
+#&gt;  $ standardize: logi TRUE
+#&gt;  $ data_filter: chr ""
+#&gt;  - attr(*, "class")= chr [1:2] "hclus" "list"</div><div class='input'>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
-
 </div>
-
 
       <footer>
       <div class="copyright">

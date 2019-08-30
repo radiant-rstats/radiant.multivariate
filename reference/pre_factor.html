@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Authors • radiant.multivariate</title>
+<title>Evaluate if data are appropriate for PCA / Factor analysis — pre_factor • radiant.multivariate</title>
 
 
 <!-- jquery -->
@@ -27,19 +27,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../pkgdown.js"></script>
 
 
 <!-- docsearch -->
-<script src="docsearch.js"></script>
+<script src="../docsearch.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
-<link href="docsearch.css" rel="stylesheet">
+<link href="../docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
 
-<meta property="og:title" content="Authors" />
+<meta property="og:title" content="Evaluate if data are appropriate for PCA / Factor analysis — pre_factor" />
+<meta property="og:description" content="Evaluate if data are appropriate for PCA / Factor analysis" />
+<meta name="twitter:card" content="summary" />
 
 
 
@@ -57,7 +59,7 @@
   </head>
 
   <body>
-    <div class="container template-authors">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -69,7 +71,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">radiant.multivariate</a>
+        <a class="navbar-link" href="../index.html">radiant.multivariate</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.9.2</span>
       </span>
     </div>
@@ -77,19 +79,19 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">
+  <a href="../index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="articles/index.html">Articles</a>
+  <a href="../articles/index.html">Articles</a>
 </li>
 <li>
-  <a href="news/index.html">Changelog</a>
+  <a href="../news/index.html">Changelog</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -151,22 +153,94 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Authors</h1>
+    <h1>Evaluate if data are appropriate for PCA / Factor analysis</h1>
+    <small class="dont-index">Source: <a href='https://github.com/radiant-rstats/radiant.multivariate/blob/master/R/pre_factor.R'><code>R/pre_factor.R</code></a></small>
+    <div class="hidden name"><code>pre_factor.Rd</code></div>
     </div>
 
-    <ul class="list-unstyled">
-      <li>
-        <p><strong>Vincent Nijs</strong>. Author, maintainer. 
-        </p>
-      </li>
+    <div class="ref-description">
+    <p>Evaluate if data are appropriate for PCA / Factor analysis</p>
+    </div>
+
+    <pre class="usage"><span class='fu'>pre_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>)</pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>dataset</th>
+      <td><p>Dataset</p></td>
+    </tr>
+    <tr>
+      <th>vars</th>
+      <td><p>Variables to include in the analysis</p></td>
+    </tr>
+    <tr>
+      <th>data_filter</th>
+      <td><p>Expression entered in, e.g., Data &gt; View to filter the dataset in Radiant. The expression should be a string (e.g., "price &gt; 10000")</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A list with all variables defined in the function as an object of class pre_factor</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>See <a href='https://radiant-rstats.github.io/docs/multivariate/pre_factor.html'>https://radiant-rstats.github.io/docs/multivariate/pre_factor.html</a> for an example in Radiant</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>summary.pre_factor</code> to summarize results</p>
+<p><code>plot.pre_factor</code> to plot results</p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>pre_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>()</div><div class='output co'>#&gt; List of 10
+#&gt;  $ pre_r2     :'data.frame':	6 obs. of  1 variable:
+#&gt;   ..$ Rsq: num [1:6] 0.89 0.38 0.794 0.585 0.808 ...
+#&gt;  $ scmat      : num [1:6, 1:6] 9.1 -0.24 -4.56 -1.73 5.14 ...
+#&gt;   ..- attr(*, "dimnames")=List of 2
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ pre_eigen  : num [1:6] 2.664 2.15 0.473 0.433 0.217 ...
+#&gt;  $ pre_kmo    :List of 5
+#&gt;   ..$ MSA  : num 0.554
+#&gt;   ..$ MSAi : Named num [1:6] 0.516 0.783 0.586 0.482 0.637 ...
+#&gt;   .. ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   ..$ Image: num [1:6, 1:6] 1 -0.0626 -0.6846 -0.3692 0.7464 ...
+#&gt;   .. ..- attr(*, "dimnames")=List of 2
+#&gt;   .. .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   .. .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   ..$ ImCov: num [1:6, 1:6] 0.1099 -0.0163 -0.1029 -0.0788 0.1083 ...
+#&gt;   ..$ Call : language psych::KMO(r = cmat)
+#&gt;   ..- attr(*, "class")= chr [1:2] "psych" "KMO"
+#&gt;  $ btest      :List of 3
+#&gt;   ..$ chisq  : num 66.7
+#&gt;   ..$ p.value: num 1.71e-08
+#&gt;   ..$ df     : num 15
+#&gt;  $ cmat       : num [1:6, 1:6] 1 0.0255 0.8378 -0.104 -0.8754 ...
+#&gt;   ..- attr(*, "dimnames")=List of 2
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ nrObs      : int 20
+#&gt;  $ df_name    : chr "shopping"
+#&gt;  $ vars       : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ data_filter: chr ""
+#&gt;  - attr(*, "class")= chr [1:2] "pre_factor" "list"</div><div class='input'>
+</div></pre>
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
+      <li><a href="#details">Details</a></li>
+      <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
-
 </div>
-
 
       <footer>
       <div class="copyright">
