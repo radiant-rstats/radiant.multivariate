@@ -18,13 +18,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -54,6 +56,7 @@
 <![endif]-->
 
 
+
   </head>
 
   <body>
@@ -70,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -137,7 +140,7 @@
 </li>
       </ul>
       
-      <form class="navbar-form navbar-right" role="search">
+      <form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
         <div class="form-group">
           <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
         </div>
@@ -148,6 +151,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -157,6 +161,14 @@
       <small>Source: <a href='https://github.com/radiant-rstats/radiant.multivariate/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="radiant-data-1-1-0-0" class="section level1">
+<h1 class="page-header">
+<a href="#radiant-data-1-1-0-0" class="anchor"></a>radiant.data 1.1.0.0<small> Unreleased </small>
+</h1>
+<ul>
+<li>Numerous small code changes to support enhanced auto-completion, tooltips, and annotations in shinyAce 0.4.1</li>
+</ul>
+</div>
     <div id="radiant-multivariate-0-9-9-2" class="section level1">
 <h1 class="page-header">
 <a href="#radiant-multivariate-0-9-9-2" class="anchor"></a>radiant.multivariate 0.9.9.2<small> Unreleased </small>
@@ -187,7 +199,7 @@
 <li>Fix initial plot size for <code>kclus</code> in the browser interface</li>
 <li>Fix labels in <code>pre_factor</code> after a ggplot2 update</li>
 <li>Avoid a warning in the <code>pre_factor</code> Plot tab on refresh</li>
-<li>Option to pass additional arguments to <code><a href="https://www.rdocumentation.org/packages/shiny/topics/runApp">shiny::runApp</a></code> when starting radiant such as the port to use. For example, radiant.multivariate::radiant.multivariate(“<a href="https://github.com/radiant-rstats/docs/raw/gh-pages/examples/demo-dvd-rnd.state.rda" class="uri">https://github.com/radiant-rstats/docs/raw/gh-pages/examples/demo-dvd-rnd.state.rda</a>”, port = 8080)</li>
+<li>Option to pass additional arguments to <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html">shiny::runApp</a></code> when starting radiant such as the port to use. For example, radiant.multivariate::radiant.multivariate(“<a href="https://github.com/radiant-rstats/docs/raw/gh-pages/examples/demo-dvd-rnd.state.rda" class="uri">https://github.com/radiant-rstats/docs/raw/gh-pages/examples/demo-dvd-rnd.state.rda</a>”, port = 8080)</li>
 <li>Avoid generatign <code>pred_data = ""</code> for conjoint predictions</li>
 <li>Load a state file on startup by providing a (relative) file path or a url</li>
 </ul>
@@ -231,7 +243,7 @@
 <h2 class="hasAnchor">
 <a href="#major-changes-1" class="anchor"></a>Major changes</h2>
 <ul>
-<li>Various changes to the code to accomodate the use of <code><a href="https://www.rdocumentation.org/packages/shiny/topics/makeReactiveBinding">shiny::makeReactiveBinding</a></code>. The advantage is that the code generated for <em>Report &gt; Rmd</em> and <em>Report &gt; R</em> will no longer have to use <code>r_data</code> to store and access data. This means that code generated and used in the Radiant browser interface will be directly usable without the browser interface as well.</li>
+<li>Various changes to the code to accomodate the use of <code><a href="https://rdrr.io/pkg/shiny/man/makeReactiveBinding.html">shiny::makeReactiveBinding</a></code>. The advantage is that the code generated for <em>Report &gt; Rmd</em> and <em>Report &gt; R</em> will no longer have to use <code>r_data</code> to store and access data. This means that code generated and used in the Radiant browser interface will be directly usable without the browser interface as well.</li>
 <li>Used <code>ggplot2</code> and <code>ggrepel</code> for <code>mds</code> brand maps</li>
 <li>Used <code>ggplot2</code> and <code>ggrepel</code> for <code>prmap</code> brand maps</li>
 </ul>
@@ -314,6 +326,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#radiant-data-1-1-0-0">1.1.0.0</a></li>
         <li><a href="#radiant-multivariate-0-9-9-2">0.9.9.2</a></li>
         <li><a href="#radiant-multivariate-0-9-9-0">0.9.9.0</a></li>
         <li><a href="#radiant-multivariate-0-9-8-0">0.9.8.0</a></li>
@@ -329,14 +342,16 @@
 
 </div>
 
+
       <footer>
       <div class="copyright">
   <p>Developed by Vincent Nijs.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.0.</p>
 </div>
+
       </footer>
    </div>
 
@@ -359,6 +374,8 @@
 </script>
 
 
+
   </body>
 </html>
+
 
