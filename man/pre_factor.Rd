@@ -4,7 +4,7 @@
 \alias{pre_factor}
 \title{Evaluate if data are appropriate for PCA / Factor analysis}
 \usage{
-pre_factor(dataset, vars, data_filter = "")
+pre_factor(dataset, vars, data_filter = "", envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -12,6 +12,8 @@ pre_factor(dataset, vars, data_filter = "")
 \item{vars}{Variables to include in the analysis}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
+
+\item{envir}{Environment to extract data from}
 }
 \value{
 A list with all variables defined in the function as an object of class pre_factor

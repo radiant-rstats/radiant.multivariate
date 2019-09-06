@@ -4,7 +4,8 @@
 \alias{prmap}
 \title{Attribute based brand maps}
 \usage{
-prmap(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
+prmap(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "",
+  envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -18,6 +19,8 @@ prmap(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
 \item{nr_dim}{Number of dimensions}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
+
+\item{envir}{Environment to extract data from}
 }
 \value{
 A list of all variables defined in the function as an object of class prmap

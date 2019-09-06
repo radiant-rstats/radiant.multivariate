@@ -10,6 +10,7 @@
 #' @param max_cases Maximum number of cases allowed (default is 1000). Set to avoid long-running analysis in the radiant web-interface
 #' @param standardize Standardized data (TRUE or FALSE)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list of all variables used in hclus as an object of class hclus
 #'
@@ -23,11 +24,14 @@
 hclus <- function(
   dataset, vars, labels = "none", distance = "sq.euclidian",
   method = "ward.D", max_cases = 5000,
-  standardize = TRUE, data_filter = ""
+  standardize = TRUE, data_filter = "",
+  envir = parent.frame()
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, if (labels == "none") vars else c(labels, vars), filt = data_filter)
+  dataset <- get_data(dataset, if (labels == "none") vars else c(labels, vars), filt = data_filter, envir = envir) %>%
+    as.data.frame()
+  rm(envir)
   if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maximum set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))

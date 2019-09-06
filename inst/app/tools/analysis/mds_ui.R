@@ -185,10 +185,11 @@ output$mds <- renderUI({
 
 .mds <- eventReactive(input$mds_run, {
   req(input$mds_id1)
-  withProgress(
-    message = "Generating MDS solution", value = 1,
-    do.call(mds, mds_inputs())
-  )
+  withProgress(message = "Generating MDS solution", value = 1, {
+    mdsi <- mds_inputs()
+    mdsi$envir <- r_data
+    do.call(mds, mdsi)
+  })
 })
 
 .summary_mds <- reactive({

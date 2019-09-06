@@ -10,6 +10,7 @@
 #' @param nr_dim Number of dimensions
 #' @param seed Random seed
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list of all variables defined in the function as an object of class mds
 #'
@@ -25,17 +26,18 @@
 #' @export
 mds <- function(
   dataset, id1, id2, dis, method = "metric",
-  nr_dim = 2, seed = 1234, data_filter = ""
+  nr_dim = 2, seed = 1234, data_filter = "",
+  envir = parent.frame()
 ) {
 
   nr_dim <- as.numeric(nr_dim)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter)
+  dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter, envir = envir)
 
   d <- dataset[[dis]]
   id1_dat <- as.character(dataset[[id1]])
   id2_dat <- as.character(dataset[[id2]])
-  rm(dataset)
+  rm(dataset, envir)
 
   ## ids
   lab <- unique(c(id1_dat, id2_dat))

@@ -16,3 +16,11 @@ if (is.null(getOption("radiant.path.model"))) options(radiant.path.model = syste
 ## loading urls and ui
 source("init.R", encoding = getOption("radiant.encoding", "UTF-8"), local = TRUE)
 options(radiant.url.patterns = make_url_patterns())
+
+if (!"package:radiant.multivariate" %in% search() &&
+  isTRUE(getOption("radiant.development")) &&
+  getOption("radiant.path.multivariate") == "..") {
+  options(radiant.from.package = FALSE)
+} else {
+  options(radiant.from.package = TRUE)
+}

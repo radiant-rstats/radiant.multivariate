@@ -192,10 +192,11 @@ output$kclus <- renderUI({
 })
 
 .kclus <- eventReactive(input$km_run, {
-  withProgress(
-    message = "Estimating cluster solution", value = 1,
-    do.call(kclus, km_inputs())
-  )
+  withProgress(message = "Estimating cluster solution", value = 1, {
+    kmi <- km_inputs()
+    kmi$envir <- r_data
+    do.call(kclus, kmi)
+  })
 })
 
 .summary_kclus <- reactive({

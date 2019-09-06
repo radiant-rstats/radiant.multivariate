@@ -6,7 +6,8 @@
 \usage{
 kclus(dataset, vars, fun = "mean", hc_init = TRUE,
   distance = "sq.euclidian", method = "ward.D", seed = 1234,
-  nr_clus = 2, standardize = TRUE, data_filter = "")
+  nr_clus = 2, standardize = TRUE, data_filter = "",
+  envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -28,6 +29,8 @@ kclus(dataset, vars, fun = "mean", hc_init = TRUE,
 \item{standardize}{Standardize data (TRUE or FALSE)}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
+
+\item{envir}{Environment to extract data from}
 }
 \value{
 A list of all variables used in kclus as an object of class kclus

@@ -207,10 +207,11 @@ output$prmap <- renderUI({
 })
 
 .prmap <- eventReactive(input$pm_run, {
-  withProgress(
-    message = "Generating perceptual map", value = 1,
-    do.call(prmap, pm_inputs())
-  )
+  withProgress(message = "Generating perceptual map", value = 1, {
+    pmi <- pm_inputs()
+    pmi$envir <- r_data
+    do.call(prmap, pmi)
+  })
 })
 
 .summary_prmap <- reactive({

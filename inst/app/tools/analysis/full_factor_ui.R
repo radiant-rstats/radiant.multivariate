@@ -190,10 +190,11 @@ output$full_factor <- renderUI({
 })
 
 .full_factor <- eventReactive(input$ff_run, {
-  withProgress(
-    message = "Estimating factor solution", value = 1,
-    do.call(full_factor, ff_inputs())
-  )
+  withProgress(message = "Estimating factor solution", value = 1, {
+    ffi <- ff_inputs()
+    ffi$envir <- r_data
+    do.call(full_factor, ffi)
+  })
 })
 
 .summary_full_factor <- eventReactive({

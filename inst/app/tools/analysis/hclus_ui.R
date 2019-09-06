@@ -169,10 +169,12 @@ output$hclus <- renderUI({
 })
 
 .hclus <- eventReactive(input$hc_run, {
-  withProgress(
-    message = "Estimating cluster solution", value = 1,
-    do.call(hclus, hc_inputs())
-  )
+  withProgress(message = "Estimating cluster solution", value = 1, {
+    hci <- hc_inputs()
+    hci$envir <- r_data
+    do.call(hclus, hci)
+
+  })
 })
 
 .summary_hclus <- reactive({

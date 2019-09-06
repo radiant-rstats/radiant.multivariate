@@ -5,7 +5,7 @@
 \title{(Dis)similarity based brand maps (MDS)}
 \usage{
 mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2,
-  seed = 1234, data_filter = "")
+  seed = 1234, data_filter = "", envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -23,6 +23,8 @@ mds(dataset, id1, id2, dis, method = "metric", nr_dim = 2,
 \item{seed}{Random seed}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
+
+\item{envir}{Environment to extract data from}
 }
 \value{
 A list of all variables defined in the function as an object of class mds

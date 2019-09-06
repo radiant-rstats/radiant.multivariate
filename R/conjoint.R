@@ -9,6 +9,7 @@
 #' @param by Variable to group data by before analysis (e.g., a respondent id)
 #' @param reverse Reverse the values of the response variable (`rvar`)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list with all variables defined in the function as an object of class conjoint
 #'
@@ -22,13 +23,14 @@
 conjoint <- function(
   dataset, rvar, evar,
   int = "", by = "none",
-  reverse = FALSE, data_filter = ""
+  reverse = FALSE, data_filter = "",
+  envir = parent.frame()
 ) {
 
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   radiant.model::var_check(evar, colnames(dataset)[-1], int) %>%
     {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
 
@@ -109,7 +111,7 @@ conjoint <- function(
     rm(cn)
   }
 
-  rm(model, coeff, tab)
+  rm(model, coeff, tab, envir)
 
   as.list(environment()) %>% add_class("conjoint")
 }
@@ -236,6 +238,7 @@ summary.conjoint <- function(
 #' @param se Logical that indicates if prediction standard errors should be calculated (default = FALSE)
 #' @param interval Type of interval calculation ("confidence" or "prediction"). Set to "none" if se is FALSE
 #' @param dec Number of decimals to show
+#' @param envir Environment to extract data from
 #' @param ... further arguments passed to or from other methods
 #'
 #' @seealso \code{\link{conjoint}} to generate the result
@@ -253,7 +256,7 @@ predict.conjoint <- function(
   object, pred_data = NULL, pred_cmd = "",
   conf_lev = 0.95, se = FALSE,
   interval = "confidence", dec = 3,
-  ...
+  envir = parent.frame(), ...
 ) {
 
   if (is.character(object)) return(object)
@@ -295,12 +298,12 @@ predict.conjoint <- function(
 
   if (is_empty(object$by, "none")) {
     object$model <- object$model_list[["full"]]$model
-    predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec) %>%
+    predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec, envir = envir) %>%
       set_attr("radiant_interval", interval) %>%
       set_attr("radiant_pred_data", df_name)
 
   } else {
-    predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec) %>%
+    predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec, envir = envir) %>%
       set_attr("radiant_interval", interval) %>%
       set_attr("radiant_pred_data", df_name)
   }
@@ -317,6 +320,7 @@ predict.conjoint <- function(
 #' @param conf_lev Confidence level used to estimate confidence intervals (.95 is the default)
 #' @param se Logical that indicates if prediction standard errors should be calculated (default = FALSE)
 #' @param dec Number of decimals to show
+#' @param envir Environment to extract data from
 #' @param ... further arguments passed to or from other methods
 #'
 #' @seealso \code{\link{conjoint}} to generate the result
@@ -329,7 +333,7 @@ predict.conjoint <- function(
 predict_conjoint_by <- function(
   object, pfun, pred_data = NULL, pred_cmd = "",
   conf_lev = 0.95, se = FALSE, dec = 3,
-  ...
+  envir = parent.frame(), ...
 ) {
 
   if (is.character(object)) return(object)
@@ -343,7 +347,7 @@ predict_conjoint_by <- function(
 
   for (i in seq_along(bylevs)) {
     object$model <- object$model_list[[bylevs[i]]]$model
-    pred[[i]] <- predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec)
+    pred[[i]] <- predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec, envir = envir)
 
     ## when se is true reordering the columns removes attributes for some reason
     if (i == 1) att <- attributes(pred[[1]])
@@ -544,7 +548,6 @@ store.conjoint <- function(dataset, object, name, ...) {
   if (missing(name)) {
     object$tab
   } else {
-    print(list(...))
     stop(
       paste0(
         "This function is deprecated. Use the code below for part worths instead:\n\n",

@@ -8,6 +8,7 @@
 #' @param pref Names of numeric brand preference measures
 #' @param nr_dim Number of dimensions
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list of all variables defined in the function as an object of class prmap
 #'
@@ -20,18 +21,21 @@
 #' @importFrom psych principal
 #'
 #' @export
-prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "") {
+prmap <- function(
+  dataset, brand, attr, pref = "", nr_dim = 2, 
+  data_filter = "", envir = parent.frame()
+) {
 
   nr_dim <- as.numeric(nr_dim)
   vars <- c(brand, attr)
   if (!is_empty(pref)) vars <- c(vars, pref)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
 
   brands <- dataset[[brand]] %>%
     as.character() %>%
     gsub("^\\s+|\\s+$", "", .)
-  f_data <- get_data(dataset, attr)
+  f_data <- get_data(dataset, attr, envir = envir)
   nrObs <- nrow(dataset)
 
   # in case : is used
@@ -61,14 +65,14 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "")
     select(-1)
 
   if (!is_empty(pref)) {
-    pref_cor <- get_data(dataset, pref) %>%
+    pref_cor <- get_data(dataset, pref, envir = envir) %>%
       cor(fres$scores) %>%
       data.frame(stringsAsFactors = FALSE)
     pref <- colnames(pref_cor)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
   }
 
-  rm(f_data, m, cscm)
+  rm(f_data, m, cscm, envir)
   as.list(environment()) %>% add_class(c("prmap", "full_factor"))
 }
 

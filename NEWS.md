@@ -1,3 +1,7 @@
+# radiant.data 1.1.0.0
+
+* Numerous small code changes to support enhanced auto-completion, tooltips, and annotations in shinyAce 0.4.1
+
 # radiant.multivariate 0.9.9.2
 
 * Label numbers for stored factor scores from factor analysis will now always correspond to the numbers used in the summary output

@@ -1,3 +1,7 @@
+if (isTRUE(getOption("radiant.from.package"))) {
+  library(radiant.multivariate)
+}
+
 shinyServer(function(input, output, session) {
 
   ## source shared functions
@@ -35,14 +39,12 @@ shinyServer(function(input, output, session) {
   ))
     source(file, encoding = getOption("radiant.encoding"), local = TRUE)
 
-  ## 'sourcing' radiant's package functions in the server.R environment
-  if (!"package:radiant.multivariate" %in% search() && getOption("radiant.path.multivariate") == "..") {
-    ## for shiny-server and development
-    for (file in list.files("../../R", pattern = "\\.(r|R)$", full.names = TRUE))
+  ## 'sourcing' package functions in the server.R environment for development
+  if (!isTRUE(getOption("radiant.from.package"))) {
+    for (file in list.files("../../R", pattern = "\\.(r|R)$", full.names = TRUE)) {
       source(file, encoding = getOption("radiant.encoding"), local = TRUE)
-  } else {
-    ## for use with launcher
-    radiant.data::copy_all(radiant.multivariate)
+    }
+    cat("\nGetting radiant.multivariate from source ...\n")
   }
 
   copy_from(radiant.model, predict_model, print_predict_model)

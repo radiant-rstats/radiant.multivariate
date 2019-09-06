@@ -12,6 +12,7 @@
 #' @param nr_clus Number of clusters to extract
 #' @param standardize Standardize data (TRUE or FALSE)
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list of all variables used in kclus as an object of class kclus
 #'
@@ -24,9 +25,15 @@
 #' @importFrom Gmedian Gmedian kGmedian
 #'
 #' @export
-kclus <- function(dataset, vars, fun = "mean", hc_init = TRUE, distance = "sq.euclidian", method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, data_filter = "") {
+kclus <- function(
+  dataset, vars, fun = "mean", hc_init = TRUE, distance = "sq.euclidian", 
+  method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, 
+  data_filter = "", envir = parent.frame()
+) {
+
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
+  rm(envir)
 
   ## in case : is used
   if (length(vars) < ncol(dataset)) {

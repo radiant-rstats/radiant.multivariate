@@ -6,7 +6,7 @@
 \usage{
 hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
   method = "ward.D", max_cases = 5000, standardize = TRUE,
-  data_filter = "")
+  data_filter = "", envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -24,6 +24,8 @@ hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
 \item{standardize}{Standardized data (TRUE or FALSE)}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
+
+\item{envir}{Environment to extract data from}
 }
 \value{
 A list of all variables used in hclus as an object of class hclus

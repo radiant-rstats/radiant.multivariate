@@ -421,16 +421,19 @@ output$conjoint <- renderUI({
 
 .conjoint <- eventReactive(input$ca_run, {
   req(available(input$ca_rvar), available(input$ca_evar))
-  withProgress(
-    message = "Estimating model", value = 1,
-    do.call(conjoint, ca_inputs())
-  )
+  withProgress(message = "Estimating model", value = 1, {
+    cai <- ca_inputs()
+    cai$envir <- r_data
+    do.call(conjoint, cai)
+  })
 })
 
 .summary_conjoint <- reactive({
   if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
   if (ca_available() != "available") return(ca_available())
-  do.call(summary, c(list(object = .conjoint()), ca_sum_inputs()))
+  cai <- ca_sum_inputs()
+  cai$object <- .conjoint()
+  do.call(summary, cai)
 })
 
 .predict_conjoint <- reactive({
@@ -445,7 +448,10 @@ output$conjoint <- renderUI({
   }
 
   withProgress(message = "Generating predictions", value = 1, {
-    do.call(predict, c(list(object = .conjoint()), ca_pred_inputs()))
+    cai <- ca_pred_inputs()
+    cai$object <- .conjoint()
+    cai$envir <- r_data
+    do.call(predict, cai)
   })
 })
 
@@ -552,7 +558,7 @@ observeEvent(input$conjoint_report, {
 
     if (input$ca_pred_plot && !is_empty(input$ca_xvar)) {
       inp_out[[3 + figs]] <- clean_args(ca_pred_plot_inputs(), ca_pred_plot_args[-1])
-      inp_out[[3 + figs]]$result <- pred_name
+      inp_out[[3 + figs]]$result <- pred_args$pred_name
       outputs <- c(outputs, "plot")
       figs <- TRUE
     }

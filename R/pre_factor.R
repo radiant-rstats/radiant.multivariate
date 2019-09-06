@@ -5,6 +5,7 @@
 #' @param dataset Dataset
 #' @param vars Variables to include in the analysis
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list with all variables defined in the function as an object of class pre_factor
 #'
@@ -17,10 +18,10 @@
 #' @importFrom psych KMO cortest.bartlett
 #'
 #' @export
-pre_factor <- function(dataset, vars, data_filter = "") {
+pre_factor <- function(dataset, vars, data_filter = "", envir = parent.frame()) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   nrObs <- nrow(dataset)
 
   ## in case : is used
@@ -51,7 +52,7 @@ pre_factor <- function(dataset, vars, data_filter = "") {
     pre_r2 <- err_mess
   }
 
-  rm(dataset, err_mess)
+  rm(dataset, err_mess, envir)
 
   as.list(environment()) %>% add_class("pre_factor")
 }

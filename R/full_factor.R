@@ -8,6 +8,7 @@
 #' @param nr_fact Number of factors to extract
 #' @param rotation Apply varimax rotation or no rotation ("varimax" or "none")
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
+#' @param envir Environment to extract data from
 #'
 #' @return A list with all variables defined in the function as an object of class full_factor
 #'
@@ -23,11 +24,13 @@
 #' @export
 full_factor <- function(
   dataset, vars, method = "PCA", nr_fact = 1,
-  rotation = "varimax", data_filter = ""
+  rotation = "varimax", data_filter = "",
+  envir = parent.frame()
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
+  rm(envir)
 
   ## in case : is used
   if (length(vars) < ncol(dataset))
