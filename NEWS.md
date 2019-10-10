@@ -1,5 +1,6 @@
-# radiant.data 1.1.0.0
+# radiant.data 1.1.1.0
 
+* Documentation updates (i.e., key functions for each tool)
 * Numerous small code changes to support enhanced auto-completion, tooltips, and annotations in shinyAce 0.4.1
 
 # radiant.multivariate 0.9.9.2
