@@ -76,32 +76,17 @@ output$ui_pm_store_name <- renderUI({
   textInput("pm_store_name", "Store factor scores:", "", placeholder = "Provide single variable name")
 })
 
-observe({
-  ## dep on most inputs
-  input$data_filter
-  input$show_filter
-  # sapply(r_drop(names(pm_args)), function(x) input[[paste0("pm_", x)]])
-  sapply(names(pm_args), function(x) input[[paste0("pm_", x)]])
-
-  ## notify user when the model needs to be updated
-  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-  if (pressed(input$pm_run)) {
-    if (is.null(input$pm_brand) && is.null(input$pm_attr)) {
-      updateTabsetPanel(session, "tabs_prmap", selected = "Summary")
-      updateActionButton(session, "pm_run", "Estimate model", icon = icon("play"))
-    } else if (isTRUE(attr(pm_inputs, "observable")$.invalidated)) {
-      updateActionButton(session, "pm_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
-    } else {
-      updateActionButton(session, "pm_run", "Estimate model", icon = icon("play"))
-    }
-  }
-})
+## add a spinning refresh icon if the factors need to be updated
+run_refresh(pm_args, "pm", init = "attr", tabs = "tabs_prmap", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_prmap <- renderUI({
   req(input$dataset)
   tagList(
-    wellPanel(
-      actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+    conditionalPanel(
+      condition = "input.tabs_prmap == 'Summary'",
+      wellPanel(
+        actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+      )
     ),
     wellPanel(
       conditionalPanel(

@@ -48,31 +48,16 @@ output$ui_km_store_name <- renderUI({
   textInput("km_store_name", NULL, "", placeholder = "Provide variable name")
 })
 
-observe({
-  ## dep on most inputs
-  input$data_filter
-  input$show_filter
-  sapply(r_drop(names(km_args)), function(x) input[[paste0("km_", x)]])
-
-  ## notify user when the model needs to be updated
-  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-  if (pressed(input$km_run)) {
-    if (is.null(input$km_vars)) {
-      updateTabsetPanel(session, "tabs_kclus ", selected = "Summary")
-      updateActionButton(session, "km_run", "Estimate model", icon = icon("play"))
-    } else if (isTRUE(attr(km_inputs, "observable")$.invalidated)) {
-      updateActionButton(session, "km_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
-    } else {
-      updateActionButton(session, "km_run", "Estimate model", icon = icon("play"))
-    }
-  }
-})
+## add a spinning refresh icon if the tabel needs to be (re)calculated
+run_refresh(km_args, "km", init = "vars", tabs = "tabs_kclus", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_kclus <- renderUI({
   req(input$dataset)
   tagList(
-    wellPanel(
-      actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+    conditionalPanel(condition = "input.tabs_kclus == 'Summary'",
+      wellPanel(
+        actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+      )
     ),
     wellPanel(
       conditionalPanel(

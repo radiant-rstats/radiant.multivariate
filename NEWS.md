@@ -1,4 +1,8 @@
-# radiant.data 1.1.1.0
+# radiant.multivariate 1.2.0.0
+
+* Update action buttons that initiate model estimation when one or more inputs are changed. When a model should be re-estimated, a spinning "refresh" icon will be shown
+
+# radiant.multivariate 1.1.1.0
 
 * Documentation updates (i.e., key functions for each tool)
 * Numerous small code changes to support enhanced auto-completion, tooltips, and annotations in shinyAce 0.4.1

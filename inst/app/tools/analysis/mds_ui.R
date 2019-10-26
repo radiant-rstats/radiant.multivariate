@@ -71,31 +71,17 @@ output$ui_mds_rev_dim <- renderUI({
   )
 })
 
-observe({
-  ## dep on most inputs
-  input$data_filter
-  input$show_filter
-  sapply(r_drop(names(mds_args)), function(x) input[[paste0("mds_", x)]])
-
-  ## notify user when the model needs to be updated
-  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-  if (pressed(input$mds_run)) {
-    if (is.null(input$mds_id1)) {
-      updateTabsetPanel(session, "tabs_mds", selected = "Summary")
-      updateActionButton(session, "mds_run", "Estimate model", icon = icon("play"))
-    } else if (isTRUE(attr(mds_inputs, "observable")$.invalidated)) {
-      updateActionButton(session, "mds_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
-    } else {
-      updateActionButton(session, "mds_run", "Estimate model", icon = icon("play"))
-    }
-  }
-})
+## add a spinning refresh icon if the map needs to be (re)created
+run_refresh(mds_args, "mds", init = "id1", tabs = "tabs_mds", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_mds <- renderUI({
   req(input$dataset)
   tagList(
-    wellPanel(
-      actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+    conditionalPanel(
+      condition = "input.tabs_mds == 'Summary'",
+      wellPanel(
+        actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+      )
     ),
     wellPanel(
       conditionalPanel(

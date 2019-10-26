@@ -53,22 +53,8 @@ observeEvent(c(input$hc_vars, input$hc_labels != "none"), {
   }
 })
 
-observe({
-  ## dep on most inputs
-  input$data_filter
-  input$show_filter
-  sapply(r_drop(names(hc_args)), function(x) input[[paste0("hc_", x)]])
-
-  ## notify user when the model needs to be updated
-  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-  if (pressed(input$hc_run)) {
-    if (isTRUE(attr(hc_inputs, "observable")$.invalidated)) {
-      updateActionButton(session, "hc_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
-    } else {
-      updateActionButton(session, "hc_run", "Estimate model", icon = icon("play"))
-    }
-  }
-})
+## add a spinning refresh icon if the tabel needs to be (re)calculated
+run_refresh(hc_args, "hc", init = "vars", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_hclus <- renderUI({
   req(input$dataset)
@@ -169,11 +155,11 @@ output$hclus <- renderUI({
 })
 
 .hclus <- eventReactive(input$hc_run, {
+  req(input$hc_vars)
   withProgress(message = "Estimating cluster solution", value = 1, {
     hci <- hc_inputs()
     hci$envir <- r_data
     do.call(hclus, hci)
-
   })
 })
 

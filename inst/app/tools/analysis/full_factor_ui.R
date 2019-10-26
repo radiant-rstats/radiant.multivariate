@@ -45,32 +45,12 @@ output$ui_ff_plots <- renderUI({
   )
 })
 
-observe({
-  ## dep on most inputs
-  input$data_filter
-  input$show_filter
-  sapply(r_drop(names(ff_args)), function(x) input[[paste0("ff_", x)]])
-
-  ## notify user when the model needs to be updated
-  ## based on https://stackoverflow.com/questions/45478521/listen-to-reactive-invalidation-in-shiny
-  if (pressed(input$ff_run)) {
-    if (is.null(input$ff_vars)) {
-      updateTabsetPanel(session, "tabs_full_factor", selected = "Summary")
-      updateActionButton(session, "ff_run", "Estimate model", icon = icon("play"))
-    } else if (isTRUE(attr(ff_inputs, "observable")$.invalidated)) {
-      updateActionButton(session, "ff_run", "Re-estimate model", icon = icon("refresh", class = "fa-spin"))
-    } else {
-      updateActionButton(session, "ff_run", "Estimate model", icon = icon("play"))
-    }
-  }
-})
+## add a spinning refresh icon if the tabel needs to be (re)calculated
+run_refresh(ff_args, "ff", init = "vars", tabs = "tabs_full_factor", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_full_factor <- renderUI({
   req(input$dataset)
   tagList(
-    wellPanel(
-      actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
-    ),
     conditionalPanel(
       condition = "input.tabs_full_factor == 'Plot'",
       wellPanel(
@@ -87,6 +67,9 @@ output$ui_full_factor <- renderUI({
     ),
     conditionalPanel(
       condition = "input.tabs_full_factor == 'Summary'",
+      wellPanel(
+        actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+      ),
       wellPanel(
         uiOutput("ui_ff_vars"),
         selectInput(
