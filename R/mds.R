@@ -32,7 +32,15 @@ mds <- function(
 
   nr_dim <- as.numeric(nr_dim)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter, envir = envir)
+  dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter, envir = envir, na.rm = FALSE)
+
+  init_row <- nrow(dataset)
+  dataset <- na.omit(dataset)
+  nr_na <- init_row - nrow(dataset)
+  if (nr_na > 0) {
+    return(paste0("The map cannot be created because the provided data contains ", nr_na, " rows with\nmissing data. Please choose other ID variables or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset.") %>%
+      add_class("mds"))
+  }
 
   d <- dataset[[dis]]
   id1_dat <- as.character(dataset[[id1]])
@@ -53,7 +61,7 @@ mds <- function(
   } else if ((lower + nrLev) == nrObs) {
     mds_dis_mat[lower.tri(mds_dis_mat, diag = TRUE)] <- d
   } else {
-    return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
+    return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose other ID variables or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
       add_class("mds"))
   }
 
