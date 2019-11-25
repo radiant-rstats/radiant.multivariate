@@ -4,7 +4,7 @@
 \alias{pre_factor}
 \title{Evaluate if data are appropriate for PCA / Factor analysis}
 \usage{
-pre_factor(dataset, vars, mcor = FALSE, data_filter = "",
+pre_factor(dataset, vars, hcor = FALSE, data_filter = "",
   envir = parent.frame())
 }
 \arguments{
@@ -12,7 +12,7 @@ pre_factor(dataset, vars, mcor = FALSE, data_filter = "",
 
 \item{vars}{Variables to include in the analysis}
 
-\item{mcor}{Use psych::mixedCor to calculate the correlation matrix}
+\item{hcor}{Use polycor::hetcor to calculate the correlation matrix}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 

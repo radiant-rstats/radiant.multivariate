@@ -72,7 +72,7 @@ output$ui_full_factor <- renderUI({
           "ff_method", label = "Method:", choices = ff_method,
           selected = state_single("ff_method", ff_method, "PCA")
         ),
-        checkboxInput("ff_mcor", "Adjust for categorical variables", value = state_init("ff_mcor", FALSE)),
+        checkboxInput("ff_hcor", "Adjust for categorical variables", value = state_init("ff_hcor", FALSE)),
         tags$table(
           tags$td(numericInput("ff_nr_fact", label = "Nr. of factors:", min = 1, value = state_init("ff_nr_fact", 1))),
           tags$td(numericInput("ff_cutoff", label = "Cutt-off:", min = 0, max = 1, value = state_init("ff_cutoff", 0), step = .05, width = "117px"))
@@ -183,6 +183,12 @@ output$full_factor <- renderUI({
   if (not_pressed(input$ff_run)) return("** Press the Estimate button to generate factor analysis results **")
   if (.ff_available() != "available") return(.ff_available())
   if (is_not(input$ff_nr_fact)) return("Number of factors should be >= 1")
+  validate(
+    need(
+      input$ff_cutoff >= 0 && input$ff_cutoff <= 1,
+      "Provide a correlation cutoff value in the range from 0 to 1"
+    )
+  )
   summary(.full_factor(), cutoff = input$ff_cutoff, fsort = input$ff_fsort)
 })
 

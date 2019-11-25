@@ -4,7 +4,7 @@
 \alias{prmap}
 \title{Attribute based brand maps}
 \usage{
-prmap(dataset, brand, attr, pref = "", nr_dim = 2, mcor = FALSE,
+prmap(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
   data_filter = "", envir = parent.frame())
 }
 \arguments{
@@ -18,7 +18,7 @@ prmap(dataset, brand, attr, pref = "", nr_dim = 2, mcor = FALSE,
 
 \item{nr_dim}{Number of dimensions}
 
-\item{mcor}{Use psych::mixedCor to calculate the correlation matrix}
+\item{hcor}{Use polycor::hetcor to calculate the correlation matrix}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 

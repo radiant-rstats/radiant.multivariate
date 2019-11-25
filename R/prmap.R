@@ -7,7 +7,7 @@
 #' @param attr Names of numeric variables
 #' @param pref Names of numeric brand preference measures
 #' @param nr_dim Number of dimensions
-#' @param mcor Use psych::mixedCor to calculate the correlation matrix
+#' @param hcor Use polycor::hetcor to calculate the correlation matrix
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #' @param envir Environment to extract data from
 #'
@@ -19,13 +19,13 @@
 #' @seealso \code{\link{summary.prmap}} to summarize results
 #' @seealso \code{\link{plot.prmap}} to plot results
 #'
-#' @importFrom psych principal mixedCor
-#' @importFrom radiant.basics .mixedCor_cpd
+#' @importFrom psych principal
 #' @importFrom lubridate is.Date
+#' @importFrom polycor hetcor
 #'
 #' @export
 prmap <- function(
-  dataset, brand, attr, pref = "", nr_dim = 2, mcor = FALSE,
+  dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
   data_filter = "", envir = parent.frame()
 ) {
 
@@ -49,13 +49,13 @@ prmap <- function(
              add_class("prmap"))
   }
 
-  if (mcor) {
-    mc <- radiant.basics::.mixedCor_cpd(f_data)
+  if (hcor) {
+    f_data <- mutate_if(f_data, is.Date, as.numeric)
+    cmat <- try(sshhr(polycor::hetcor(f_data, ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
     f_data <- mutate_all(f_data, radiant.data::as_numeric)
-    cmat <- try(sshhr(psych::mixedCor(f_data, c = mc$c, p = mc$p, d = mc$d, ncat = Inf)$rho), silent = TRUE)
     if (inherits(cmat, "try-error")) {
-      message("Calculating the mixed correlation matrix produced an error.\nUsing standard correlation matrix instead")
-      mcor <- "Calculation failed"
+      message("Calculating the heterogeneous correlation matrix produced an error.\nUsing standard correlation matrix instead")
+      hcor <- "Calculation failed"
       cmat <- cor(f_data)
     }
   } else {
@@ -132,15 +132,15 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   cat("Dimensions  :", object$nr_dim, "\n")
   cat("Rotation    : varimax\n")
   cat("Observations:", object$nrObs, "\n")
-  if (is.character(object$mcor)) {
-    cat(paste0("Correlation : Pearson (adjustment using psych::mixedCor failed)\n"))
-  } else if (isTRUE(object$mcor)) {
-    cat(paste0("Correlation : Mixed correlations using psych::mixedCor\n"))
+  if (is.character(object$hcor)) {
+    cat(paste0("Correlation : Pearson (adjustment using polycor::hetcor failed)\n"))
+  } else if (isTRUE(object$hcor)) {
+    cat(paste0("Correlation : Heterogeneous correlations using polycor::hetcor\n"))
   } else {
     cat("Correlation : Pearson\n")
   }
   if (sum(object$anyCategorical) > 0) {
-    if (isTRUE(object$mcor)) {
+    if (isTRUE(object$hcor)) {
       cat("** Categorical variables are assumed to be ordinal **\n")
     } else {
       cat("** Categorical variables included without adjustment **\n")

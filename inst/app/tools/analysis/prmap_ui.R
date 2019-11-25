@@ -100,7 +100,7 @@ output$ui_prmap <- renderUI({
           selected = state_init("pm_nr_dim", 2),
           inline = TRUE
         ),
-        checkboxInput("pm_mcor", "Adjust for categorical variables", value = state_init("pm_mcor", FALSE)),
+        checkboxInput("pm_hcor", "Adjust for categorical variables", value = state_init("pm_hcor", FALSE)),
         numericInput(
           "pm_cutoff", label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05
@@ -183,7 +183,7 @@ output$prmap <- renderUI({
   } else if (length(input$pm_attr) < 2) {
     "Please select two or more attribute variables"
   } else {
-    brand <- .get_data()[[input$pm_brand]]
+    # brand <- .get_data()[[input$pm_brand]]
     # if (length(unique(brand)) < length(brand)) {
       # "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
         # suggest_data("retailers")
@@ -203,6 +203,12 @@ output$prmap <- renderUI({
 
 .summary_prmap <- reactive({
   if (.prmap_available() != "available") return(.prmap_available())
+  validate(
+    need(
+      input$pm_cutoff >= 0 && input$pm_cutoff <= 1,
+      "Provide a correlation cutoff value in the range from 0 to 1"
+    )
+  )
   summary(.prmap(), cutoff = input$pm_cutoff)
 })
 
