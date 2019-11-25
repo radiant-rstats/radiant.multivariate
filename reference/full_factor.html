@@ -168,7 +168,7 @@
     <p>Factor analysis (PCA)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>full_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"PCA"</span>, <span class='kw'>mcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nr_fact</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+    <pre class="usage"><span class='fu'>full_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"PCA"</span>, <span class='kw'>hcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nr_fact</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>rotation</span> <span class='kw'>=</span> <span class='st'>"varimax"</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -187,8 +187,8 @@
       <td><p>Factor extraction method to use</p></td>
     </tr>
     <tr>
-      <th>mcor</th>
-      <td><p>Use psych::mixedCor to calculate the correlation matrix</p></td>
+      <th>hcor</th>
+      <td><p>Use polycor::hetcor to calculate the correlation matrix</p></td>
     </tr>
     <tr>
       <th>nr_fact</th>
@@ -297,7 +297,7 @@
 #&gt;   ..$ v6: num [1:20] 3 4 3 6 4 4 4 4 3 6 ...
 #&gt;  $ vars          : chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;  $ method        : chr "PCA"
-#&gt;  $ mcor          : logi FALSE
+#&gt;  $ hcor          : logi FALSE
 #&gt;  $ nr_fact       : num 1
 #&gt;  $ rotation      : chr "varimax"
 #&gt;  $ data_filter   : chr ""

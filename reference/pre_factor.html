@@ -168,7 +168,7 @@
     <p>Evaluate if data are appropriate for PCA / Factor analysis</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pre_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>mcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>,
+    <pre class="usage"><span class='fu'>pre_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>hcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -183,8 +183,8 @@
       <td><p>Variables to include in the analysis</p></td>
     </tr>
     <tr>
-      <th>mcor</th>
-      <td><p>Use psych::mixedCor to calculate the correlation matrix</p></td>
+      <th>hcor</th>
+      <td><p>Use polycor::hetcor to calculate the correlation matrix</p></td>
     </tr>
     <tr>
       <th>data_filter</th>
@@ -240,7 +240,7 @@
 #&gt;  $ nrObs         : int 20
 #&gt;  $ df_name       : chr "shopping"
 #&gt;  $ vars          : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ mcor          : logi FALSE
+#&gt;  $ hcor          : logi FALSE
 #&gt;  $ data_filter   : chr ""
 #&gt;  - attr(*, "class")= chr [1:2] "pre_factor" "list"</div><div class='input'>
 </div></pre>
