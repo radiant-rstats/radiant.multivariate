@@ -72,7 +72,7 @@ output$ui_full_factor <- renderUI({
           "ff_method", label = "Method:", choices = ff_method,
           selected = state_single("ff_method", ff_method, "PCA")
         ),
-        checkboxInput("ff_hcor", "Adjust for categorical variables", value = state_init("ff_hcor", FALSE)),
+        checkboxInput("ff_hcor", "Adjust for {factor} variables", value = state_init("ff_hcor", FALSE)),
         tags$table(
           tags$td(numericInput("ff_nr_fact", label = "Nr. of factors:", min = 1, value = state_init("ff_nr_fact", 1))),
           tags$td(numericInput("ff_cutoff", label = "Cutt-off:", min = 0, max = 1, value = state_init("ff_cutoff", 0), step = .05, width = "117px"))

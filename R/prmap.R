@@ -135,19 +135,27 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   if (is.character(object$hcor)) {
     cat(paste0("Correlation : Pearson (adjustment using polycor::hetcor failed)\n"))
   } else if (isTRUE(object$hcor)) {
-    cat(paste0("Correlation : Heterogeneous correlations using polycor::hetcor\n"))
+    if (sum(object$anyCategorical) > 0) {
+      cat(paste0("Correlation : Heterogeneous correlations using polycor::hetcor\n"))
+    } else {
+      cat(paste0("Correlation : Pearson\n"))
+    }
   } else {
     cat("Correlation : Pearson\n")
   }
   if (sum(object$anyCategorical) > 0) {
     if (isTRUE(object$hcor)) {
-      cat("** Categorical variables are assumed to be ordinal **\n")
+      cat("** Variables of type {factor} are assumed to be ordinal **\n\n")
     } else {
-      cat("** Categorical variables included without adjustment **\n")
+      cat("** Variables of type {factor} included without adjustment **\n\n")
     }
+  } else if (isTRUE(object$hcor)) {
+    cat("** No variables of type {factor} selected. No adjustment applied **\n\n")
+  } else {
+    cat("\n")
   }
 
-  cat("\nBrand - Factor scores:\n")
+  cat("Brand - Factor scores:\n")
   round(object$scores, dec) %>% print()
 
   cat("\nAttribute - Factor loadings:\n")

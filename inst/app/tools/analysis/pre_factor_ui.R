@@ -44,7 +44,7 @@ output$ui_pre_factor <- renderUI({
       conditionalPanel(
         condition = "input.tabs_pre_factor == 'Summary'",
         uiOutput("ui_pf_vars"),
-        checkboxInput("pf_hcor", "Adjust for categorical variables", value = state_init("pf_hcor", FALSE)),
+        checkboxInput("pf_hcor", "Adjust for {factor} variables", value = state_init("pf_hcor", FALSE)),
       ),
       conditionalPanel(
         condition = "input.tabs_pre_factor == 'Plot'",

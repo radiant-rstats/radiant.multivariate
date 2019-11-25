@@ -100,7 +100,7 @@ output$ui_prmap <- renderUI({
           selected = state_init("pm_nr_dim", 2),
           inline = TRUE
         ),
-        checkboxInput("pm_hcor", "Adjust for categorical variables", value = state_init("pm_hcor", FALSE)),
+        checkboxInput("pm_hcor", "Adjust for {factor} variables", value = state_init("pm_hcor", FALSE)),
         numericInput(
           "pm_cutoff", label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05
