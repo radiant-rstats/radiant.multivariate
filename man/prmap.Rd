@@ -4,8 +4,8 @@
 \alias{prmap}
 \title{Attribute based brand maps}
 \usage{
-prmap(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "",
-  envir = parent.frame())
+prmap(dataset, brand, attr, pref = "", nr_dim = 2, mcor = FALSE,
+  data_filter = "", envir = parent.frame())
 }
 \arguments{
 \item{dataset}{Dataset}
@@ -17,6 +17,8 @@ prmap(dataset, brand, attr, pref = "", nr_dim = 2, data_filter = "",
 \item{pref}{Names of numeric brand preference measures}
 
 \item{nr_dim}{Number of dimensions}
+
+\item{mcor}{Use psych::mixedCor to calculate the correlation matrix}
 
 \item{data_filter}{Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")}
 

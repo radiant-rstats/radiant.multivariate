@@ -7,6 +7,7 @@
 #' @param method Factor extraction method to use
 #' @param nr_fact Number of factors to extract
 #' @param rotation Apply varimax rotation or no rotation ("varimax" or "none")
+#' @param mcor Use psych::mixedCor to calculate the correlation matrix
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #' @param envir Environment to extract data from
 #'
@@ -18,12 +19,13 @@
 #' @seealso \code{\link{summary.full_factor}} to summarize results
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
-#' @importFrom psych principal fa
+#' @importFrom psych principal fa factor.scores mixedCor
 #' @importFrom GPArotation quartimax oblimin simplimax
+#' @importFrom radiant.basics .mixedCor_cpd
 #'
 #' @export
 full_factor <- function(
-  dataset, vars, method = "PCA", nr_fact = 1,
+  dataset, vars, method = "PCA", mcor = FALSE, nr_fact = 1,
   rotation = "varimax", data_filter = "",
   envir = parent.frame()
 ) {
@@ -36,12 +38,8 @@ full_factor <- function(
   if (length(vars) < ncol(dataset))
     vars <- colnames(dataset)
 
+  anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
   nrObs <- nrow(dataset)
-  if (nrObs <= ncol(dataset)) {
-    return("Data should have more observations than variables.\nPlease reduce the number of variables." %>%
-      add_class("full_factor"))
-  }
-
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dataset)) {
     return("The number of factors cannot exceed the number of variables" %>%
@@ -49,14 +47,31 @@ full_factor <- function(
     nrFac <- ncol(dataset)
   }
 
+  if (mcor) {
+    mc <- radiant.basics::.mixedCor_cpd(dataset)
+    dataset <- mutate_all(dataset, radiant.data::as_numeric)
+    cmat <- try(sshhr(psych::mixedCor(dataset, c = mc$c, p = mc$p, d = mc$d, ncat = Inf)$rho), silent = TRUE)
+    if (inherits(cmat, "try-error")) {
+      message("Calculating the mixed correlation matrix produced an error.\nUsing standard correlation matrix instead")
+      mcor <- "Calculation failed"
+      cmat <- cor(dataset)
+    }
+  } else {
+    dataset <- mutate_all(dataset, radiant.data::as_numeric)
+    cmat <- cor(dataset)
+  }
+
   if (method == "PCA") {
     fres <- psych::principal(
-      dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      cmat, nfactors = nrFac, rotate = rotation, scores = FALSE,
       oblique.scores = FALSE
     )
+    m <- fres$loadings[, colnames(fres$loadings)]
+    cscm <- m %*% solve(crossprod(m))
+    fres$scores <- scale(as.matrix(dataset), center = TRUE, scale = TRUE) %*% cscm
   } else {
     fres <- try(psych::fa(
-      dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,
+      cmat, nfactors = nrFac, rotate = rotation,
       oblique.scores = FALSE, fm = "ml"
     ), silent = TRUE)
     if (inherits(fres, "try-error")) {
@@ -65,6 +80,7 @@ full_factor <- function(
           add_class("full_factor")
       )
     }
+    fres$scores <- psych::factor.scores(as.matrix(dataset), fres, method = "Thurstone")$scores
   }
 
   ## convert loadings object to data.frame
@@ -119,6 +135,20 @@ summary.full_factor <- function(
   cat("Method      :", object$method, "\n")
   cat("Rotation    :", object$rotation, "\n")
   cat("Observations:", format_nr(object$nrObs, dec = 0), "\n")
+  if (is.character(object$mcor)) {
+    cat(paste0("Correlation : Pearson (adjustment using psych::mixedCor failed)\n"))
+  } else if (isTRUE(object$mcor)) {
+    cat(paste0("Correlation : Mixed correlations using psych::mixedCor\n"))
+  } else {
+    cat("Correlation : Pearson\n")
+  }
+  if (sum(object$anyCategorical) > 0) {
+    if (isTRUE(object$mcor)) {
+      cat("** Categorical variables are assumed to be ordinal **\n")
+    } else {
+      cat("** Categorical variables included without adjustment **\n")
+    }
+  }
 
   cat("\nFactor loadings:\n")
 

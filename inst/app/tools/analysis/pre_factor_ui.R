@@ -18,8 +18,9 @@ pf_inputs <- reactive({
 })
 
 output$ui_pf_vars <- renderUI({
-  isNum <- "numeric" == .get_class() | "integer" == .get_class()
-  vars <- varnames()[isNum]
+  vars <- varnames()
+  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  vars <- vars[toSelect]
   selectInput(
     inputId = "pf_vars", label = "Variables:", choices = vars,
     selected = state_multiple("pf_vars", vars),
@@ -42,7 +43,8 @@ output$ui_pre_factor <- renderUI({
     wellPanel(
       conditionalPanel(
         condition = "input.tabs_pre_factor == 'Summary'",
-        uiOutput("ui_pf_vars")
+        uiOutput("ui_pf_vars"),
+        checkboxInput("pf_mcor", "Adjust for categorical variables", value = state_init("pf_mcor", FALSE)),
       ),
       conditionalPanel(
         condition = "input.tabs_pre_factor == 'Plot'",

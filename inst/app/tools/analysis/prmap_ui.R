@@ -40,8 +40,9 @@ output$ui_pm_brand <- renderUI({
 })
 
 output$ui_pm_attr <- renderUI({
-  isNum <- "numeric" == .get_class() | "integer" == .get_class()
-  vars <- varnames()[isNum]
+  vars <- varnames()
+  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  vars <- vars[toSelect]
   selectInput(
     inputId = "pm_attr", label = "Attributes:", choices = vars,
     selected = state_multiple("pm_attr", vars), multiple = TRUE,
@@ -99,6 +100,7 @@ output$ui_prmap <- renderUI({
           selected = state_init("pm_nr_dim", 2),
           inline = TRUE
         ),
+        checkboxInput("pm_mcor", "Adjust for categorical variables", value = state_init("pm_mcor", FALSE)),
         numericInput(
           "pm_cutoff", label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05

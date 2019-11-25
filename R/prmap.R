@@ -7,6 +7,7 @@
 #' @param attr Names of numeric variables
 #' @param pref Names of numeric brand preference measures
 #' @param nr_dim Number of dimensions
+#' @param mcor Use psych::mixedCor to calculate the correlation matrix
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #' @param envir Environment to extract data from
 #'
@@ -18,11 +19,13 @@
 #' @seealso \code{\link{summary.prmap}} to summarize results
 #' @seealso \code{\link{plot.prmap}} to plot results
 #'
-#' @importFrom psych principal
+#' @importFrom psych principal mixedCor
+#' @importFrom radiant.basics .mixedCor_cpd
+#' @importFrom lubridate is.Date
 #'
 #' @export
 prmap <- function(
-  dataset, brand, attr, pref = "", nr_dim = 2, 
+  dataset, brand, attr, pref = "", nr_dim = 2, mcor = FALSE,
   data_filter = "", envir = parent.frame()
 ) {
 
@@ -36,6 +39,7 @@ prmap <- function(
     as.character() %>%
     gsub("^\\s+|\\s+$", "", .)
   f_data <- get_data(dataset, attr, envir = envir)
+  anyCategorical <- sapply(f_data, function(x) is.numeric(x) || is.Date(x)) == FALSE
   nrObs <- nrow(dataset)
 
   # in case : is used
@@ -45,8 +49,22 @@ prmap <- function(
              add_class("prmap"))
   }
 
+  if (mcor) {
+    mc <- radiant.basics::.mixedCor_cpd(f_data)
+    f_data <- mutate_all(f_data, radiant.data::as_numeric)
+    cmat <- try(sshhr(psych::mixedCor(f_data, c = mc$c, p = mc$p, d = mc$d, ncat = Inf)$rho), silent = TRUE)
+    if (inherits(cmat, "try-error")) {
+      message("Calculating the mixed correlation matrix produced an error.\nUsing standard correlation matrix instead")
+      mcor <- "Calculation failed"
+      cmat <- cor(f_data)
+    }
+  } else {
+    f_data <- mutate_all(f_data, radiant.data::as_numeric)
+    cmat <- cor(f_data)
+  }
+
   fres <- sshhr(psych::principal(
-    cov(f_data), nfactors = nr_dim, rotate = "varimax",
+    cmat, nfactors = nr_dim, rotate = "varimax",
     scores = FALSE, oblique.scores = FALSE
   ))
 
@@ -111,9 +129,23 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   if (!is_empty(object$pref)) {
     cat("Preferences :", paste0(object$pref, collapse = ", "), "\n")
   }
-  cat("Dimensions:", object$nr_dim, "\n")
+  cat("Dimensions  :", object$nr_dim, "\n")
   cat("Rotation    : varimax\n")
   cat("Observations:", object$nrObs, "\n")
+  if (is.character(object$mcor)) {
+    cat(paste0("Correlation : Pearson (adjustment using psych::mixedCor failed)\n"))
+  } else if (isTRUE(object$mcor)) {
+    cat(paste0("Correlation : Mixed correlations using psych::mixedCor\n"))
+  } else {
+    cat("Correlation : Pearson\n")
+  }
+  if (sum(object$anyCategorical) > 0) {
+    if (isTRUE(object$mcor)) {
+      cat("** Categorical variables are assumed to be ordinal **\n")
+    } else {
+      cat("** Categorical variables included without adjustment **\n")
+    }
+  }
 
   cat("\nBrand - Factor scores:\n")
   round(object$scores, dec) %>% print()

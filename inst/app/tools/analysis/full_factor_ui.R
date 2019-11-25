@@ -22,8 +22,9 @@ ff_inputs <- reactive({
 # Factor analysis
 ###############################
 output$ui_ff_vars <- renderUI({
-  isNum <- "numeric" == .get_class() | "integer" == .get_class()
-  vars <- varnames()[isNum]
+  vars <- varnames()
+  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  vars <- vars[toSelect]
   selectInput(
     inputId = "ff_vars", label = "Variables:", choices = vars,
     selected = state_multiple("ff_vars", vars, input$pf_vars),
@@ -36,15 +37,6 @@ output$ui_ff_store_name <- renderUI({
   textInput("ff_store_name", "Store factor scores:", "", placeholder = "Provide single variable name")
 })
 
-output$ui_ff_plots <- renderUI({
-  plot_list <- c("Respondents" = "resp", "Attributes" = "attr")
-  checkboxGroupInput(
-    "ff_plots", NULL, plot_list,
-    selected = state_group("ff_plots", "attr"),
-    inline = TRUE
-  )
-})
-
 ## add a spinning refresh icon if the tabel needs to be (re)calculated
 run_refresh(ff_args, "ff", init = "vars", tabs = "tabs_full_factor", label = "Estimate model", relabel = "Re-estimate model")
 
@@ -54,7 +46,11 @@ output$ui_full_factor <- renderUI({
     conditionalPanel(
       condition = "input.tabs_full_factor == 'Plot'",
       wellPanel(
-        uiOutput("ui_ff_plots")
+        checkboxGroupInput(
+          "ff_plots", NULL, c("Respondents" = "resp", "Attributes" = "attr"),
+          selected = state_group("ff_plots", "attr"),
+          inline = TRUE
+        )
         # conditionalPanel(
         #   condition = "input.tabs_full_factor == 'Plot'",
         #   tags$table(
@@ -76,6 +72,7 @@ output$ui_full_factor <- renderUI({
           "ff_method", label = "Method:", choices = ff_method,
           selected = state_single("ff_method", ff_method, "PCA")
         ),
+        checkboxInput("ff_mcor", "Adjust for categorical variables", value = state_init("ff_mcor", FALSE)),
         tags$table(
           tags$td(numericInput("ff_nr_fact", label = "Nr. of factors:", min = 1, value = state_init("ff_nr_fact", 1))),
           tags$td(numericInput("ff_cutoff", label = "Cutt-off:", min = 0, max = 1, value = state_init("ff_cutoff", 0), step = .05, width = "117px"))
@@ -190,7 +187,7 @@ output$full_factor <- renderUI({
 })
 
 .plot_full_factor <- eventReactive({
-  c(input$ff_run, input$ff_plots)
+  c(input$ff_run, !is.null(input$ff_plots))
 }, {
   if (not_pressed(input$ff_run)) {
     "** Press the Estimate button to generate factor analysis results **"
