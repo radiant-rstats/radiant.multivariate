@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -168,7 +168,7 @@
     <p>Factor analysis (PCA)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>full_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"PCA"</span>, <span class='kw'>nr_fact</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+    <pre class="usage"><span class='fu'>full_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"PCA"</span>, <span class='kw'>mcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>nr_fact</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>rotation</span> <span class='kw'>=</span> <span class='st'>"varimax"</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -185,6 +185,10 @@
     <tr>
       <th>method</th>
       <td><p>Factor extraction method to use</p></td>
+    </tr>
+    <tr>
+      <th>mcor</th>
+      <td><p>Use psych::mixedCor to calculate the correlation matrix</p></td>
     </tr>
     <tr>
       <th>nr_fact</th>
@@ -216,13 +220,16 @@
 <p><code>plot.full_factor</code> to plot results</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>full_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 11
-#&gt;  $ floadings  :'data.frame':	6 obs. of  1 variable:
+    <pre class="examples"><div class='input'><span class='fu'>full_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 16
+#&gt;  $ floadings     :'data.frame':	6 obs. of  1 variable:
 #&gt;   ..$ PC1: num [1:6] 0.9602 -0.0084 0.9227 -0.223 -0.9149 ...
-#&gt;  $ fres       :List of 29
+#&gt;  $ cscm          : num [1:6, 1] 0.36039 -0.00315 0.34632 -0.0837 -0.34337 ...
+#&gt;  $ m             : Named num [1:6] 0.9602 -0.0084 0.9227 -0.223 -0.9149 ...
+#&gt;   ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ fres          :List of 28
 #&gt;   ..$ values      : num [1:6] 2.664 2.15 0.473 0.433 0.217 ...
 #&gt;   ..$ rotation    : chr "varimax"
-#&gt;   ..$ n.obs       : int 20
+#&gt;   ..$ n.obs       : logi NA
 #&gt;   ..$ communality : Named num [1:6] 9.22e-01 7.06e-05 8.51e-01 4.97e-02 8.37e-01 ...
 #&gt;   .. ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;   ..$ loadings    : 'loadings' num [1:6, 1] 0.9602 -0.0084 0.9227 -0.223 -0.9149 ...
@@ -232,13 +239,13 @@
 #&gt;   ..$ fit         : num 0.583
 #&gt;   ..$ fit.off     : num 0.655
 #&gt;   ..$ fn          : chr "principal"
-#&gt;   ..$ Call        : language psych::principal(r = dataset, nfactors = nrFac, rotate = rotation, scores = TRUE,      oblique.scores = FALSE)
+#&gt;   ..$ Call        : language psych::principal(r = cmat, nfactors = nrFac, rotate = rotation, scores = FALSE,      oblique.scores = FALSE)
 #&gt;   ..$ uniquenesses: Named num [1:6] 0.0779 0.9999 0.1485 0.9503 0.163 ...
 #&gt;   .. ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;   ..$ complexity  : Named num [1:6] 1 1 1 1 1 1
 #&gt;   .. ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;   ..$ chi         : num 42.7
-#&gt;   ..$ EPVAL       : num 2.46e-06
+#&gt;   ..$ chi         : num NA
+#&gt;   ..$ EPVAL       : num NA
 #&gt;   ..$ R2          : Named num 1
 #&gt;   .. ..- attr(*, "names")= chr "PC1"
 #&gt;   ..$ objective   : num 1.69
@@ -253,8 +260,7 @@
 #&gt;   ..$ null.model  : num 4.13
 #&gt;   ..$ criteria    : Named num [1:3] 1.69 NA NA
 #&gt;   .. ..- attr(*, "names")= chr [1:3] "objective" "" ""
-#&gt;   ..$ STATISTIC   : num 26.2
-#&gt;   ..$ PVAL        : num 0.00188
+#&gt;   ..$ PVAL        : logi NA
 #&gt;   ..$ weights     : num [1:6, 1] 0.36039 -0.00315 0.34632 -0.0837 -0.34337 ...
 #&gt;   .. ..- attr(*, "dimnames")=List of 2
 #&gt;   .. .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
@@ -272,26 +278,29 @@
 #&gt;   .. .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;   .. .. ..$ : chr "PC1"
 #&gt;   ..$ scores      : num [1:20, 1] 1.2546 -1.1585 1.4166 0.0974 -1.2608 ...
-#&gt;   .. ..- attr(*, "dimnames")=List of 2
-#&gt;   .. .. ..$ : NULL
-#&gt;   .. .. ..$ : chr "PC1"
 #&gt;   ..- attr(*, "class")= chr [1:2] "psych" "principal"
-#&gt;  $ nrFac      : num 1
-#&gt;  $ nrObs      : int 20
-#&gt;  $ df_name    : chr "shopping"
-#&gt;  $ dataset    :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	20 obs. of  6 variables:
-#&gt;   ..$ v1: int [1:20] 6 2 7 4 1 6 5 7 2 3 ...
-#&gt;   ..$ v2: int [1:20] 4 3 2 6 3 4 3 3 4 5 ...
-#&gt;   ..$ v3: int [1:20] 7 1 6 4 2 6 6 7 3 3 ...
-#&gt;   ..$ v4: int [1:20] 3 4 4 5 2 3 3 4 3 6 ...
-#&gt;   ..$ v5: int [1:20] 2 5 1 3 6 3 3 1 6 4 ...
-#&gt;   ..$ v6: int [1:20] 3 4 3 6 4 4 4 4 3 6 ...
-#&gt;   ..- attr(*, "description")= chr "## Shopping attitudes\n\n### Description\n\n20 consumers were asked to respond to six questions to determine th"| __truncated__
-#&gt;  $ vars       : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ method     : chr "PCA"
-#&gt;  $ nr_fact    : num 1
-#&gt;  $ rotation   : chr "varimax"
-#&gt;  $ data_filter: chr ""
+#&gt;  $ cmat          : num [1:6, 1:6] 1 0.0255 0.8378 -0.104 -0.8754 ...
+#&gt;   ..- attr(*, "dimnames")=List of 2
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ nrFac         : num 1
+#&gt;  $ nrObs         : int 20
+#&gt;  $ anyCategorical: Named logi [1:6] FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt;   ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ df_name       : chr "shopping"
+#&gt;  $ dataset       :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	20 obs. of  6 variables:
+#&gt;   ..$ v1: num [1:20] 6 2 7 4 1 6 5 7 2 3 ...
+#&gt;   ..$ v2: num [1:20] 4 3 2 6 3 4 3 3 4 5 ...
+#&gt;   ..$ v3: num [1:20] 7 1 6 4 2 6 6 7 3 3 ...
+#&gt;   ..$ v4: num [1:20] 3 4 4 5 2 3 3 4 3 6 ...
+#&gt;   ..$ v5: num [1:20] 2 5 1 3 6 3 3 1 6 4 ...
+#&gt;   ..$ v6: num [1:20] 3 4 3 6 4 4 4 4 3 6 ...
+#&gt;  $ vars          : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ method        : chr "PCA"
+#&gt;  $ mcor          : logi FALSE
+#&gt;  $ nr_fact       : num 1
+#&gt;  $ rotation      : chr "varimax"
+#&gt;  $ data_filter   : chr ""
 #&gt;  - attr(*, "class")= chr [1:2] "full_factor" "list"</div><div class='input'>
 </div></pre>
   </div>

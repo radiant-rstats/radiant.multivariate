@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -202,6 +202,7 @@
 #&gt; Data        : shopping 
 #&gt; Variables   : v1, v2, v3, v4, v5, v6 
 #&gt; Observations: 20 
+#&gt; Correlation : Pearson
 #&gt; 
 #&gt; Bartlett test
 #&gt; Null hyp. : variables are not correlated
@@ -226,8 +227,9 @@
 #&gt;  PC3        0.47       0.08         0.88
 #&gt;  PC4        0.43       0.07         0.95
 #&gt;  PC5        0.22       0.04         0.99
-#&gt;  PC6        0.06       0.01         1.00</div><div class='input'><span class='fu'>pre_factor</span>(<span class='no'>computer</span>, <span class='st'>"high_end:business"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>()</div><div class='output co'>#&gt; Data should have more observations than variables.
-#&gt; Please reduce the number of variables.</div><div class='input'>
+#&gt;  PC6        0.06       0.01         1.00</div><div class='input'><span class='fu'>pre_factor</span>(<span class='no'>computer</span>, <span class='st'>"high_end:business"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: NaNs produced</span></div><div class='output co'>#&gt; Error in solve.default(r) : 
+#&gt;   system is computationally singular: reciprocal condition number = 8.23843e-18</div><div class='output co'>#&gt; <span class='message'>matrix is not invertible, image not found</span></div><div class='output co'>#&gt; The selected variables are perfectly collinear. Please check the correlations
+#&gt; and remove any variable with a correlation of 1 or -1 from the analysis</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

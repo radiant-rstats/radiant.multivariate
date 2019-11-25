@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -144,9 +144,16 @@
 <p>Another plot that can be used to determine the number of segments is a scree-plot. This is a plot of the within-cluster heterogeneity on the vertical axis and the number of segments on the horizontal axis. Again, Hierarchical cluster analysis starts with many segments and groups respondents together until only one segments is left. The scree plot is created by selecting <code>Scree</code> (and <code>Change</code>) from the <code>Plot(s)</code> dropdown menu. If <code>Plot cutoff</code> is set to 0 we see results for all possible cluster solutions. To make the plot easier to evaluate, we can set <code>Plot cutoff</code> to, for example, 0.05 (i.e. show only solutions that have <code>Within-cluster heterogeneity</code> above 5%).</p>
 <p align="center">
 <img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate//hclus_scree.png"></p>
-<p>Reading the plot from left-to-right we see that within-segment heterogeneity increases sharply when we move from 3 to 2 segments. This is also clear from the <code>Change in within-cluster heterogeneity</code> plot (i.e., <code>Change</code>). To avoid creating a heterogeneous segment we, again, choose 3 segments. Now that we have determined the appropriate number of segments to extract we can use <em>Cluster &gt; K-clustering</em> to generate the final cluster solution.</p>
+<p>Reading the plot from left-to-right we see that within-segment heterogeneity increases sharply when we move from 3 to 2 segments. This is also clear from the <code>Change in within-cluster heterogeneity</code> plot (i.e., <code>Change</code>). To avoid creating a heterogeneous segment we, again, choose 3 segments. Now that we have determined the appropriate number of segments to extract we can use either <em>Cluster &gt; Hierarchical</em> or <em>Cluster &gt; K-clustering</em> to generate the final cluster solution.</p>
 <p>To download the plots click the download button on the top-right of the screen.</p>
 </div>
+<div id="additional-options" class="section level2">
+<h2 class="hasAnchor">
+<a href="#additional-options" class="anchor"></a>Additional options</h2>
+<ul>
+<li>By default, data will be standardized before it is analyzed. To pass data in its raw form to the estimation algorithm, make sure the <code>Standardize</code> box is un-checked.</li>
+<li>Hierarchical cluster-analysis (HC) generates numerous clustering solutions. The highest number of clusters is equal to the number of observations in the data (e.g., ever respondent is treated as a separate cluster). The lowest number of clusters evaluated, is equal to 1 (e.g., all respondent are grouped together in a single cluster). Although, HC analysis is often used as a diagnostic tool before generating a final solution using, e.g., K-means, we can also store any specific clustering solution generated using HC. To accomplish this, first choose the <code>Number of clusters</code>, then provide a name for the variable that will contain cluster assignment information, and finally, press the <code>Store</code> button.</li>
+</ul>
 <div id="report-rmd" class="section level3">
 <h3 class="hasAnchor">
 <a href="#report-rmd" class="anchor"></a>Report &gt; Rmd</h3>
@@ -161,12 +168,20 @@
 <a href="#r-functions" class="anchor"></a>R-functions</h3>
 <p>For an overview of related R-functions used by Radiant to conduct cluster analysis see <a href="https://radiant-rstats.github.io/radiant.multivariate/reference/index.html#section-multivariate-cluster" target="_blank"><em>Multivariate &gt; Cluster</em></a></p>
 <p>The key function from the <code>stats</code> package used in the <code>hclus</code> tool is <code>hclust</code>.</p>
-<p>© Vincent Nijs (2018) <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width: 0" src="./images/by-nc-sa.png"></a></p>
+<p>© Vincent Nijs (2018) <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width: 0" src="images/by-nc-sa.png"></a></p>
+</div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
 
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#additional-options">Additional options</a></li>
+      </ul>
+</div>
       </div>
 
 </div>

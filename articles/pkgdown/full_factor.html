@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -182,6 +182,10 @@
 <p align="center">
 <img src="https://radiant-rstats.github.io/docs/multivariate/figures_multivariate//full_factor_summary_shopping.png"></p>
 </div>
+<div id="including-categorical-variables" class="section level2">
+<h2 class="hasAnchor">
+<a href="#including-categorical-variables" class="anchor"></a>Including categorical variables</h2>
+<p>Output shown in <em>Multivariate &gt; Factor</em> is estimated using either Principal Components Analysis (PCA) or Maximum Likelihood (ML). The correlation matrix used as input for estimation can be calculated for variables of type <code>numeric</code>, <code>integer</code>, <code>date</code>, and <code>factor</code>. When variables of type factor are included the <code>Adjust for categorical variables</code> box should be checked. When correlations are estimated with adjustment, variables that are of type <code>factor</code> will be treated as either dichotomous (2-levels) or polytomous (&gt; 2-levels). All other variables will be treated as continuous.</p>
 <div id="report-rmd" class="section level3">
 <h3 class="hasAnchor">
 <a href="#report-rmd" class="anchor"></a>Report &gt; Rmd</h3>
@@ -195,12 +199,20 @@
 <a href="#r-functions" class="anchor"></a>R-functions</h3>
 <p>For an overview of related R-functions used by Radiant to conduct factor analysis see <a href="https://radiant-rstats.github.io/radiant.multivariate/reference/index.html#section-multivariate-factor" target="_blank"><em>Multivariate &gt; Factor</em></a>.</p>
 <p>The key functions from the <code>psych</code> packages used in the <code>full_factor</code> tool are <code>principal</code> and <code>fa</code> .</p>
-<p>© Vincent Nijs (2018) <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width: 0" src="./images/by-nc-sa.png"></a></p>
+<p>© Vincent Nijs (2018) <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width: 0" src="images/by-nc-sa.png"></a></p>
+</div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
 
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#including-categorical-variables">Including categorical variables</a></li>
+      </ul>
+</div>
       </div>
 
 </div>

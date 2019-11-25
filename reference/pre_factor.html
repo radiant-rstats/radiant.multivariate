@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
       </span>
     </div>
 
@@ -168,7 +168,8 @@
     <p>Evaluate if data are appropriate for PCA / Factor analysis</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pre_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
+    <pre class="usage"><span class='fu'>pre_factor</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>mcor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -180,6 +181,10 @@
     <tr>
       <th>vars</th>
       <td><p>Variables to include in the analysis</p></td>
+    </tr>
+    <tr>
+      <th>mcor</th>
+      <td><p>Use psych::mixedCor to calculate the correlation matrix</p></td>
     </tr>
     <tr>
       <th>data_filter</th>
@@ -203,15 +208,15 @@
 <p><code>plot.pre_factor</code> to plot results</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>pre_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 10
-#&gt;  $ pre_r2     :'data.frame':	6 obs. of  1 variable:
+    <pre class="examples"><div class='input'><span class='fu'>pre_factor</span>(<span class='no'>shopping</span>, <span class='st'>"v1:v6"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 12
+#&gt;  $ pre_r2        :'data.frame':	6 obs. of  1 variable:
 #&gt;   ..$ Rsq: num [1:6] 0.89 0.38 0.794 0.585 0.808 ...
-#&gt;  $ scmat      : num [1:6, 1:6] 9.1 -0.24 -4.56 -1.73 5.14 ...
+#&gt;  $ scmat         : num [1:6, 1:6] 9.1 -0.24 -4.56 -1.73 5.14 ...
 #&gt;   ..- attr(*, "dimnames")=List of 2
 #&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ pre_eigen  : num [1:6] 2.664 2.15 0.473 0.433 0.217 ...
-#&gt;  $ pre_kmo    :List of 5
+#&gt;  $ pre_eigen     : num [1:6] 2.664 2.15 0.473 0.433 0.217 ...
+#&gt;  $ pre_kmo       :List of 5
 #&gt;   ..$ MSA  : num 0.554
 #&gt;   ..$ MSAi : Named num [1:6] 0.516 0.783 0.586 0.482 0.637 ...
 #&gt;   .. ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
@@ -222,18 +227,21 @@
 #&gt;   ..$ ImCov: num [1:6, 1:6] 0.1099 -0.0163 -0.1029 -0.0788 0.1083 ...
 #&gt;   ..$ Call : language psych::KMO(r = cmat)
 #&gt;   ..- attr(*, "class")= chr [1:2] "psych" "KMO"
-#&gt;  $ btest      :List of 3
+#&gt;  $ btest         :List of 3
 #&gt;   ..$ chisq  : num 66.7
 #&gt;   ..$ p.value: num 1.71e-08
 #&gt;   ..$ df     : num 15
-#&gt;  $ cmat       : num [1:6, 1:6] 1 0.0255 0.8378 -0.104 -0.8754 ...
+#&gt;  $ cmat          : num [1:6, 1:6] 1 0.0255 0.8378 -0.104 -0.8754 ...
 #&gt;   ..- attr(*, "dimnames")=List of 2
 #&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
 #&gt;   .. ..$ : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ nrObs      : int 20
-#&gt;  $ df_name    : chr "shopping"
-#&gt;  $ vars       : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ data_filter: chr ""
+#&gt;  $ anyCategorical: Named logi [1:6] FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt;   ..- attr(*, "names")= chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ nrObs         : int 20
+#&gt;  $ df_name       : chr "shopping"
+#&gt;  $ vars          : chr [1:6] "v1" "v2" "v3" "v4" ...
+#&gt;  $ mcor          : logi FALSE
+#&gt;  $ data_filter   : chr ""
 #&gt;  - attr(*, "class")= chr [1:2] "pre_factor" "list"</div><div class='input'>
 </div></pre>
   </div>
