@@ -53,6 +53,11 @@ observeEvent(c(input$hc_vars, input$hc_labels != "none"), {
   }
 })
 
+output$ui_hc_store_name <- renderUI({
+  req(input$dataset)
+  textInput("hc_store_name", NULL, "", placeholder = "Provide variable name")
+})
+
 ## add a spinning refresh icon if the tabel needs to be (re)calculated
 run_refresh(hc_args, "hc", init = "vars", label = "Estimate model", relabel = "Re-estimate model")
 
@@ -96,6 +101,20 @@ output$ui_hclus <- renderUI({
         ), width = "100%"
       )),
       checkboxInput("hc_standardize", "Standardize", state_init("hc_standardize", TRUE))
+    ),
+    wellPanel(
+      conditionalPanel(
+        condition = "input.hc_vars != null",
+        numericInput(
+          "hc_nr_clus", "Number of clusters:", min = 2,
+          value = state_init("hc_nr_clus", 2)
+        ),
+        HTML("<label>Store cluster membership:</label>"),
+        tags$table(
+          tags$td(uiOutput("ui_hc_store_name")),
+          tags$td(actionButton("hc_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
+        )
+      )
     ),
     help_and_report(
       modal_title = "Hierarchical cluster analysis",
@@ -201,6 +220,16 @@ observeEvent(input$hclus_report, {
     inp_out <- list("", "")
     figs <- FALSE
   }
+
+  if (!is_empty(input$hc_store_name)) {
+    fixed <- fix_names(input$hc_store_name)
+    updateTextInput(session, "hc_store_name", value = fixed)
+    nr_clus <- ifelse(is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
+    xcmd <- glue('{input$dataset} <- store({input$dataset}, result, nr_clus = {nr_clus}, name = "{fixed}")')
+  } else {
+    xcmd <- ""
+  }
+
   update_report(
     inp_main = clean_args(hc_inputs(), hc_args),
     fun_name = "hclus",
@@ -208,8 +237,24 @@ observeEvent(input$hclus_report, {
     outputs = outputs,
     figs = figs,
     fig.width = hc_plot_width(),
-    fig.height = hc_plot_height()
+    fig.height = hc_plot_height(),
+    xcmd = xcmd
   )
+})
+
+## store cluster membership
+observeEvent(input$hc_store, {
+  req(input$hc_store_name, input$hc_run)
+  fixed <- fix_names(input$hc_store_name)
+  nr_clus <- ifelse(is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
+  updateTextInput(session, "hc_store_name", value = fixed)
+  robj <- .hclus()
+  if (!is.character(robj)) {
+    withProgress(
+      message = "Storing cluster membership", value = 1,
+      r_data[[input$dataset]] <- store(r_data[[input$dataset]], robj, nr_clus = nr_clus, name = fixed)
+    )
+  }
 })
 
 download_handler(

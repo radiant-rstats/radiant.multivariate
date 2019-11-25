@@ -203,3 +203,31 @@ plot.hclus <- function(
     if (shiny) . else print(.)
   }
 }
+
+#' Add a cluster membership variable to the active dataset
+#'
+#' @details See \url{https://radiant-rstats.github.io/docs/multivariate/hclus.html} for an example in Radiant
+#'
+#' @param dataset Dataset to append to cluster membership variable to
+#' @param object Return value from \code{\link{hclus}}
+#' @param nr_clus Number of clusters to extract
+#' @param name Name of cluster membership variable
+#' @param ... Additional arguments
+#'
+#' @examples
+#' hclus(shopping, vars = "v1:v6") %>%
+#'   store(shopping, ., nr_clus = 3) %>%
+#'   head()
+#' @seealso \code{\link{hclus}} to generate results
+#' @seealso \code{\link{summary.hclus}} to summarize results
+#' @seealso \code{\link{plot.hclus}} to plot results
+#'
+#' @export
+store.hclus <- function(dataset, object, nr_clus = 2, name = "", ...) {
+  if (is_empty(name)) name <- paste0("hclus", nr_clus)
+  indr <- indexr(dataset, object$vars, object$data_filter)
+  hm <- rep(NA, indr$nr)
+  hm[indr$ind] <- cutree(object$hc_out, nr_clus)
+  dataset[[name]] <- as.factor(hm)
+  dataset
+}
