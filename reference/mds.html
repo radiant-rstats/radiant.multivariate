@@ -224,7 +224,7 @@
 <p><code>plot.mds</code> to plot results</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>mds</span>(<span class='no'>city</span>, <span class='st'>"from"</span>, <span class='st'>"to"</span>, <span class='st'>"distance"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 17
+    <pre class="examples"><div class='input'><span class='fu'>mds</span>(<span class='no'>city</span>, <span class='st'>"from"</span>, <span class='st'>"to"</span>, <span class='st'>"distance"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 19
 #&gt;  $ res        :List of 2
 #&gt;   ..$ points: num [1:9, 1:2] -1349 -1199 -1077 -1227 -428 ...
 #&gt;   .. ..- attr(*, "dimnames")=List of 2
@@ -244,6 +244,8 @@
 #&gt;  $ id2_dat    : chr [1:45] "Boston" "NY" "DC" "Miami" ...
 #&gt;  $ id1_dat    : chr [1:45] "Boston" "Boston" "Boston" "Boston" ...
 #&gt;  $ d          : int [1:45] 0 206 429 1504 963 2976 3095 2979 1949 0 ...
+#&gt;  $ nr_na      : int 0
+#&gt;  $ init_row   : int 45
 #&gt;  $ df_name    : chr "city"
 #&gt;  $ id1        : chr "from"
 #&gt;  $ id2        : chr "to"
@@ -252,7 +254,7 @@
 #&gt;  $ nr_dim     : num 2
 #&gt;  $ seed       : num 1234
 #&gt;  $ data_filter: chr ""
-#&gt;  - attr(*, "class")= chr [1:2] "mds" "list"</div><div class='input'><span class='fu'>mds</span>(<span class='no'>diamonds</span>, <span class='st'>"clarity"</span>, <span class='st'>"cut"</span>, <span class='st'>"price"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt;  'mds' chr "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variabl"| __truncated__</div><div class='input'>
+#&gt;  - attr(*, "class")= chr [1:2] "mds" "list"</div><div class='input'><span class='fu'>mds</span>(<span class='no'>diamonds</span>, <span class='st'>"clarity"</span>, <span class='st'>"cut"</span>, <span class='st'>"price"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt;  'mds' chr "Number of observations and unique IDs for the brand variable do not match.\nPlease choose other ID variables or"| __truncated__</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
