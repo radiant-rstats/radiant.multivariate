@@ -41,7 +41,8 @@ output$ui_pm_brand <- renderUI({
 
 output$ui_pm_attr <- renderUI({
   vars <- varnames()
-  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  # toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  toSelect <- .get_class() %in% c("numeric", "integer", "date")
   vars <- vars[toSelect]
   selectInput(
     inputId = "pm_attr", label = "Attributes:", choices = vars,
@@ -52,8 +53,9 @@ output$ui_pm_attr <- renderUI({
 
 output$ui_pm_pref <- renderUI({
   if (not_available(input$pm_attr)) return()
-  isNum <- "numeric" == .get_class() | "integer" == .get_class()
-  vars <- varnames()[isNum]
+  vars <- varnames()
+  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  vars <- vars[toSelect]
   if (length(vars) > 0) vars <- vars[-which(vars %in% input$pm_attr)]
   selectInput(
     inputId = "pm_pref", label = "Preferences:", choices = vars,
@@ -100,7 +102,7 @@ output$ui_prmap <- renderUI({
           selected = state_init("pm_nr_dim", 2),
           inline = TRUE
         ),
-        checkboxInput("pm_hcor", "Adjust for {factor} variables", value = state_init("pm_hcor", FALSE)),
+        # checkboxInput("pm_hcor", "Adjust for {factor} variables", value = state_init("pm_hcor", FALSE)),
         numericInput(
           "pm_cutoff", label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05

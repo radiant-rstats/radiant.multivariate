@@ -20,6 +20,8 @@
 #' @seealso \code{\link{summary.hclus}} to summarize results
 #' @seealso \code{\link{plot.hclus}} to plot results
 #'
+#' @importFrom gower gower_dist
+#'
 #' @export
 hclus <- function(
   dataset, vars, labels = "none", distance = "sq.euclidian",
@@ -30,13 +32,15 @@ hclus <- function(
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, if (labels == "none") vars else c(labels, vars), filt = data_filter, envir = envir) %>%
-    as.data.frame()
+    as.data.frame() %>%
+    mutate_if(is.Date, as.numeric)
   rm(envir)
   if (nrow(dataset) > max_cases) {
     return("The number of cases to cluster exceed the maximum set. Change\nthe number of cases allowed using the 'Max cases' input box." %>%
       add_class("hclus"))
   }
 
+  anyCategorical <- sapply(dataset, function(x) is.numeric(x)) == FALSE
   ## in case : is used
   if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
@@ -52,11 +56,18 @@ hclus <- function(
     dataset <- select(dataset, -1)
   }
 
-  hc_out <- dataset %>%
-    {if (standardize) scale(.) else .} %>%
-    {if (distance == "sq.euclidian") dist(., method = "euclidean") ^ 2 else dist(., method = distance)} %>%
-    hclust(d = ., method = method)
-
+  if (standardize) {
+    dataset <- mutate_if(dataset, is.numeric, ~ as.vector(scale(.)))
+  }
+  if (distance == "sq.euclidian") {
+    d <- dist(dataset, method = "euclidean") ^ 2
+  } else if (distance == "gower") {
+    d <- sapply(1:nrow(dataset), function(i) gower::gower_dist(dataset[i, ], dataset)) %>%
+      as.dist()
+  } else {
+    d <- dist(dataset, method = distance)
+  }
+  hc_out <- hclust(d = d, method = method)
   as.list(environment()) %>% add_class("hclus")
 }
 
@@ -88,6 +99,9 @@ summary.hclus <- function(object, ...) {
   cat("Distance    :", object$distance, "\n")
   cat("Standardize :", object$standardize, "\n")
   cat("Observations:", format_nr(length(object$hc_out$order), dec = 0), "\n")
+  if (sum(object$anyCategorical) > 0 && object$distance != "gower") {
+    cat("** When {factor} variables are included \"Gower\" distance should be used **\n\n")
+  }
 }
 
 #' Plot method for the hclus function

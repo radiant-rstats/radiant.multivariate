@@ -4,8 +4,10 @@ hc_method <- list(
 )
 
 hc_distance <- c(
-  "Squared euclidean" = "sq.euclidian", "Euclidian" = "euclidean",
-  "Maximum" = "maximum", "Manhattan" = "manhattan", "Canberra" = "canberra", "Binary" = "binary", "Minkowski" = "minkowski"
+  "Squared euclidean" = "sq.euclidian", "Binary" = "binary",
+  "Canberra" = "canberra", "Euclidian" = "euclidean",
+  "Gower" = "gower", "Manhattan" = "manhattan",
+  "Maximum" = "maximum", "Minkowski" = "minkowski"
 )
 
 hc_plots <- c("Scree" = "scree", "Change" = "change", "Dendrogram" = "dendro")
@@ -28,8 +30,9 @@ hc_inputs <- reactive({
 ###############################################################
 
 output$ui_hc_vars <- renderUI({
-  isNum <- "numeric" == .get_class() | "integer" == .get_class()
-  vars <- varnames()[isNum]
+  vars <- varnames()
+  toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
+  vars <- vars[toSelect]
   selectInput(
     inputId = "hc_vars", label = "Variables:", choices = vars,
     selected = state_multiple("hc_vars", vars),

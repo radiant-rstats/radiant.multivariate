@@ -22,6 +22,7 @@
 #' @importFrom psych principal fa factor.scores
 #' @importFrom GPArotation quartimax oblimin simplimax
 #' @importFrom polycor hetcor
+#' @importFrom psych scoreIrt
 #'
 #' @export
 full_factor <- function(
@@ -80,7 +81,18 @@ full_factor <- function(
           add_class("full_factor")
       )
     }
-    fres$scores <- psych::factor.scores(as.matrix(dataset), fres, method = "Thurstone")$scores
+    if (sum(anyCategorical) == ncol(dataset)) {
+      scores <- try(scale(psych::scoreIrt(fres, as.matrix(dataset))[,1:nrFac]), silent=TRUE)
+      if (inherits(scores, "try-error")) {
+        return("An error occured estimating latent factor scores using psychIrt." %>% add_class("full_factor"))
+      } else {
+        fres$scores <- scores
+        rm(scores)
+        colnames(fres$scores) <- colnames(fres$loadings)
+      }
+    } else {
+      fres$scores <- psych::factor.scores(as.matrix(dataset), fres, method = "Thurstone")$scores
+    }
   }
 
   ## convert loadings object to data.frame
@@ -148,7 +160,14 @@ summary.full_factor <- function(
   }
   if (sum(object$anyCategorical) > 0) {
     if (isTRUE(object$hcor)) {
-      cat("** Variables of type {factor} are assumed to be ordinal **\n\n")
+      cat("** Variables of type {factor} are assumed to be ordinal **\n")
+      if (object$method == "PCA") {
+        cat("** Factor scores are biased when using PCA when one or more {factor} variables are included **\n\n")
+      } else if (sum(object$anyCategorical) == length(object$vars)) {
+        cat("** Factor scores calculated using psych::scoreIrt **\n\n")
+      } else if (sum(object$anyCategorical) < length(object$vars)) {
+        cat("** Factor scores are biased when a mix of {factor} and numeric variables are used **\n\n")
+      }
     } else {
       cat("** Variables of type {factor} included without adjustment **\n\n")
     }
