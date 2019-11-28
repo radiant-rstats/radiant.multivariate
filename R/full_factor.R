@@ -32,7 +32,8 @@ full_factor <- function(
 ) {
 
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
-  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
+  dataset <- get_data(dataset, vars, filt = data_filter, envir = envir) %>%
+    mutate_if(is.Date, as.numeric)
   rm(envir)
 
   ## in case : is used
@@ -40,7 +41,6 @@ full_factor <- function(
     vars <- colnames(dataset)
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
-  isFct <- anyCategorical
   nrObs <- nrow(dataset)
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dataset)) {
@@ -50,7 +50,6 @@ full_factor <- function(
   }
 
   if (hcor) {
-    dataset <- mutate_if(dataset, is.Date, as.numeric)
     cmat <- try(sshhr(polycor::hetcor(dataset, ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     if (inherits(cmat, "try-error")) {
