@@ -40,6 +40,10 @@ full_factor <- function(
     vars <- colnames(dataset)
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
+  isFct <- anyCategorical
+  if (sum(isFct) > 0) {
+    isFct[isFct] <- select_if(dataset, isFct) %>% {sapply(., function(x) length(levels(x)) == 2)}
+  }
   nrObs <- nrow(dataset)
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dataset)) {
@@ -62,6 +66,7 @@ full_factor <- function(
     cmat <- cor(dataset)
   }
 
+
   if (method == "PCA") {
     fres <- psych::principal(
       cmat, nfactors = nrFac, rotate = rotation, scores = FALSE,
@@ -69,7 +74,7 @@ full_factor <- function(
     )
     m <- fres$loadings[, colnames(fres$loadings)]
     cscm <- m %*% solve(crossprod(m))
-    fres$scores <- scale(as.matrix(dataset), center = TRUE, scale = TRUE) %*% cscm
+    fres$scores <- as.matrix(mutate_all(dataset, radiant.data::standardize)) %*% cscm
   } else {
     fres <- try(psych::fa(
       cmat, nfactors = nrFac, rotate = rotation,
@@ -81,12 +86,16 @@ full_factor <- function(
           add_class("full_factor")
       )
     }
-    if (sum(anyCategorical) == ncol(dataset)) {
-      scores <- try(scale(psych::scoreIrt(fres, as.matrix(dataset))[,1:nrFac]), silent=TRUE)
+    if (sum(anyCategorical) == ncol(dataset) && isTRUE(hcor)) {
+      ## necessary to deal with psych::irt.tau qnorm issue
+      dataset <- mutate_if(dataset, isFct, ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
+      scores <- try(psych::scoreIrt(fres, dataset), silent=TRUE)
       if (inherits(scores, "try-error")) {
-        return("An error occured estimating latent factor scores using psychIrt." %>% add_class("full_factor"))
+        return(
+          paste0("An error occured estimating latent factor scores using psychIrt. The error message was:\n\n", attr(scores, 'condition')$message) %>% add_class("full_factor")
+        )
       } else {
-        fres$scores <- scores
+        fres$scores <- apply(scores[,1:nrFac], 2, radiant.data::standardize)
         rm(scores)
         colnames(fres$scores) <- colnames(fres$loadings)
       }
