@@ -41,9 +41,6 @@ full_factor <- function(
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
   isFct <- anyCategorical
-  if (sum(isFct) > 0) {
-    isFct[isFct] <- select_if(dataset, isFct) %>% {sapply(., function(x) length(levels(x)) == 2)}
-  }
   nrObs <- nrow(dataset)
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dataset)) {
@@ -88,7 +85,8 @@ full_factor <- function(
     }
     if (sum(anyCategorical) == ncol(dataset) && isTRUE(hcor)) {
       ## necessary to deal with psych::irt.tau qnorm issue
-      dataset <- mutate_if(dataset, isFct, ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
+      isMaxMinOne <- sapply(dataset, function(x) (max(x, na.rm = TRUE) - min(x, na.rm = TRUE) == 1))
+      dataset <- mutate_if(dataset, isMaxMinOne, ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
       scores <- try(psych::scoreIrt(fres, dataset), silent=TRUE)
       if (inherits(scores, "try-error")) {
         return(
