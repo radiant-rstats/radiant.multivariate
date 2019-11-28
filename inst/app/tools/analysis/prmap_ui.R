@@ -41,6 +41,7 @@ output$ui_pm_brand <- renderUI({
 
 output$ui_pm_attr <- renderUI({
   vars <- varnames()
+  ## can't get valid factor scores with PCA and {factor} variables
   # toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
   toSelect <- .get_class() %in% c("numeric", "integer", "date")
   vars <- vars[toSelect]
