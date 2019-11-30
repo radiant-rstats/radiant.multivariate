@@ -83,7 +83,8 @@ prmap <- function(
     select(-1)
 
   if (!is_empty(pref)) {
-    p_data <- get_data(dataset, pref, envir = envir)
+    p_data <- get_data(dataset, pref, envir = envir) %>%
+      mutate_if(is.Date, as.numeric)
     anyPrefCat <- sapply(p_data, function(x) is.numeric(x) || is.Date(x)) == FALSE
     if (sum(anyPrefCat) > 0) {
       pref_cor <- sshhr(polycor::hetcor(cbind(p_data, fres$scores), ML = FALSE, std.err = FALSE)$correlations)
