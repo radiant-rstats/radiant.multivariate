@@ -57,7 +57,7 @@ output$ui_pm_pref <- renderUI({
   vars <- varnames()
   toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
   vars <- vars[toSelect]
-  if (length(vars) > 0) vars <- vars[-which(vars %in% input$pm_attr)]
+  if (length(vars) > 0) vars <- vars[-which(vars %in% c(input$pm_brand, input$pm_attr))]
   selectInput(
     inputId = "pm_pref", label = "Preferences:", choices = vars,
     selected = state_multiple("pm_pref", vars), multiple = TRUE,

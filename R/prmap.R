@@ -83,18 +83,19 @@ prmap <- function(
     select(-1)
 
   if (!is_empty(pref)) {
-    if (sum(anyCategorical) > 0) {
-      pref_dat <- get_data(dataset, pref, envir = envir)
-      pref_cor <- sshhr(polycor::hetcor(cbind(pref_dat, fres$scores), ML = FALSE, std.err = FALSE)$correlations)
+    p_data <- get_data(dataset, pref, envir = envir)
+    anyPrefCat <- sapply(p_data, function(x) is.numeric(x) || is.Date(x)) == FALSE
+    if (sum(anyPrefCat) > 0) {
+      pref_cor <- sshhr(polycor::hetcor(cbind(p_data, fres$scores), ML = FALSE, std.err = FALSE)$correlations)
       pref_cor <- as.data.frame(pref_cor[-((length(pref)+1):nrow(pref_cor)), -(1:length(pref))], stringsAsFactor = FALSE)
-
     } else {
-      pref_cor <- get_data(dataset, pref, envir = envir) %>%
+      pref_cor <- p_data %>%
         cor(fres$scores) %>%
         data.frame(stringsAsFactors = FALSE)
     }
     pref <- colnames(pref_cor)
     pref_cor$communalities <- rowSums(pref_cor ^ 2)
+    rm(p_data, anyPrefCat)
   }
 
   rm(f_data, m, cscm, envir)
