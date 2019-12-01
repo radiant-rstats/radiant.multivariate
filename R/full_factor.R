@@ -92,18 +92,18 @@ full_factor <- function(
         max_dat <- max(dataset)
         min_dat <- min(dataset)
         if (any(tau == Inf)) {
-          tau[tau == Inf] <- max((max_dat - min_dat) * 1.5, 4)
+          tau[tau == Inf] <- max((max_dat - min_dat) * 5, 4)
           warning("Tau values of Inf found. Adjustment applied")
         }
         if (any(tau == -Inf)) {
-          tau[tau == -Inf] <- min(-(max_dat - min_dat) * 1.5, -4)
+          tau[tau == -Inf] <- min(-(max_dat - min_dat) * 5, -4)
           warning("Tau values of -Inf found. Adjustment applied")
         }
         diffi <- list()
         for (i in 1:nf) diffi[[i]] <- tau/sqrt(1 - m[, i]^2)
         discrim <- m/sqrt(1 - m^2)
         new.stats <- list(difficulty = diffi, discrimination = discrim)
-        psych::score.irt.poly(new.stats, dataset, bounds = c(-4, 4))
+        psych::score.irt.poly(new.stats, dataset, cut = 0, bounds = c(-4, 4))
       }
       scores <- try(.irt.tau(), silent = TRUE)
       rm(.irt.tau)
