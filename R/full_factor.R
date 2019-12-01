@@ -50,18 +50,20 @@ full_factor <- function(
   }
 
   if (hcor) {
-    cmat <- try(sshhr(polycor::hetcor(dataset, ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
+    cmat <- try(sshhr(polycor::hetcor(dataset, ML = FALSE, std.err = FALSE)), silent = TRUE)
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     if (inherits(cmat, "try-error")) {
-      message("Calculating the heterogeneous correlation matrix produced an error.\nUsing standard correlation matrix instead")
+      warning("Calculating the heterogeneous correlation matrix produced an error.\nUsing standard correlation matrix instead")
       hcor <- "Calculation failed"
       cmat <- cor(dataset)
+    } else {
+      cmat <- cmat$correlations
     }
+
   } else {
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     cmat <- cor(dataset)
   }
-
 
   if (method == "PCA") {
     fres <- psych::principal(
@@ -72,10 +74,7 @@ full_factor <- function(
     cscm <- m %*% solve(crossprod(m))
     fres$scores <- as.matrix(mutate_all(dataset, radiant.data::standardize)) %*% cscm
   } else {
-    fres <- try(psych::fa(
-      cmat, nfactors = nrFac, rotate = rotation,
-      oblique.scores = FALSE, fm = "ml"
-    ), silent = TRUE)
+    fres <- try(psych::fa(cmat, nfactors = nrFac, rotate = rotation, oblique.scores = FALSE, fm = "ml"), silent = TRUE)
     if (inherits(fres, "try-error")) {
       return(
         "An error occured. Increase the number of variables or reduce the number of factors" %>%
@@ -86,13 +85,32 @@ full_factor <- function(
       ## necessary to deal with psych::irt.tau qnorm issue
       isMaxMinOne <- sapply(dataset, function(x) (max(x, na.rm = TRUE) - min(x, na.rm = TRUE) == 1))
       dataset <- mutate_if(dataset, isMaxMinOne, ~ (. - min(., na.rm = TRUE)) / (max(., na.rm = TRUE) - min(., na.rm = TRUE)))
-      scores <- try(psych::scoreIrt(fres, dataset), silent=TRUE)
+      .irt.tau <- function() {
+        tau <- psych::irt.tau(dataset)
+        m <- fres$loadings[, colnames(fres$loadings), drop = FALSE]
+        nf <- dim(m)[2]
+        if (any(tau == Inf)) {
+          tau[tau == Inf] <- 4
+          warning("Tau values of Inf found. Adjustment applied")
+        }
+        if (any(tau == -Inf)) {
+          tau[tau == -Inf] <- -4
+          warning("Tau values of -Inf found. Adjustment applied")
+        }
+        diffi <- list()
+        for (i in 1:nf) diffi[[i]] <- tau/sqrt(1 - m[, i]^2)
+        discrim <- m/sqrt(1 - m^2)
+        new.stats <- list(difficulty = diffi, discrimination = discrim)
+        psych::score.irt.poly(new.stats, dataset, bounds = c(-4, 4), mod = "normal")
+      }
+      scores <- try(.irt.tau(), silent = TRUE)
+      rm(.irt.tau)
       if (inherits(scores, "try-error")) {
         return(
           paste0("An error occured estimating latent factor scores using psychIrt. The error message was:\n\n", attr(scores, 'condition')$message) %>% add_class("full_factor")
         )
       } else {
-        fres$scores <- apply(scores[,1:nrFac], 2, radiant.data::standardize)
+        fres$scores <- apply(scores[,1:nrFac, drop=FALSE], 2, radiant.data::standardize)
         rm(scores)
         colnames(fres$scores) <- colnames(fres$loadings)
       }
