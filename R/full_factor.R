@@ -89,12 +89,14 @@ full_factor <- function(
         tau <- psych::irt.tau(dataset)
         m <- fres$loadings[, colnames(fres$loadings), drop = FALSE]
         nf <- dim(m)[2]
+        max_dat <- max(dataset)
+        min_dat <- min(dataset)
         if (any(tau == Inf)) {
-          tau[tau == Inf] <- 4
+          tau[tau == Inf] <- max((max_dat - min_dat), 4)
           warning("Tau values of Inf found. Adjustment applied")
         }
         if (any(tau == -Inf)) {
-          tau[tau == -Inf] <- -4
+          tau[tau == -Inf] <- min(-(max_dat - min_dat), -4)
           warning("Tau values of -Inf found. Adjustment applied")
         }
         diffi <- list()
