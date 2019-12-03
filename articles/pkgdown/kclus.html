@@ -164,9 +164,9 @@
 <h3 class="hasAnchor">
 <a href="#report-rmd" class="anchor"></a>Report &gt; Rmd</h3>
 <p>Add code to <a href="https://radiant-rstats.github.io/docs/data/report_rmd.html" target="_blank"><em>Report &gt; Rmd</em></a> to (re)create the analysis by clicking the <i title="report results" class="fa fa-edit"></i> icon on the bottom left of your screen or by pressing <code>ALT-enter</code> on your keyboard.</p>
-<p>If a plot was created it can be customized using <code>ggplot2</code> commands or with <code>gridExtra</code>. See example below and <a href="https://radiant-rstats.github.io/docs/data/visualize.html" target="_blank"><em>Data &gt; Visualize</em></a> for details.</p>
+<p>If a plot was created it can be customized using <code>ggplot2</code> commands or with <code>patchwork</code>. See example below and <a href="https://radiant-rstats.github.io/docs/data/visualize.html" target="_blank"><em>Data &gt; Visualize</em></a> for details.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(result, <span class="dt">plots =</span> <span class="st">"bar"</span>, <span class="dt">custom =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">    </span>gridExtra<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="dt">grobs =</span> ., <span class="dt">top =</span> <span class="st">"K-means Cluster Analysis"</span>, <span class="dt">ncol =</span> <span class="dv">2</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">wrap_plots</span>(plot_list, <span class="dt">ncol =</span> <span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">plot_annotation</span>(<span class="dt">title =</span> <span class="st">"K-means Cluster Analysis"</span>)</a></code></pre></div>
 </div>
 <div id="r-functions" class="section level3">
 <h3 class="hasAnchor">
