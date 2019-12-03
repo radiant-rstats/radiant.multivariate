@@ -16,6 +16,7 @@ Imports:
     dplyr (>= 0.8.3),
     rlang (>= 0.4.0),
     ggplot2 (>= 2.2.1),
+    gridExtra (>= 2.0.0),
     scales (>= 0.4.0),
     magrittr (>= 1.5),
     psych (>= 1.8.4),

@@ -15,6 +15,7 @@ globalVariables(c(
 #' @importFrom scales percent
 #' @importFrom import from
 #' @importFrom patchwork wrap_plots plot_annotation
+#' @importFrom gridExtra grid.arrange
 #' @importFrom grDevices rainbow
 #' @importFrom graphics abline arrows par plot points text title
 #' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd as.formula predict median
