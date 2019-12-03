@@ -12,9 +12,9 @@ globalVariables(c(
 #' @importFrom dplyr select select_at filter mutate mutate_if funs group_by group_by_at lag slice bind_rows mutate_all summarise_all rename
 #' @importFrom rlang .data
 #' @importFrom magrittr %>% %<>% %T>% set_colnames set_rownames set_names
-#' @importFrom gridExtra grid.arrange
 #' @importFrom scales percent
 #' @importFrom import from
+#' @importFrom patchwork wrap_plots plot_annotation
 #' @importFrom grDevices rainbow
 #' @importFrom graphics abline arrows par plot points text title
 #' @importFrom stats as.dendrogram as.dist cmdscale cor cov cutree dist factanal hclust kmeans lm na.omit qt sd as.formula predict median

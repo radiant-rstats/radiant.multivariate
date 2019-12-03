@@ -194,8 +194,9 @@ plot.hclus <- function(
       # geom_edge_elbow()
 
     if (cutoff == 0) {
-      # plot(hc, labels = labels, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
+      # plot_list[["dendro"]] <- patchwork::wrap_elements(plt, clip = FALSE)
+      # plot_list[["dendro"]] <- patchwork::wrap_elements(~ plot(hc), clip = FALSE)
     } else {
       plot(
         hc, ylim = c(cutoff, 1), leaflab = "none",
@@ -205,16 +206,13 @@ plot.hclus <- function(
     return(invisible())
   }
 
-  if (custom) {
-    if (length(plot_list) == 1) {
-      return(plot_list[[1]])
+  if (length(plot_list) > 0) {
+    if (custom) {
+      if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
-      return(plot_list)
+      patchwork::wrap_plots(plot_list, ncol = 1) %>%
+        {if (shiny) . else print(.)}
     }
-  }
-
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>% {
-    if (shiny) . else print(.)
   }
 }
 

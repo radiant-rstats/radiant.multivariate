@@ -16,7 +16,6 @@ Imports:
     dplyr (>= 0.8.3),
     rlang (>= 0.4.0),
     ggplot2 (>= 2.2.1),
-    gridExtra (>= 2.0.0),
     scales (>= 0.4.0),
     magrittr (>= 1.5),
     psych (>= 1.8.4),
@@ -28,7 +27,8 @@ Imports:
     ggrepel (>= 0.8),
     lubridate (>= 1.7.4),
     polycor (>= 0.7.10),
-    gower (>= 0.2.1)
+    gower (>= 0.2.1),
+    patchwork (>= 1.0.0)
 Suggests:
     testthat (>= 2.0.0),
     pkgdown (>= 1.1.0)

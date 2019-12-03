@@ -106,6 +106,7 @@ full_factor <- function(
         psych::score.irt.poly(new.stats, dataset, cut = 0, bounds = c(-4, 4))
       }
       scores <- try(.irt.tau(), silent = TRUE)
+      # scores <- psych::scoreIrt(fres, dataset, cut = 0)
       rm(.irt.tau)
       if (inherits(scores, "try-error")) {
         return(
@@ -303,16 +304,14 @@ plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, .
     }
   }
 
-  if (custom) {
-    if (length(plot_list) == 1) {
-      return(plot_list[[1]])
+  if (length(plot_list) > 0) {
+    if (custom) {
+      if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
-      return(plot_list)
+      patchwork::wrap_plots(plot_list, ncol = min(length(plot_list), 2)) %>%
+        {if (shiny) . else print(.)}
     }
   }
-
-  sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = min(length(plot_list), 2))) %>%
-    {if (shiny) . else print(.)}
 }
 
 #' Store factor scores to active dataset
