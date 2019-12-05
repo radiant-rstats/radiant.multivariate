@@ -235,9 +235,7 @@ plot.pre_factor <- function(
     if (custom) {
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
-      # patchwork::wrap_plots(plot_list, ncol = 1) %>%
-      #   {if (shiny) . else print(.)}
-      sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+      patchwork::wrap_plots(plot_list, ncol = 1) %>%
         {if (shiny) . else print(.)}
     }
   }

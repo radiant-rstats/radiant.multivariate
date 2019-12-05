@@ -182,10 +182,6 @@ plot.hclus <- function(
       xlab <- "When dendrogram is selected no other plots can be shown.\nCall the plot function separately in Report > Rmd to view different plot types."
     }
 
-    ## can't combine base graphics with grid graphics
-    ## https://cran.r-project.org/web/packages/gridExtra/vignettes/grid.arrange.html
-    ## ... unless you want to try gridBase https://cran.r-project.org/web/packages/gridBase/index.html
-
     ## trying out ggraph - looks great but dendrogram very slow for larger datasets
     # install.packages("ggraph")
     # library(ggraph)
@@ -195,13 +191,13 @@ plot.hclus <- function(
 
     if (cutoff == 0) {
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
-      # plot_list[["dendro"]] <- patchwork::wrap_elements(plt, clip = FALSE)
       # plot_list[["dendro"]] <- patchwork::wrap_elements(~ plot(hc), clip = FALSE)
     } else {
       plot(
         hc, ylim = c(cutoff, 1), leaflab = "none",
         main = "Cutoff dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity"
       )
+      # plot_list[["dendro"]] <- patchwork::wrap_elements(~ plot(hc), clip = FALSE)
     }
     return(invisible())
   }
@@ -210,9 +206,7 @@ plot.hclus <- function(
     if (custom) {
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
-      # patchwork::wrap_plots(plot_list, ncol = 1) %>%
-      #   {if (shiny) . else print(.)}
-      sshhr(gridExtra::grid.arrange(grobs = plot_list, ncol = 1)) %>%
+      patchwork::wrap_plots(plot_list, ncol = 1) %>%
         {if (shiny) . else print(.)}
     }
   }
