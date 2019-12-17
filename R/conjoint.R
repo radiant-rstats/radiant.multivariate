@@ -171,19 +171,19 @@ summary.conjoint <- function(
   coeff$label %<>% format(justify = "left")
   if (!additional) {
     coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
-    print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
+    print(dplyr::rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
     cat("\n")
   } else {
     if (all(coeff$p.value == "NaN")) {
       coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
-      print(rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
+      print(dplyr::rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
       cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
       return()
     } else {
       p.small <- coeff$p.value < .001
       coeff[, 2:5] %<>% format_df(dec)
       coeff$p.value[p.small] <- "< .001"
-      print(rename(coeff, `  ` = "label", ` ` = "sig_star"), row.names = FALSE)
+      print(dplyr::rename(coeff, `  ` = "label", ` ` = "sig_star"), row.names = FALSE)
     }
 
     model <- object$model_list[[show]]$model
