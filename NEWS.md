@@ -1,5 +1,9 @@
-# radiant.multivariate 1.2.0.0
+# radiant.multivariate 1.3.0.0
 
+* Allow factor variables in pre-factor, factor, and attribute based maps. Correlations will be calculated `polycor::hetcor` and factor scores are calculated using `psych::score.irt.poly`.
+* Add option to save cluster membership for hierarchical clustering
+* Add `gower` distance as a distance metric for hierarchical clustering
+* Use `patchwork` for grouping multiple plots together
 * Update action buttons that initiate model estimation when one or more inputs are changed. When a model should be re-estimated, a spinning "refresh" icon will be shown
 
 # radiant.multivariate 1.1.1.0
