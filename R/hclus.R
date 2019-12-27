@@ -42,9 +42,8 @@ hclus <- function(
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x)) == FALSE
   ## in case : is used
-  if (length(vars) < ncol(dataset)) {
-    vars <- colnames(dataset)
-  }
+  if (length(vars) < ncol(dataset)) vars <- colnames(dataset)
+  if (any(anyCategorical) && distance != "gower") distance <- "gower"
 
   if (labels != "none") {
     if (length(unique(dataset[[1]])) == nrow(dataset)) {
@@ -59,6 +58,7 @@ hclus <- function(
   if (standardize) {
     dataset <- mutate_if(dataset, is.numeric, ~ as.vector(scale(.)))
   }
+
   if (distance == "sq.euclidian") {
     d <- dist(dataset, method = "euclidean") ^ 2
   } else if (distance == "gower") {
@@ -100,7 +100,7 @@ summary.hclus <- function(object, ...) {
   cat("Standardize :", object$standardize, "\n")
   cat("Observations:", format_nr(length(object$hc_out$order), dec = 0), "\n")
   if (sum(object$anyCategorical) > 0 && object$distance != "gower") {
-    cat("** When {factor} variables are included \"Gower\" distance should be used **\n\n")
+    cat("** When {factor} variables are included \"Gower\" distance is used **\n\n")
   }
 }
 

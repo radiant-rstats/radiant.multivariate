@@ -3,7 +3,7 @@
 ###############################################################
 
 km_plots <- c("None" = "none", "Density" = "density", "Bar" = "bar", "Scatter" = "scatter")
-km_algorithm <- c("K-means" = "mean", "K-medians" = "median")
+km_algorithm <- c("K-means" = "kmeans", "K-proto" = "kproto")
 
 # list of function arguments
 km_args <- as.list(formals(kclus))
@@ -19,18 +19,8 @@ km_inputs <- reactive({
 
 output$ui_km_vars <- renderUI({
 
-  ## are there any two-level vars
-  dum <- two_level_vars()
-  if (length(dum) > 0) {
-    isVars <- .get_class() %in% c("integer", "numeric", "factor")
-    isFct <- {.get_class() == "factor"} %>%
-      {names(.[.])} %>%
-      base::setdiff(., dum)
-    vars <- varnames()[isVars] %>% .[!. %in% isFct]
-  } else {
-    isVars <- .get_class() %in% c("integer", "numeric")
-    vars <- varnames()[isVars]
-  }
+    sel <- .get_class() %in% c("integer", "numeric", "factor")
+    vars <- varnames()[sel]
 
   selectInput(
     inputId = "km_vars", label = "Variables:", choices = vars,
@@ -64,7 +54,7 @@ output$ui_kclus <- renderUI({
         condition = "input.tabs_kclus == 'Summary'",
         selectInput(
           "km_fun", label = "Algorithm:", choices = km_algorithm,
-          selected = state_single("km_fun", km_algorithm, "mean"), multiple = FALSE
+          selected = state_single("km_fun", km_algorithm, "kmeans"), multiple = FALSE
         ),
         uiOutput("ui_km_vars"),
         checkboxInput("km_standardize", "Standardize", state_init("km_standardize", TRUE)),

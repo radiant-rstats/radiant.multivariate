@@ -4,13 +4,14 @@
 #'
 #' @param dataset Dataset
 #' @param vars Vector of variables to include in the analysis
-#' @param fun Function to use: "mean" or "median"
+#' @param fun Use either "kmeans" or "kproto" for clustering
 #' @param hc_init Use centers from hclus as the starting point
 #' @param distance Distance for hclus
 #' @param method Method for hclus
 #' @param seed Random see to use for k-clustering if hc_init is FALSE
 #' @param nr_clus Number of clusters to extract
 #' @param standardize Standardize data (TRUE or FALSE)
+#' @param lambda Parameter > 0 to trade off between Euclidean distance of numeric variables and simple matching coefficient between categorical variables. Also a vector of variable specific factors is possible where the order must correspond to the order of the variables in the data. In this case all variables' distances will be multiplied by their corresponding lambda value.
 #' @param data_filter Expression entered in, e.g., Data > View to filter the dataset in Radiant. The expression should be a string (e.g., "price > 10000")
 #' @param envir Environment to extract data from
 #'
@@ -22,12 +23,12 @@
 #' @seealso \code{\link{plot.kclus}} to plot results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
-#' @importFrom Gmedian Gmedian kGmedian
+#' @importFrom clustMixType kproto
 #'
 #' @export
 kclus <- function(
-  dataset, vars, fun = "mean", hc_init = TRUE, distance = "sq.euclidian", 
-  method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, 
+  dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.euclidian",
+  method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, lambda = NULL,
   data_filter = "", envir = parent.frame()
 ) {
 
@@ -40,13 +41,36 @@ kclus <- function(
     vars <- colnames(dataset)
   }
 
-  if (fun == "median" && length(vars) < 2) {
-    stop("K-medians requires at least two variables as input")
+  if (fun == "median") {
+    stop("K-medians is deprecated. Use either 'kmeans' or 'kproto' for the 'fun' argument")
+  } else if (fun %in% c("mean", "kmeans")) {
+    fun <- "kmeans"
+    dataset <- select_if(dataset, function(x) !is.factor(x))
+    if (ncol(dataset) < length(vars))
+      cat("** Categorical variables cannot be used with K-means **.\n** Select the K-proto option instead **\n\n")
+    vars <- colnames(dataset)
+  } else if (fun == "kproto") {
+    if (hc_init) distance <- "gower"
+    if (!any(sapply(dataset, function(x) is.numeric(x)) == FALSE)) {
+      fun <- "kmeans"
+      cat("** K-means used when no categorical variables included **\n\n")
+    }
   }
 
-  ## converting factors to integer with first level = 1
-  convert <- function(x) as.integer(x == levels(x)[1])
-  dataset <- mutate_if(dataset, is.factor, convert)
+  max_freq <- function(x) as.factor(names(which.max(table(x))))
+  center_calc <- function(x, prop = FALSE) {
+    if (is.numeric(x)) {
+      mean(x)
+    } else {
+      mf <- max_freq(x)
+      if (prop) {
+        ps <- table(x) / length(x)
+        as.factor(paste0(mf, " (", 100 * round(ps[as.character(mf)], 2), "%)"))
+      } else {
+        mf
+      }
+    }
+  }
 
   if (hc_init) {
     init <- hclus(
@@ -54,69 +78,41 @@ kclus <- function(
       distance = distance, method = method,
       max_cases = Inf, standardize = standardize
     )
-
     clus_var <- cutree(init$hc_out, k = nr_clus)
     hc_cent <- c()
     km_out <- dataset %>%
       mutate(clus_var = clus_var) %>%
-      {if (standardize) mutate_all(., ~ as.vector(scale(.))) else .} %T>% {
+      {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %T>% {
         hc_cent <<-
           group_by(., clus_var) %>%
-          summarise_all(mean) %>%
-          select(-clus_var) %>%
-          as.matrix()
+          summarise_all(center_calc) %>%
+          select(-clus_var)
       } %>%
       select(-clus_var) %>%
       {
-        if (fun == "median") {
-          km_cent <- kmeans(., centers = hc_cent, algorithm = "MacQueen", iter.max = 500)$centers
-          Gmedian::kGmedian(., ncenters = km_cent)
+        if (fun == "kproto") {
+          clustMixType::kproto(as.data.frame(.), k = hc_cent, iter.max = 500, verbose = FALSE, lambda = lambda)
         } else {
-          kmeans(., centers = hc_cent, iter.max = 500)
+          kmeans(., centers = as.matrix(hc_cent), iter.max = 500)
         }
       }
     rm(init, hc_cent)
   } else {
-    seed %>% gsub("[^0-9]", "", .) %>% {
-      if (!is_empty(.)) set.seed(seed)
-    }
-    km_out <- dataset %>% {
-      if (standardize) mutate_all(., ~ as.vector(scale(.))) else .
-    } %>% {
-      if (fun == "median") {
-        km_cent <- kmeans(., centers = nr_clus, algorithm = "MacQueen", iter.max = 500)$centers
-        Gmedian::kGmedian(., ncenters = km_cent)
+    seed %>% gsub("[^0-9]", "", .) %>% {if (!is_empty(.)) set.seed(seed)}
+    km_out <- dataset %>%
+      {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %>%
+      {if (fun == "kproto") {
+        clustMixType::kproto(as.data.frame(.), k = nr_clus, iter.max = 500, verbose = FALSE, lambda = lambda)
       } else {
         kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
-      }
-    }
+      }}
   }
 
-  ## same calculations of SST etc. as for kmeans (verified)
-  if (fun == "median") {
-    sdat <- dataset %>% {
-      if (standardize) mutate_all(., ~ as.vector(scale(.))) else .
-    }
-    km_out$withinss <-
-      mutate(sdat, clus_var = km_out$cluster) %>%
-      group_by(clus_var) %>%
-      summarise_all(~ sum((. - mean(.))^2)) %>%
-      select(-clus_var) %>%
-      rowSums()
-    km_out$tot.withinss <- sum(km_out$withinss)
-    km_out$totss <-
-      summarise_all(sdat, ~ sum((. - mean(.))^2)) %>%
-      sum(.)
-    km_out$betweenss <- km_out$totss - km_out$tot.withinss
-    rm(sdat)
-  }
-
-  ## Gmedian / tibble / dplyr issue
   clus_names <- paste("Cluster", 1:nr_clus)
   clus_means <- dataset %>%
     mutate(clus_var = km_out$cluster) %>%
     group_by(clus_var) %>%
-    summarise_all(mean) %>%
+    summarise_all(function(x) center_calc(x, prop = TRUE)) %>%
     select(-clus_var) %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
     set_rownames(clus_names)
@@ -143,13 +139,16 @@ kclus <- function(
 #'
 #' @export
 summary.kclus <- function(object, dec = 2, ...) {
-  cat(paste0("K-", object$fun, "s cluster analysis\n"))
+  cat(paste0("K-", substring(object$fun, 2), " cluster analysis\n"))
   cat("Data         :", object$df_name, "\n")
   if (!is_empty(object$data_filter)) {
     cat("Filter       :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables    :", paste0(object$vars, collapse = ", "), "\n")
-  cat("Clustering by:", paste0("K-", object$fun, "s\n"))
+  cat("Clustering by:", paste0("K-", substring(object$fun, 2), "\n"))
+  if (object$fun == "kproto") {
+    cat("Lambda       :", round(object$km_out$lambda, dec), "\n")
+  }
   if (object$hc_init) {
     cat("HC method    :", object$method, "\n")
     cat("HC distance  :", object$distance, "\n")
@@ -158,7 +157,8 @@ summary.kclus <- function(object, dec = 2, ...) {
   cat("Observations :", format_nr(object$nr_obs, dec = 0), "\n")
   cat("Generated    :", object$nr_clus, "clusters of sizes", paste0(format_nr(object$km_out$size, dec = 0), collapse = " | "), "\n\n")
 
-  # cat(paste0("Cluster ", object$fun,"s:\n"))
+  # print(str(object))
+
   cat(paste0("Cluster means:\n"))
   cm <- object$clus_means
   cm <- cbind(data.frame(" " = paste0("Cluster ", 1:nrow(cm)), check.names = FALSE), cm)
@@ -200,18 +200,24 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
   x$dataset$Cluster <- as.factor(x$km_out$cluster)
   vars <- colnames(x$dataset) %>% .[-length(.)]
 
-  ## what to report?
-  x$fun <- "mean"
-  fun <- if (x$fun == "mean") mean else median
+  fct_plot <- function(dataset, var1, var2, color = "black", alpha = 0.5) {
+    tab <- as.data.frame(table(dataset[[var1]], dataset[[var2]]))
+    ggplot(tab, aes_string(x = "Var2", y = "Freq", fill = "Var1")) +
+      geom_bar(stat = "identity", position = "fill", alpha = alpha, color = color) +
+      scale_y_continuous(labels = scales::percent) +
+      labs(y = "", x = var2, fill = var1)
+  }
 
   plot_list <- list()
-
   if ("density" %in% plots) {
     for (var in vars) {
-      plot_list[[paste0("dens_", var)]] <-
-        ggplot(x$dataset, aes_string(x = var, fill = "Cluster")) +
-        geom_density(adjust = 2.5, alpha = 0.3) +
-        labs(y = "") + theme(axis.text.y = element_blank())
+      plot_list[[paste0("dens_", var)]] <- if (is.numeric(x$dataset[[var]])) {
+          ggplot(x$dataset, aes_string(x = var, fill = "Cluster")) +
+          geom_density(adjust = 2.5, alpha = 0.3) +
+          labs(y = "") + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+      } else {
+         fct_plot(x$dataset, "Cluster", var, color = "black", alpha = 0.3)
+      }
     }
   }
   if ("bar" %in% plots) {
@@ -220,40 +226,47 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
     }
 
     for (var in vars) {
-      dat_summary <-
-        select_at(x$dataset, .vars = c(var, "Cluster")) %>%
-        group_by_at(.vars = "Cluster") %>%
-        summarise_all(
-          list(
-            cent = fun,
-            n = length,
-            sd = sd,
-            se = se,
-            me = ~ me_calc(se, n, .95)
+      plot_list[[paste0("bar_", var)]] <- if (is.numeric(x$dataset[[var]])) {
+        dat_summary <-
+          select_at(x$dataset, .vars = c(var, "Cluster")) %>%
+          group_by_at(.vars = "Cluster") %>%
+          summarise_all(
+            list(
+              cent = mean,
+              n = length,
+              sd = sd,
+              se = se,
+              me = ~ me_calc(se, n, .95)
+            )
           )
-        )
 
-      plot_list[[paste0("bar_", var)]] <-
-        ggplot(dat_summary, aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
-        geom_bar(stat = "identity") +
-        geom_errorbar(width = .1, aes(ymin = cent - me, ymax = cent + me)) +
-        geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), color = "blue") +
-        theme(legend.position = "none") +
-        labs(y = paste0(var, " (", x$fun, ")"))
+          ggplot(dat_summary, aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
+          geom_bar(stat = "identity", alpha = 0.5) +
+          geom_errorbar(width = .1, aes(ymin = cent - me, ymax = cent + me)) +
+          geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), color = "blue") +
+          theme(legend.position = "none") +
+          labs(y = paste0(var, " (mean)"))
+      } else {
+         fct_plot(x$dataset, var, "Cluster")
+      }
     }
   }
   if ("scatter" %in% plots) {
     for (var in vars) {
-      plot_list[[paste0("scatter_", var)]] <-
-        visualize(
-          x$dataset,
-          xvar = "Cluster", yvar = var,
-          check = "jitter",
-          type = "scatter",
-          linecol = "blue",
-          pointcol = "black",
-          custom = TRUE
-        )
+      plot_list[[paste0("scatter_", var)]] <- if (is.numeric(x$dataset[[var]])) {
+          visualize(
+            x$dataset,
+            xvar = "Cluster", yvar = var,
+            check = "jitter",
+            type = "scatter",
+            linecol = "blue",
+            pointcol = "black",
+            custom = TRUE
+          )
+      } else {
+         fct_plot(x$dataset, var, "Cluster")
+      }
+
     }
   }
 
