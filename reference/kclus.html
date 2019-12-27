@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">radiant.multivariate</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -168,9 +168,9 @@
     <p>K-clustering</p>
     </div>
 
-    <pre class="usage"><span class='fu'>kclus</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"mean"</span>, <span class='kw'>hc_init</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <pre class="usage"><span class='fu'>kclus</span>(<span class='no'>dataset</span>, <span class='no'>vars</span>, <span class='kw'>fun</span> <span class='kw'>=</span> <span class='st'>"kmeans"</span>, <span class='kw'>hc_init</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>distance</span> <span class='kw'>=</span> <span class='st'>"sq.euclidian"</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"ward.D"</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>1234</span>,
-  <span class='kw'>nr_clus</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>standardize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>nr_clus</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>standardize</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>data_filter</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>envir</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>parent.frame</a></span>())</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -186,7 +186,7 @@
     </tr>
     <tr>
       <th>fun</th>
-      <td><p>Function to use: "mean" or "median"</p></td>
+      <td><p>Use either "kmeans" or "kproto" for clustering</p></td>
     </tr>
     <tr>
       <th>hc_init</th>
@@ -213,6 +213,10 @@
       <td><p>Standardize data (TRUE or FALSE)</p></td>
     </tr>
     <tr>
+      <th>lambda</th>
+      <td><p>Parameter &gt; 0 to trade off between Euclidean distance of numeric variables and simple matching coefficient between categorical variables. Also a vector of variable specific factors is possible where the order must correspond to the order of the variables in the data. In this case all variables' distances will be multiplied by their corresponding lambda value.</p></td>
+    </tr>
+    <tr>
       <th>data_filter</th>
       <td><p>Expression entered in, e.g., Data &gt; View to filter the dataset in Radiant. The expression should be a string (e.g., "price &gt; 10000")</p></td>
     </tr>
@@ -235,7 +239,7 @@
 <p><code>store.kclus</code> to add cluster membership to the selected dataset</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>kclus</span>(<span class='no'>shopping</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"v1:v6"</span>), <span class='kw'>nr_clus</span> <span class='kw'>=</span> <span class='fl'>3</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 17
+    <pre class="examples"><div class='input'><span class='fu'>kclus</span>(<span class='no'>shopping</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"v1:v6"</span>), <span class='kw'>nr_clus</span> <span class='kw'>=</span> <span class='fl'>3</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span>()</div><div class='output co'>#&gt; List of 19
 #&gt;  $ nr_obs     : int 20
 #&gt;  $ clus_means :'data.frame':	3 obs. of  6 variables:
 #&gt;   ..$ v1: num [1:3] 5.75 1.67 3.5
@@ -260,7 +264,8 @@
 #&gt;   ..$ ifault      : int 0
 #&gt;   ..- attr(*, "class")= chr "kmeans"
 #&gt;  $ clus_var   : int [1:20] 1 2 1 3 2 1 1 1 2 3 ...
-#&gt;  $ convert    :function (x)  
+#&gt;  $ center_calc:function (x, prop = FALSE)  
+#&gt;  $ max_freq   :function (x)  
 #&gt;  $ df_name    : chr "shopping"
 #&gt;  $ dataset    :Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	20 obs. of  6 variables:
 #&gt;   ..$ v1: int [1:20] 6 2 7 4 1 6 5 7 2 3 ...
@@ -271,13 +276,14 @@
 #&gt;   ..$ v6: int [1:20] 3 4 3 6 4 4 4 4 3 6 ...
 #&gt;   ..- attr(*, "description")= chr "## Shopping attitudes\n\n### Description\n\n20 consumers were asked to respond to six questions to determine th"| __truncated__
 #&gt;  $ vars       : chr [1:6] "v1" "v2" "v3" "v4" ...
-#&gt;  $ fun        : chr "mean"
+#&gt;  $ fun        : chr "kmeans"
 #&gt;  $ hc_init    : logi TRUE
 #&gt;  $ distance   : chr "sq.euclidian"
 #&gt;  $ method     : chr "ward.D"
 #&gt;  $ seed       : num 1234
 #&gt;  $ nr_clus    : num 3
 #&gt;  $ standardize: logi TRUE
+#&gt;  $ lambda     : NULL
 #&gt;  $ data_filter: chr ""
 #&gt;  - attr(*, "class")= chr [1:2] "kclus" "list"</div></pre>
   </div>
