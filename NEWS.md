@@ -1,3 +1,7 @@
+# radiant.multivariate 1.3.2.0
+
+* Allow factor variables in K-clustering using clustMixType::kproto
+
 # radiant.multivariate 1.3.0.0
 
 * Allow factor variables in pre-factor, factor, and attribute based maps. Correlations will be calculated `polycor::hetcor` and factor scores are calculated using `psych::score.irt.poly`.

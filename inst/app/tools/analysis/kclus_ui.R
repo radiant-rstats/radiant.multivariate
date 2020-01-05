@@ -18,15 +18,26 @@ km_inputs <- reactive({
 })
 
 output$ui_km_vars <- renderUI({
-
-    sel <- .get_class() %in% c("integer", "numeric", "factor")
-    vars <- varnames()[sel]
-
+  sel <- .get_class() %in% c("integer", "numeric", "factor")
+  vars <- varnames()[sel]
   selectInput(
     inputId = "km_vars", label = "Variables:", choices = vars,
     selected = state_multiple("km_vars", vars, input$hc_vars),
     multiple = TRUE, size = min(8, length(vars)), selectize = FALSE
   )
+})
+
+output$ui_km_lambda <- renderUI({
+  numericInput(
+    "km_lambda", "Lambda:", min = 0,
+    value = state_init("km_lambda", NA)
+  )
+})
+
+observeEvent(input$km_fun, {
+  if (input$km_fun == "kmeans") {
+    updateNumericInput(session = session, inputId = "km_lambda", value = NA)
+  }
 })
 
 observeEvent(input$dataset, {
@@ -57,6 +68,10 @@ output$ui_kclus <- renderUI({
           selected = state_single("km_fun", km_algorithm, "kmeans"), multiple = FALSE
         ),
         uiOutput("ui_km_vars"),
+        conditionalPanel(
+          condition = "input.km_fun == 'kproto'",
+          uiOutput("ui_km_lambda")
+        ),
         checkboxInput("km_standardize", "Standardize", state_init("km_standardize", TRUE)),
         checkboxInput(
           inputId = "km_hc_init", label = "Initial centers from HC",
@@ -210,8 +225,11 @@ observeEvent(input$kclus_report, {
     xcmd <- ""
   }
 
+  kmi <- km_inputs()
+  if (input$km_fun == "kmeans") kmi$lambda <- NULL
+
   update_report(
-    inp_main = clean_args(km_inputs(), km_args),
+    inp_main = clean_args(kmi, km_args),
     fun_name = "kclus",
     inp_out = inp_out,
     outputs = outputs,

@@ -36,6 +36,8 @@ kclus <- function(
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   rm(envir)
 
+  if (is_empty(lambda)) lambda <- NULL
+
   ## in case : is used
   if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
@@ -89,20 +91,26 @@ kclus <- function(
           select(-clus_var)
       } %>%
       select(-clus_var) %>%
-      {
-        if (fun == "kproto") {
-          clustMixType::kproto(as.data.frame(.), k = hc_cent, iter.max = 500, verbose = FALSE, lambda = lambda)
-        } else {
-          kmeans(., centers = as.matrix(hc_cent), iter.max = 500)
-        }
-      }
+      {if (fun == "kproto") {
+         kp <- clustMixType::kproto(as.data.frame(.), k = hc_cent, iter.max = 500, verbose = FALSE, lambda = lambda)
+         ## kproto doesn't provide totss or betweenss by default
+         kp$totss <- clustMixType::kproto(as.data.frame(.), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
+         kp$betweenss <- kp$totss - kp$tot.withinss
+         kp
+       } else {
+         kmeans(., centers = as.matrix(hc_cent), iter.max = 500)
+      }}
     rm(init, hc_cent)
   } else {
     seed %>% gsub("[^0-9]", "", .) %>% {if (!is_empty(.)) set.seed(seed)}
     km_out <- dataset %>%
       {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %>%
       {if (fun == "kproto") {
-        clustMixType::kproto(as.data.frame(.), k = nr_clus, iter.max = 500, verbose = FALSE, lambda = lambda)
+        kp <- clustMixType::kproto(as.data.frame(.), k = nr_clus, iter.max = 500, verbose = FALSE, lambda = lambda)
+        ## kproto doesn't provide totss or betweenss by default
+        kp$totss <- clustMixType::kproto(as.data.frame(.), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
+        kp$betweenss <- kp$totss - kp$tot.withinss
+        kp
       } else {
         kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
       }}
@@ -156,8 +164,6 @@ summary.kclus <- function(object, dec = 2, ...) {
   cat("Standardize  :", object$standardize, "\n")
   cat("Observations :", format_nr(object$nr_obs, dec = 0), "\n")
   cat("Generated    :", object$nr_clus, "clusters of sizes", paste0(format_nr(object$km_out$size, dec = 0), collapse = " | "), "\n\n")
-
-  # print(str(object))
 
   cat(paste0("Cluster means:\n"))
   cm <- object$clus_means
