@@ -1,3 +1,22 @@
+## R CMD check results
+
+## Resubmission
+
+This is a resubmission. In this version I have fixed several bugs and added several new features (see NEWS.md for details). This version is dependent on the new versions of radiant.data and radiant.model that were recently submitted to CRAN and are in process. 
+
+## Test environments
+
+* local OS X install, R 3.6.3
+* local Windows install, R 3.6.3
+* ubuntu "trusty" (on travis-ci), R release and devel
+* win-builder
+
+## R CMD check results
+
+There were no ERRORs, WARNINGs, or NOTEs. 
+
+# Previous cran-comments
+
 ## Resubmission
 
 This is a resubmission. In this version I have tried to address an issue with building a vignette in the radiant package, brought to my attention by an email from Prof Ripley (see below). I was able to trace the problem to a function in radiant.multivariate that was affected by the recent release of dplyr 0.8.1.
@@ -53,7 +72,6 @@ This is a resubmission. In this version I have fixed several bugs and added seve
 
 There were no ERRORs, WARNINGs, or NOTEs. 
 
-# Previous cran-comments
 
 ## Resubmission
 
