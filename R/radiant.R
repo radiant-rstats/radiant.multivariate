@@ -1,5 +1,6 @@
 #' Launch radiant.multivariate in the default browser
 #'
+#' @description Launch radiant.multivariate in the default web browser
 #' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
 #'
 #' @param state Path to state file to load

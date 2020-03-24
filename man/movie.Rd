@@ -4,7 +4,9 @@
 \name{movie}
 \alias{movie}
 \title{Conjoint data for Movie theaters}
-\format{A data frame with 18 rows and 6 variables}
+\format{
+A data frame with 18 rows and 6 variables
+}
 \usage{
 data(movie)
 }

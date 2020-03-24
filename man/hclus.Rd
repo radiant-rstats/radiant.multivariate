@@ -4,9 +4,17 @@
 \alias{hclus}
 \title{Hierarchical cluster analysis}
 \usage{
-hclus(dataset, vars, labels = "none", distance = "sq.euclidian",
-  method = "ward.D", max_cases = 5000, standardize = TRUE,
-  data_filter = "", envir = parent.frame())
+hclus(
+  dataset,
+  vars,
+  labels = "none",
+  distance = "sq.euclidian",
+  method = "ward.D",
+  max_cases = 5000,
+  standardize = TRUE,
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

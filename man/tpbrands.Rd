@@ -4,7 +4,9 @@
 \name{tpbrands}
 \alias{tpbrands}
 \title{Toothpaste brands}
-\format{A data frame with 45 rows and 4 variables}
+\format{
+A data frame with 45 rows and 4 variables
+}
 \usage{
 data(tpbrands)
 }

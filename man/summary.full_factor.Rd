@@ -4,8 +4,7 @@
 \alias{summary.full_factor}
 \title{Summary method for the full_factor function}
 \usage{
-\method{summary}{full_factor}(object, cutoff = 0, fsort = FALSE,
-  dec = 2, ...)
+\method{summary}{full_factor}(object, cutoff = 0, fsort = FALSE, dec = 2, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{full_factor}}}

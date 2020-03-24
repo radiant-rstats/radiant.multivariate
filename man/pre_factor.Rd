@@ -4,8 +4,13 @@
 \alias{pre_factor}
 \title{Evaluate if data are appropriate for PCA / Factor analysis}
 \usage{
-pre_factor(dataset, vars, hcor = FALSE, data_filter = "",
-  envir = parent.frame())
+pre_factor(
+  dataset,
+  vars,
+  hcor = FALSE,
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

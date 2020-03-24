@@ -4,7 +4,9 @@
 \name{carpet}
 \alias{carpet}
 \title{Carpet cleaners}
-\format{A data frame with 18 rows and 5 variables}
+\format{
+A data frame with 18 rows and 5 variables
+}
 \usage{
 data(carpet)
 }

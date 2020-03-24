@@ -3,7 +3,6 @@
 \docType{package}
 \name{radiant.multivariate}
 \alias{radiant.multivariate}
-\alias{radiant.multivariate-package}
 \title{radiant.multivariate}
 \usage{
 radiant.multivariate(state, ...)
@@ -14,9 +13,7 @@ radiant.multivariate(state, ...)
 \item{...}{additional arguments to pass to shiny::runApp (e.g, port = 8080)}
 }
 \description{
-radiant.multivariate
-
-Launch radiant.multivariate in the default browser
+Launch radiant.multivariate in the default web browser
 }
 \details{
 See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials

@@ -4,8 +4,16 @@
 \alias{full_factor}
 \title{Factor analysis (PCA)}
 \usage{
-full_factor(dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1,
-  rotation = "varimax", data_filter = "", envir = parent.frame())
+full_factor(
+  dataset,
+  vars,
+  method = "PCA",
+  hcor = FALSE,
+  nr_fact = 1,
+  rotation = "varimax",
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

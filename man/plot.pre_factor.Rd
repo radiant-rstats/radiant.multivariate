@@ -4,8 +4,14 @@
 \alias{plot.pre_factor}
 \title{Plot method for the pre_factor function}
 \usage{
-\method{plot}{pre_factor}(x, plots = c("scree", "change"),
-  cutoff = 0.2, shiny = FALSE, custom = FALSE, ...)
+\method{plot}{pre_factor}(
+  x,
+  plots = c("scree", "change"),
+  cutoff = 0.2,
+  shiny = FALSE,
+  custom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{Return value from \code{\link{pre_factor}}}

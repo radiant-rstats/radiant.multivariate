@@ -4,7 +4,9 @@
 \name{toothpaste}
 \alias{toothpaste}
 \title{Toothpaste attitudes}
-\format{A data frame with 60 rows and 10 variables}
+\format{
+A data frame with 60 rows and 10 variables
+}
 \usage{
 data(toothpaste)
 }

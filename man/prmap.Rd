@@ -4,8 +4,16 @@
 \alias{prmap}
 \title{Attribute based brand maps}
 \usage{
-prmap(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
-  data_filter = "", envir = parent.frame())
+prmap(
+  dataset,
+  brand,
+  attr,
+  pref = "",
+  nr_dim = 2,
+  hcor = FALSE,
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

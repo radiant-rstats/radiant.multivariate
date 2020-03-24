@@ -4,7 +4,9 @@
 \name{computer}
 \alias{computer}
 \title{Perceptions of computer (re)sellers}
-\format{A data frame with 5 rows and 8 variables}
+\format{
+A data frame with 5 rows and 8 variables
+}
 \usage{
 data(computer)
 }

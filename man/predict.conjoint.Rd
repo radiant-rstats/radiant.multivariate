@@ -4,9 +4,17 @@
 \alias{predict.conjoint}
 \title{Predict method for the conjoint function}
 \usage{
-\method{predict}{conjoint}(object, pred_data = NULL, pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, interval = "confidence", dec = 3,
-  envir = parent.frame(), ...)
+\method{predict}{conjoint}(
+  object,
+  pred_data = NULL,
+  pred_cmd = "",
+  conf_lev = 0.95,
+  se = FALSE,
+  interval = "confidence",
+  dec = 3,
+  envir = parent.frame(),
+  ...
+)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}

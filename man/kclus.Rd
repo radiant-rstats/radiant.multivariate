@@ -4,10 +4,20 @@
 \alias{kclus}
 \title{K-clustering}
 \usage{
-kclus(dataset, vars, fun = "kmeans", hc_init = TRUE,
-  distance = "sq.euclidian", method = "ward.D", seed = 1234,
-  nr_clus = 2, standardize = TRUE, lambda = NULL, data_filter = "",
-  envir = parent.frame())
+kclus(
+  dataset,
+  vars,
+  fun = "kmeans",
+  hc_init = TRUE,
+  distance = "sq.euclidian",
+  method = "ward.D",
+  seed = 1234,
+  nr_clus = 2,
+  standardize = TRUE,
+  lambda = NULL,
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

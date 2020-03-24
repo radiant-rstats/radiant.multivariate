@@ -4,8 +4,16 @@
 \alias{plot.prmap}
 \title{Plot method for the prmap function}
 \usage{
-\method{plot}{prmap}(x, plots = "", scaling = 2, fontsz = 5,
-  seed = 1234, shiny = FALSE, custom = FALSE, ...)
+\method{plot}{prmap}(
+  x,
+  plots = "",
+  scaling = 2,
+  fontsz = 5,
+  seed = 1234,
+  shiny = FALSE,
+  custom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{Return value from \code{\link{prmap}}}

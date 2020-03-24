@@ -4,9 +4,17 @@
 \alias{predict_conjoint_by}
 \title{Predict method for the conjoint function when a by variables is used}
 \usage{
-predict_conjoint_by(object, pfun, pred_data = NULL, pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, dec = 3, envir = parent.frame(),
-  ...)
+predict_conjoint_by(
+  object,
+  pfun,
+  pred_data = NULL,
+  pred_cmd = "",
+  conf_lev = 0.95,
+  se = FALSE,
+  dec = 3,
+  envir = parent.frame(),
+  ...
+)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}

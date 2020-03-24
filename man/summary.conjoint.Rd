@@ -4,8 +4,7 @@
 \alias{summary.conjoint}
 \title{Summary method for the conjoint function}
 \usage{
-\method{summary}{conjoint}(object, show = "", mc_diag = FALSE,
-  additional = FALSE, dec = 3, ...)
+\method{summary}{conjoint}(object, show = "", mc_diag = FALSE, additional = FALSE, dec = 3, ...)
 }
 \arguments{
 \item{object}{Return value from \code{\link{conjoint}}}

@@ -1,3 +1,7 @@
+# radiant.multivariate 1.3.4.0
+
+* Minor adjustments in anticipation of dplyr 1.0.0
+
 # radiant.multivariate 1.3.2.0
 
 * Allow factor variables in K-clustering using clustMixType::kproto

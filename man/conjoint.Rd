@@ -4,8 +4,16 @@
 \alias{conjoint}
 \title{Conjoint analysis}
 \usage{
-conjoint(dataset, rvar, evar, int = "", by = "none", reverse = FALSE,
-  data_filter = "", envir = parent.frame())
+conjoint(
+  dataset,
+  rvar,
+  evar,
+  int = "",
+  by = "none",
+  reverse = FALSE,
+  data_filter = "",
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{dataset}{Dataset}

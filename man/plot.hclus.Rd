@@ -4,8 +4,14 @@
 \alias{plot.hclus}
 \title{Plot method for the hclus function}
 \usage{
-\method{plot}{hclus}(x, plots = c("scree", "change"), cutoff = 0.05,
-  shiny = FALSE, custom = FALSE, ...)
+\method{plot}{hclus}(
+  x,
+  plots = c("scree", "change"),
+  cutoff = 0.05,
+  shiny = FALSE,
+  custom = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{Return value from \code{\link{hclus}}}

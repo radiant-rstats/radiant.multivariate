@@ -4,7 +4,9 @@
 \name{mp3}
 \alias{mp3}
 \title{Conjoint data for MP3 players}
-\format{A data frame with 18 rows and 6 variables}
+\format{
+A data frame with 18 rows and 6 variables
+}
 \usage{
 data(mp3)
 }

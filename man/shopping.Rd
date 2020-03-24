@@ -4,7 +4,9 @@
 \name{shopping}
 \alias{shopping}
 \title{Shopping attitudes}
-\format{A data frame with 20 rows and 7 variables}
+\format{
+A data frame with 20 rows and 7 variables
+}
 \usage{
 data(shopping)
 }

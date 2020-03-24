@@ -4,7 +4,9 @@
 \name{city}
 \alias{city}
 \title{City distances}
-\format{A data frame with 45 rows and 3 variables}
+\format{
+A data frame with 45 rows and 3 variables
+}
 \usage{
 data(city)
 }
