@@ -2,7 +2,7 @@
 
 ## Resubmission
 
-This is a resubmission. In this version I have fixed several bugs and added several new features (see NEWS.md for details). This version is dependent on the new versions of radiant.data and radiant.model that were recently submitted to CRAN and are in process. 
+This is a resubmission. In this version I have fixed several bugs and added several new features (see NEWS.md for details). This version is dependent on the new versions of radiant.data and radiant.model that were recently accepted. 
 
 ## Test environments
 
