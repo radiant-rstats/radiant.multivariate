@@ -39,4 +39,4 @@ BugReports: https://github.com/radiant-rstats/radiant.multivariate/issues
 License: AGPL-3 | file LICENSE
 LazyData: true
 Encoding: UTF-8
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
