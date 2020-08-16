@@ -1,3 +1,7 @@
+# radiant.multivariate 1.3.6.0
+
+* Allowing singular correlation matrix in `pre_factor`
+
 # radiant.multivariate 1.3.5.0
 
 * Minor adjustments in anticipation of dplyr 1.0.0

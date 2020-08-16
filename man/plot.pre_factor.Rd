@@ -35,7 +35,6 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for
 \examples{
 result <- pre_factor(shopping, "v1:v6")
 plot(result, plots = c("change", "scree"), cutoff = .05)
-
 }
 \seealso{
 \code{\link{pre_factor}} to calculate results

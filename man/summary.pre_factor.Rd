@@ -23,7 +23,6 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for
 result <- pre_factor(shopping, "v1:v6")
 summary(result)
 pre_factor(computer, "high_end:business") \%>\% summary()
-
 }
 \seealso{
 \code{\link{pre_factor}} to calculate results

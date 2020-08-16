@@ -34,7 +34,6 @@ See \url{https://radiant-rstats.github.io/docs/multivariate/pre_factor.html} for
 }
 \examples{
 pre_factor(shopping, "v1:v6") \%>\% str()
-
 }
 \seealso{
 \code{\link{summary.pre_factor}} to summarize results
