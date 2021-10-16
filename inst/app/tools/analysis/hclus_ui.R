@@ -139,7 +139,7 @@ hc_plot <- reactive({
   req(plots)
   ph <- plots %>%
     {if (length(.) == 1 && . == "dendro") 800 else 400}
-  pw <- if (!is_empty(plots) && plots == "dendro") 900 else 650
+  pw <- if (!radiant.data::is_empty(plots) && plots == "dendro") 900 else 650
   list(plot_width = pw, plot_height = ph * length(plots))
 })
 
@@ -224,10 +224,10 @@ observeEvent(input$hclus_report, {
     figs <- FALSE
   }
 
-  if (!is_empty(input$hc_store_name)) {
+  if (!radiant.data::is_empty(input$hc_store_name)) {
     fixed <- fix_names(input$hc_store_name)
     updateTextInput(session, "hc_store_name", value = fixed)
-    nr_clus <- ifelse(is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
+    nr_clus <- ifelse(radiant.data::is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
     xcmd <- glue('{input$dataset} <- store({input$dataset}, result, nr_clus = {nr_clus}, name = "{fixed}")')
   } else {
     xcmd <- ""
@@ -249,7 +249,7 @@ observeEvent(input$hclus_report, {
 observeEvent(input$hc_store, {
   req(input$hc_store_name, input$hc_run)
   fixed <- fix_names(input$hc_store_name)
-  nr_clus <- ifelse(is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
+  nr_clus <- ifelse(radiant.data::is_empty(input$hc_nr_clus), 2, input$hc_nr_clus)
   updateTextInput(session, "hc_store_name", value = fixed)
   robj <- .hclus()
   if (!is.character(robj)) {

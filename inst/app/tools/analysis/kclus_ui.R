@@ -128,7 +128,7 @@ output$ui_kclus <- renderUI({
 })
 
 km_plot <- eventReactive(c(input$km_run, input$km_plots), {
-  if (.km_available() == "available" && !is_empty(input$km_plots, "none")) {
+  if (.km_available() == "available" && !radiant.data::is_empty(input$km_plots, "none")) {
     list(plot_width = 750, plot_height = 300 * ceiling(length(input$km_vars) / 2))
   }
 })
@@ -197,7 +197,7 @@ output$kclus <- renderUI({
 .plot_kclus <- eventReactive(c(input$km_run, input$km_plots), {
   if (.km_available() != "available") {
     .km_available()
-  } else if (is_empty(input$km_plots, "none")) {
+  } else if (radiant.data::is_empty(input$km_plots, "none")) {
     "Please select a plot type from the drop-down menu"
   } else {
     withProgress(message = "Generating plots", value = 1, {
@@ -208,7 +208,7 @@ output$kclus <- renderUI({
 
 observeEvent(input$kclus_report, {
   inp_out <- list(list(dec = 2), "")
-  if (!is_empty(input$km_plots, "none")) {
+  if (!radiant.data::is_empty(input$km_plots, "none")) {
     figs <- TRUE
     outputs <- c("summary", "plot")
     inp_out[[2]] <- list(plots = input$km_plots, custom = FALSE)
@@ -217,7 +217,7 @@ observeEvent(input$kclus_report, {
     figs <- FALSE
   }
 
-  if (!is_empty(input$km_store_name)) {
+  if (!radiant.data::is_empty(input$km_store_name)) {
     fixed <- fix_names(input$km_store_name)
     updateTextInput(session, "km_store_name", value = fixed)
     xcmd <- glue('{input$dataset} <- store({input$dataset}, result, name = "{fixed}")')

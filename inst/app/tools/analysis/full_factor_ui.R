@@ -211,7 +211,7 @@ output$full_factor <- renderUI({
 observeEvent(input$full_factor_report, {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2), list(custom = FALSE))
-  if (!is_empty(input$ff_store_name)) {
+  if (!radiant.data::is_empty(input$ff_store_name)) {
     fixed <- fix_names(input$ff_store_name)
     updateTextInput(session, "ff_store_name", value = fixed)
     xcmd <- glue('{input$dataset} <- store({input$dataset}, result, name = "{fixed}")')

@@ -36,7 +36,7 @@ kclus <- function(
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   rm(envir)
 
-  if (is_empty(lambda)) lambda <- NULL
+  if (radiant.data::is_empty(lambda)) lambda <- NULL
 
   ## in case : is used
   if (length(vars) < ncol(dataset)) {
@@ -102,7 +102,7 @@ kclus <- function(
       }}
     rm(init, hc_cent)
   } else {
-    seed %>% gsub("[^0-9]", "", .) %>% {if (!is_empty(.)) set.seed(seed)}
+    seed %>% gsub("[^0-9]", "", .) %>% {if (!radiant.data::is_empty(.)) set.seed(seed)}
     km_out <- dataset %>%
       {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %>%
       {if (fun == "kproto") {
@@ -149,7 +149,7 @@ kclus <- function(
 summary.kclus <- function(object, dec = 2, ...) {
   cat(paste0("K-", substring(object$fun, 2), " cluster analysis\n"))
   cat("Data         :", object$df_name, "\n")
-  if (!is_empty(object$data_filter)) {
+  if (!radiant.data::is_empty(object$data_filter)) {
     cat("Filter       :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables    :", paste0(object$vars, collapse = ", "), "\n")
@@ -305,7 +305,7 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
 #'
 #' @export
 store.kclus <- function(dataset, object, name = "", ...) {
-  if (is_empty(name)) name <- paste0("kclus", object$nr_clus)
+  if (radiant.data::is_empty(name)) name <- paste0("kclus", object$nr_clus)
   indr <- indexr(dataset, object$vars, object$data_filter)
   km <- rep(NA, indr$nr)
   km[indr$ind] <- object$km_out$cluster
