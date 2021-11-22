@@ -87,7 +87,7 @@ output$ui_full_factor <- renderUI({
           tags$table(
             # tags$td(textInput("ff_store_name", "Store scores:", state_init("ff_store_name", "factor"))),
             tags$td(uiOutput("ui_ff_store_name")),
-            tags$td(actionButton("ff_store", "Store", icon = icon("plus")), style = "padding-top:30px;")
+            tags$td(actionButton("ff_store", "Store", icon = icon("plus")), class = "top")
           )
         )
       )

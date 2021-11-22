@@ -112,7 +112,7 @@ output$ui_prmap <- renderUI({
           condition = "input.pm_attr != null",
           tags$table(
             tags$td(uiOutput("ui_pm_store_name")),
-            tags$td(actionButton("pm_store", "Store", icon = icon("plus")), style = "padding-top:30px;")
+            tags$td(actionButton("pm_store", "Store", icon = icon("plus")), class = "top")
           )
         )
       ),

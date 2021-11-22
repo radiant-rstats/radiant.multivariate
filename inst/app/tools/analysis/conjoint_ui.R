@@ -176,13 +176,13 @@ output$ui_ca_store <- renderUI({
     HTML("<label>Store all PWs in a new dataset:</label>"),
     tags$table(
       tags$td(textInput("ca_store_pw_name", NULL, "", placeholder = "Provide data name")),
-      tags$td(actionButton("ca_store_pw", "Store", icon = icon("plus")), style = "padding-top:5px;")
+      tags$td(actionButton("ca_store_pw", "Store", icon = icon("plus")), class = "top_mini")
     ),
     tags$br(),
     HTML("<label>Store all IWs in a new dataset:</label>"),
     tags$table(
       tags$td(textInput("ca_store_iw_name", NULL, "", placeholder = "Provide data name")),
-      tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus")), style = "padding-top:5px;")
+      tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus")), class = "top_mini")
     )
   )
 })
@@ -201,7 +201,7 @@ output$ui_ca_store_pred <- renderUI({
     if (!input$ca_pred_plot) tags$br(),
     HTML(lab),
     tags$td(textInput("ca_store_pred_name", NULL, name, placeholder = "Provide data name")),
-    tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), style = "padding-top:5px;")
+    tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), class = "top_mini")
   )
 })
 

@@ -1,3 +1,8 @@
+# radiant.multivariate 1.4.1.0
+
+* Fixed `is_empty` function clash with `rlang`
+* Adjustments to work with the latest version of `shiny` and `bootstrap4`
+
 # radiant.multivariate 1.3.6.0
 
 * Allowing singular correlation matrix in `pre_factor`

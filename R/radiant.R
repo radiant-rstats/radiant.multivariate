@@ -1,7 +1,7 @@
 #' Launch radiant.multivariate in the default browser
 #'
 #' @description Launch radiant.multivariate in the default web browser
-#' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#' @details See \url{https://radiant-rstats.github.io/docs/} for documentation and tutorials
 #'
 #' @param state Path to state file to load
 #' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)
@@ -17,7 +17,7 @@ radiant.multivariate <- function(state, ...) radiant.data::launch(package = "rad
 
 #' Launch radiant.multivariate in an Rstudio window
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#' @details See \url{https://radiant-rstats.github.io/docs/} for documentation and tutorials
 #'
 #' @param state Path to state file to load
 #' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)
@@ -33,7 +33,7 @@ radiant.multivariate_window <- function(state, ...) radiant.data::launch(package
 
 #' Launch radiant.multivariate in the Rstudio viewer
 #'
-#' @details See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+#' @details See \url{https://radiant-rstats.github.io/docs/} for documentation and tutorials
 #'
 #' @param state Path to state file to load
 #' @param ... additional arguments to pass to shiny::runApp (e.g, port = 8080)

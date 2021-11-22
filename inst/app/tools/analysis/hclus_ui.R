@@ -115,7 +115,7 @@ output$ui_hclus <- renderUI({
         HTML("<label>Store cluster membership:</label>"),
         tags$table(
           tags$td(uiOutput("ui_hc_store_name")),
-          tags$td(actionButton("hc_store", "Store", icon = icon("plus")), style = "padding-top:5px;")
+          tags$td(actionButton("hc_store", "Store", icon = icon("plus")), class = "top_mini")
         )
       )
     ),

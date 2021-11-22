@@ -15,7 +15,7 @@ radiant.multivariate_window(state, ...)
 Launch radiant.multivariate in an Rstudio window
 }
 \details{
-See \url{https://radiant-rstats.github.io/docs} for documentation and tutorials
+See \url{https://radiant-rstats.github.io/docs/} for documentation and tutorials
 }
 \examples{
 \dontrun{
