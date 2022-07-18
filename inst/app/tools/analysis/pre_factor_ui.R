@@ -139,7 +139,7 @@ output$pre_factor <- renderUI({
   }
 })
 
-observeEvent(input$pre_factor_report, {
+pre_factor_report <- function() {
   inp_out <- list(list(dec = 2), "")
   if (length(input$pf_plots) > 0) {
     figs <- TRUE
@@ -158,7 +158,7 @@ observeEvent(input$pre_factor_report, {
     fig.width = pf_plot_width(),
     fig.height = pf_plot_height()
   )
-})
+}
 
 download_handler(
   id = "dlp_pre_factor",
@@ -170,3 +170,18 @@ download_handler(
   width = pf_plot_width,
   height = pf_plot_height
 )
+
+observeEvent(input$pre_factor_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  pre_factor_report()
+})
+
+observeEvent(input$pre_factor_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_pre_factor_screenshot")
+})
+
+observeEvent(input$modal_pre_factor_screenshot, {
+  pre_factor_report()
+  removeModal() ## remove shiny modal after save
+})

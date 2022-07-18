@@ -208,7 +208,7 @@ output$full_factor <- renderUI({
   }
 })
 
-observeEvent(input$full_factor_report, {
+full_factor_report <- function() {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$ff_cutoff, fsort = input$ff_fsort, dec = 2), list(custom = FALSE))
   if (!radiant.data::is_empty(input$ff_store_name)) {
@@ -230,7 +230,7 @@ observeEvent(input$full_factor_report, {
     fig.height = ff_plot_height(),
     xcmd = xcmd
   )
-})
+}
 
 ## store factor scores
 observeEvent(input$ff_store, {
@@ -275,3 +275,18 @@ download_handler(
   width = ff_plot_width,
   height = ff_plot_height
 )
+
+observeEvent(input$full_factor_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  full_factor_report()
+})
+
+observeEvent(input$full_factor_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_full_factor_screenshot")
+})
+
+observeEvent(input$modal_full_factor_screenshot, {
+  full_factor_report()
+  removeModal() ## remove shiny modal after save
+})

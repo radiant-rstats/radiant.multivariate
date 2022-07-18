@@ -139,7 +139,7 @@ hc_plot <- reactive({
   req(plots)
   ph <- plots %>%
     {if (length(.) == 1 && . == "dendro") 800 else 400}
-  pw <- if (!radiant.data::is_empty(plots) && plots == "dendro") 900 else 650
+  pw <- if (!radiant.data::is_empty(plots) && length(plots) == 1 && plots == "dendro") 900 else 650
   list(plot_width = pw, plot_height = ph * length(plots))
 })
 
@@ -209,7 +209,7 @@ output$hclus <- renderUI({
   }
 })
 
-observeEvent(input$hclus_report, {
+hclus_report <- function() {
   if (length(input$hc_plots) > 0) {
     if (input$hc_cutoff != 0.05) {
       inp_out <- list("", list(plots = input$hc_plots, cutoff = input$hc_cutoff, custom = FALSE))
@@ -243,7 +243,7 @@ observeEvent(input$hclus_report, {
     fig.height = hc_plot_height(),
     xcmd = xcmd
   )
-})
+}
 
 ## store cluster membership
 observeEvent(input$hc_store, {
@@ -270,3 +270,18 @@ download_handler(
   width = hc_plot_width,
   height = hc_plot_height
 )
+
+observeEvent(input$hclus_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  hclus_report()
+})
+
+observeEvent(input$hclus_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_hclus_screenshot")
+})
+
+observeEvent(input$modal_hclus_screenshot, {
+  hclus_report()
+  removeModal() ## remove shiny modal after save
+})

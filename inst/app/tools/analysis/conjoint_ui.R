@@ -478,7 +478,7 @@ output$conjoint <- renderUI({
   })
 })
 
-observeEvent(input$conjoint_report, {
+conjoint_report <- function() {
   outputs <- c("summary")
   inp_out <- list("", "")
   inp_out[[1]] <- clean_args(ca_sum_inputs(), ca_sum_args[-1])
@@ -559,7 +559,7 @@ observeEvent(input$conjoint_report, {
     fig.height = ca_plot_height(),
     xcmd = xcmd
   )
-})
+}
 
 observeEvent(input$ca_store_pw, {
   name <- input$ca_store_pw_name
@@ -670,3 +670,18 @@ download_handler(
   width = ca_plot_width,
   height = ca_plot_height
 )
+
+observeEvent(input$conjoint_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  conjoint_report()
+})
+
+observeEvent(input$conjoint_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_conjoint_screenshot")
+})
+
+observeEvent(input$modal_conjoint_screenshot, {
+  conjoint_report()
+  removeModal() ## remove shiny modal after save
+})

@@ -207,7 +207,7 @@ output$kclus <- renderUI({
   }
 })
 
-observeEvent(input$kclus_report, {
+kclus_report <- function() {
   inp_out <- list(list(dec = 2), "")
   if (!radiant.data::is_empty(input$km_plots, "none")) {
     figs <- TRUE
@@ -239,7 +239,7 @@ observeEvent(input$kclus_report, {
     fig.height = km_plot_height(),
     xcmd = xcmd
   )
-})
+}
 
 ## store cluster membership
 observeEvent(input$km_store, {
@@ -282,3 +282,18 @@ download_handler(
   width = km_plot_width,
   height = km_plot_height
 )
+
+observeEvent(input$kclus_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  kclus_report()
+})
+
+observeEvent(input$kclus_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_kclus_screenshot")
+})
+
+observeEvent(input$modal_kclus_screenshot, {
+  kclus_report()
+  removeModal() ## remove shiny modal after save
+})

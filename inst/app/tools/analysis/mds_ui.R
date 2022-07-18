@@ -12,8 +12,9 @@ mds_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
   mds_args$data_filter <- if (input$show_filter) input$data_filter else ""
   mds_args$dataset <- input$dataset
-  for (i in r_drop(names(mds_args)))
+  for (i in r_drop(names(mds_args))) {
     mds_args[[i]] <- input[[paste0("mds_", i)]]
+  }
   mds_args
 })
 
@@ -26,8 +27,9 @@ mds_plot_args <- as.list(if (exists("plot.mds")) {
 ## list of function inputs selected by user
 mds_plot_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(mds_plot_args))
+  for (i in names(mds_plot_args)) {
     mds_plot_args[[i]] <- input[[paste0("mds_", i)]]
+  }
   mds_plot_args
 })
 
@@ -117,16 +119,20 @@ output$ui_mds <- renderUI({
 mds_plot <- eventReactive(input$mds_run, {
   req(input$mds_nr_dim)
   nrDim <- .mds() %>%
-    {if (is.list(.)) ncol(.mds()$res$points) else as.numeric(input$mds_nr_dim)}
+    (function(x) if (is.list(x)) ncol(x$res$points) else as.numeric(input$mds_nr_dim))
   nrPlots <- (nrDim * (nrDim - 1)) / 2
   list(plot_width = 650, plot_height = 650 * nrPlots)
 })
 
-mds_plot_width <- function()
-  mds_plot() %>% {if (is.list(.)) .$plot_width else 650}
+mds_plot_width <- function() {
+  mds_plot() %>%
+    (function(x) if (is.list(x)) x$plot_width else 650)
+}
 
-mds_plot_height <- function()
-  mds_plot() %>% {if (is.list(.)) .$plot_height else 650}
+mds_plot_height <- function() {
+  mds_plot() %>%
+    (function(x) if (is.list(x)) x$plot_height else 650)
+}
 
 output$mds <- renderUI({
   register_print_output("summary_mds", ".summary_mds")
@@ -179,21 +185,30 @@ output$mds <- renderUI({
 })
 
 .summary_mds <- reactive({
-  if (.mds_available() != "available") return(.mds_available())
-  .mds() %>% {if (is.character(.)) . else summary(., dec = 2)}
+  if (.mds_available() != "available") {
+    return(.mds_available())
+  }
+  .mds() %>%
+    {
+      if (is.character(.)) . else summary(., dec = 2)
+    }
 })
 
 .plot_mds <- reactive({
-  if (.mds_available() != "available") return(.mds_available())
+  if (.mds_available() != "available") {
+    return(.mds_available())
+  }
   req("mds_rev_dim" %in% names(input))
   robj <- .mds()
-  if (is.character(robj)) return(robj)
+  if (is.character(robj)) {
+    return(robj)
+  }
   withProgress(message = "Generating brand maps", value = 1, {
     do.call(plot, c(list(x = robj), mds_plot_inputs(), shiny = TRUE))
   })
 })
 
-observeEvent(input$mds_report, {
+mds_report <- function() {
   outputs <- c("summary", "plot")
   inp_out <- list(list(dec = 2), "")
   inp <- mds_inputs()
@@ -208,12 +223,12 @@ observeEvent(input$mds_report, {
     fig.width = mds_plot_width(),
     fig.height = mds_plot_height()
   )
-})
+}
 
 dl_mds_coord <- function(path) {
   if (pressed(input$mds_run)) {
     .mds()$res$points %>%
-      {set_colnames(., paste0("Dimension", 1:ncol(.)))} %>%
+      (function(x) set_colnames(x, paste0("Dimension", 1:ncol(x)))) %>%
       write.csv(file = path, row.names = FALSE)
   } else {
     cat("No output available. Press the Estimate button to generate results", file = path)
@@ -239,3 +254,17 @@ download_handler(
   height = mds_plot_height
 )
 
+observeEvent(input$mds_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  mds_report()
+})
+
+observeEvent(input$mds_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_mds_screenshot")
+})
+
+observeEvent(input$modal_mds_screenshot, {
+  mds_report()
+  removeModal() ## remove shiny modal after save
+})

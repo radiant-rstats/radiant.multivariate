@@ -227,7 +227,7 @@ output$prmap <- renderUI({
   })
 })
 
-observeEvent(input$prmap_report, {
+prmap_report <- function() {
   outputs <- c("summary", "plot")
   inp_out <- list(list(cutoff = input$pm_cutoff, dec = 2), "")
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
@@ -248,7 +248,7 @@ observeEvent(input$prmap_report, {
     fig.height = pm_plot_height(),
     xcmd = xcmd
   )
-})
+}
 
 ## store factor scores
 observeEvent(input$pm_store, {
@@ -293,3 +293,18 @@ download_handler(
   width = pm_plot_width,
   height = pm_plot_height
 )
+
+observeEvent(input$prmap_report, {
+  r_info[["latest_screenshot"]] <- NULL
+  prmap_report()
+})
+
+observeEvent(input$prmap_screenshot, {
+  r_info[["latest_screenshot"]] <- NULL
+  radiant_screenshot_modal("modal_prmap_screenshot")
+})
+
+observeEvent(input$modal_prmap_screenshot, {
+  prmap_report()
+  removeModal() ## remove shiny modal after save
+})
