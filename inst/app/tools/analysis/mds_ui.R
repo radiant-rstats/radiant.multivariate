@@ -82,7 +82,7 @@ output$ui_mds <- renderUI({
     conditionalPanel(
       condition = "input.tabs_mds == 'Summary'",
       wellPanel(
-        actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+        actionButton("mds_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
       )
     ),
     wellPanel(

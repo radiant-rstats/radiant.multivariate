@@ -13,8 +13,9 @@ ca_inputs <- reactive({
   # loop needed because reactive values don't allow single bracket indexing
   ca_args$data_filter <- if (input$show_filter) input$data_filter else ""
   ca_args$dataset <- input$dataset
-  for (i in r_drop(names(ca_args)))
+  for (i in r_drop(names(ca_args))) {
     ca_args[[i]] <- input[[paste0("ca_", i)]]
+  }
   ca_args
 })
 
@@ -22,13 +23,14 @@ ca_sum_args <- as.list(if (exists("summary.conjoint")) {
   formals(summary.conjoint)
 } else {
   formals(radiant.multivariate:::summary.conjoint)
-} )
+})
 
 ## list of function inputs selected by user
 ca_sum_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(ca_sum_args))
+  for (i in names(ca_sum_args)) {
     ca_sum_args[[i]] <- input[[paste0("ca_", i)]]
+  }
   ca_sum_args
 })
 
@@ -36,13 +38,14 @@ ca_plot_args <- as.list(if (exists("plot.conjoint")) {
   formals(plot.conjoint)
 } else {
   formals(radiant.multivariate:::plot.conjoint)
-} )
+})
 
 ## list of function inputs selected by user
 ca_plot_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(ca_plot_args))
+  for (i in names(ca_plot_args)) {
     ca_plot_args[[i]] <- input[[paste0("ca_", i)]]
+  }
   ca_plot_args
 })
 
@@ -50,13 +53,14 @@ ca_pred_args <- as.list(if (exists("predict.conjoint")) {
   formals(predict.conjoint)
 } else {
   formals(radiant.multivariate:::predict.conjoint)
-} )
+})
 
 ## list of function inputs selected by user
 ca_pred_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(ca_pred_args))
+  for (i in names(ca_pred_args)) {
     ca_pred_args[[i]] <- input[[paste0("ca_", i)]]
+  }
 
   ca_pred_args$pred_cmd <- ca_pred_args$pred_data <- ""
   if (input$ca_predict == "cmd") {
@@ -78,13 +82,14 @@ ca_pred_plot_args <- as.list(if (exists("plot.model.predict")) {
   formals(plot.model.predict)
 } else {
   formals(radiant.model:::plot.model.predict)
-} )
+})
 
 ## list of function inputs selected by user
 ca_pred_plot_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(ca_pred_plot_args))
+  for (i in names(ca_pred_plot_args)) {
     ca_pred_plot_args[[i]] <- input[[paste0("ca_", i)]]
+  }
   ca_pred_plot_args
 })
 
@@ -124,13 +129,16 @@ output$ui_ca_int <- renderUI({
     return()
   } else {
     vars <- input$ca_evar
-    if (not_available(vars) || length(vars) < 2) return()
+    if (not_available(vars) || length(vars) < 2) {
+      return()
+    }
     ## list of interaction terms to show
     choices <- iterms(vars, input$ca_show_interactions)
   }
 
   selectInput(
-    "ca_int", label = NULL, choices = choices,
+    "ca_int",
+    label = NULL, choices = choices,
     selected = state_init("ca_int"),
     multiple = TRUE, size = min(4, length(choices)), selectize = FALSE
   )
@@ -148,7 +156,9 @@ output$ui_ca_by <- renderUI({
 output$ui_ca_show <- renderUI({
   levs <- c()
   if (available(input$ca_by)) {
-    levs <- .get_data()[[input$ca_by]] %>% as_factor() %>% levels()
+    levs <- .get_data()[[input$ca_by]] %>%
+      as_factor() %>%
+      levels()
   }
   selectInput(
     inputId = "ca_show", label = "Show:", choices = levs,
@@ -176,13 +186,13 @@ output$ui_ca_store <- renderUI({
     HTML("<label>Store all PWs in a new dataset:</label>"),
     tags$table(
       tags$td(textInput("ca_store_pw_name", NULL, "", placeholder = "Provide data name")),
-      tags$td(actionButton("ca_store_pw", "Store", icon = icon("plus")), class = "top_mini")
+      tags$td(actionButton("ca_store_pw", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top_mini")
     ),
     tags$br(),
     HTML("<label>Store all IWs in a new dataset:</label>"),
     tags$table(
       tags$td(textInput("ca_store_iw_name", NULL, "", placeholder = "Provide data name")),
-      tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus")), class = "top_mini")
+      tags$td(actionButton("ca_store_iw", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top_mini")
     )
   )
 })
@@ -201,7 +211,7 @@ output$ui_ca_store_pred <- renderUI({
     if (!input$ca_pred_plot) tags$br(),
     HTML(lab),
     tags$td(textInput("ca_store_pred_name", NULL, name, placeholder = "Provide data name")),
-    tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus")), class = "top_mini")
+    tags$td(actionButton("ca_store_pred", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top_mini")
   )
 })
 
@@ -226,9 +236,10 @@ output$ui_ca_pred_data <- renderUI({
 output$ui_conjoint <- renderUI({
   req(input$dataset)
   tagList(
-    conditionalPanel(condition = "input.tabs_conjoint == 'Summary'",
+    conditionalPanel(
+      condition = "input.tabs_conjoint == 'Summary'",
       wellPanel(
-        actionButton("ca_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+        actionButton("ca_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
       )
     ),
     wellPanel(
@@ -252,7 +263,8 @@ output$ui_conjoint <- renderUI({
         conditionalPanel(
           condition = "input.ca_evar != null",
           checkboxInput(
-            "ca_reverse", label = "Reverse evaluation scores",
+            "ca_reverse",
+            label = "Reverse evaluation scores",
             value = state_init("ca_reverse", FALSE)
           ),
           conditionalPanel(
@@ -271,7 +283,8 @@ output$ui_conjoint <- renderUI({
       conditionalPanel(
         condition = "input.tabs_conjoint == 'Predict'",
         selectInput(
-          "ca_predict", label = "Prediction input type:", ca_predict,
+          "ca_predict",
+          label = "Prediction input type:", ca_predict,
           selected = state_single("ca_predict", ca_predict, "none")
         ),
         conditionalPanel(
@@ -302,7 +315,8 @@ output$ui_conjoint <- renderUI({
       conditionalPanel(
         condition = "input.tabs_conjoint == 'Plot'",
         selectInput(
-          "ca_plots", "Conjoint plots:", choices = ca_plots,
+          "ca_plots", "Conjoint plots:",
+          choices = ca_plots,
           selected = state_single("ca_plots", ca_plots, "none")
         ),
         conditionalPanel(
@@ -338,7 +352,9 @@ ca_available <- reactive({
 
 ca_plot <- reactive({
   req(pressed(input$ca_run))
-  if (ca_available() != "available") return()
+  if (ca_available() != "available") {
+    return()
+  }
   req(input$ca_plots)
 
   nrVars <- length(input$ca_evar)
@@ -350,14 +366,23 @@ ca_plot <- reactive({
   list(plot_width = plot_width, plot_height = plot_height)
 })
 
-ca_plot_width <- function()
-  ca_plot() %>% {if (is.list(.)) .$plot_width else 650}
+ca_plot_width <- function() {
+  ca_plot() %>%
+    {
+      if (is.list(.)) .$plot_width else 650
+    }
+}
 
-ca_plot_height <- function()
-  ca_plot() %>% {if (is.list(.)) .$plot_height else 400}
+ca_plot_height <- function() {
+  ca_plot() %>%
+    {
+      if (is.list(.)) .$plot_height else 400
+    }
+}
 
-ca_pred_plot_height <- function()
+ca_pred_plot_height <- function() {
   if (input$ca_pred_plot) 500 else 0
+}
 
 output$conjoint <- renderUI({
   register_print_output("summary_conjoint", ".summary_conjoint")
@@ -415,17 +440,27 @@ output$conjoint <- renderUI({
 })
 
 .summary_conjoint <- reactive({
-  if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
-  if (ca_available() != "available") return(ca_available())
+  if (not_pressed(input$ca_run)) {
+    return("** Press the Estimate button to estimate the model **")
+  }
+  if (ca_available() != "available") {
+    return(ca_available())
+  }
   cai <- ca_sum_inputs()
   cai$object <- .conjoint()
   do.call(summary, cai)
 })
 
 .predict_conjoint <- reactive({
-  if (not_pressed(input$ca_run)) return("** Press the Estimate button to estimate the model **")
-  if (ca_available() != "available") return(ca_available())
-  if (radiant.data::is_empty(input$ca_predict, "none")) return("** Select prediction input **")
+  if (not_pressed(input$ca_run)) {
+    return("** Press the Estimate button to estimate the model **")
+  }
+  if (ca_available() != "available") {
+    return(ca_available())
+  }
+  if (radiant.data::is_empty(input$ca_predict, "none")) {
+    return("** Select prediction input **")
+  }
   if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && radiant.data::is_empty(input$ca_pred_data)) {
     return("** Select data for prediction **")
   }
@@ -443,14 +478,22 @@ output$conjoint <- renderUI({
 
 .predict_print_conjoint <- reactive({
   .predict_conjoint() %>%
-    {if (is.character(.)) cat(., "\n") else print(.)}
+    {
+      if (is.character(.)) cat(., "\n") else print(.)
+    }
 })
 
 .predict_plot_conjoint <- reactive({
-  if (not_pressed(input$ca_run)) return(invisible())
-  if (ca_available() != "available") return(ca_available())
+  if (not_pressed(input$ca_run)) {
+    return(invisible())
+  }
+  if (ca_available() != "available") {
+    return(ca_available())
+  }
   req(input$ca_pred_plot, available(input$ca_xvar))
-  if (radiant.data::is_empty(input$ca_predict, "none")) return(invisible())
+  if (radiant.data::is_empty(input$ca_predict, "none")) {
+    return(invisible())
+  }
   if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && radiant.data::is_empty(input$ca_pred_data)) {
     return(invisible())
   }
@@ -471,7 +514,9 @@ output$conjoint <- renderUI({
   input$ca_scale_plot
   input$ca_plots
   isolate({
-    if (ca_available() != "available") return(ca_available())
+    if (ca_available() != "available") {
+      return(ca_available())
+    }
     withProgress(message = "Generating plots", value = 1, {
       do.call(plot, c(list(x = .conjoint()), ca_plot_inputs(), shiny = TRUE))
     })
@@ -505,8 +550,7 @@ conjoint_report <- function() {
   }
 
   if (!radiant.data::is_empty(input$ca_predict, "none") &&
-     (!radiant.data::is_empty(input$ca_pred_data) || !radiant.data::is_empty(input$ca_pred_cmd))) {
-
+    (!radiant.data::is_empty(input$ca_pred_data) || !radiant.data::is_empty(input$ca_pred_cmd))) {
     pred_args <- clean_args(ca_pred_inputs(), ca_pred_args[-1])
     if (!radiant.data::is_empty(pred_args$pred_cmd)) {
       pred_args$pred_cmd <- strsplit(pred_args$pred_cmd, ";")[[1]]
@@ -526,7 +570,7 @@ conjoint_report <- function() {
       fixed <- fix_names(input$ca_store_pred_name)
       updateTextInput(session, "ca_store_pred_name", value = fixed)
       outputs <- c(outputs, paste0(fixed, " <- predict"))
-      xcmd <- paste0(xcmd, fixed %>% paste0("register(\"", ., "\")\nprint(", . ,", n = 10)"))
+      xcmd <- paste0(xcmd, fixed %>% paste0("register(\"", ., "\")\nprint(", ., ", n = 10)"))
     } else {
       outputs <- c(outputs, "pred <- predict")
       xcmd <- paste0(xcmd, "print(pred, n = 10)")
@@ -535,7 +579,8 @@ conjoint_report <- function() {
           fixed <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*)")) %>%
             fix_names() %>%
             deparse(., control = getOption("dctrl"), width.cutoff = 500L)
-          xcmd <- paste0(xcmd, "\n", input$ca_pred_data , " <- store(",
+          xcmd <- paste0(
+            xcmd, "\n", input$ca_pred_data, " <- store(",
             input$ca_pred_data, ", pred, name = ", fixed, ")"
           )
         }
@@ -567,7 +612,9 @@ observeEvent(input$ca_store_pw, {
   fixed <- fix_names(input$ca_store_pw_name)
   updateTextInput(session, "ca_store_pw_name", value = fixed)
   robj <- .conjoint()
-  if (!is.list(robj)) return()
+  if (!is.list(robj)) {
+    return()
+  }
   withProgress(
     message = "Storing PWs", value = 1,
     r_data[[fixed]] <- robj$PW
@@ -581,7 +628,9 @@ observeEvent(input$ca_store_iw, {
   fixed <- fix_names(input$ca_store_iw_name)
   updateTextInput(session, "ca_store_iw_name", value = fixed)
   robj <- .conjoint()
-  if (!is.list(robj)) return()
+  if (!is.list(robj)) {
+    return()
+  }
   withProgress(
     message = "Storing IWs", value = 1,
     r_data[[fixed]] <- robj$IW
@@ -592,13 +641,15 @@ observeEvent(input$ca_store_iw, {
 observeEvent(input$ca_store_pred, {
   req(!radiant.data::is_empty(input$ca_pred_data), pressed(input$ca_run))
   pred <- .predict_conjoint()
-  if (is.null(pred)) return()
+  if (is.null(pred)) {
+    return()
+  }
   fixed <- fix_names(input$ca_store_pred_name)
   updateTextInput(session, "ca_store_pred_name", value = fixed)
   if ("conjoint.predict.by" %in% class(pred)) {
     withProgress(
       message = "Storing predictions in new dataset", value = 1,
-        r_data[[fixed]] <- pred,
+      r_data[[fixed]] <- pred,
     )
     register(fixed)
   } else {

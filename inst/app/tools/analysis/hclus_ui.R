@@ -19,8 +19,9 @@ hc_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
   hc_args$data_filter <- if (input$show_filter) input$data_filter else ""
   hc_args$dataset <- input$dataset
-  for (i in r_drop(names(hc_args)))
+  for (i in r_drop(names(hc_args))) {
     hc_args[[i]] <- input[[paste0("hc_", i)]]
+  }
   hc_args
 })
 
@@ -68,22 +69,25 @@ output$ui_hclus <- renderUI({
   req(input$dataset)
   tagList(
     wellPanel(
-      actionButton("hc_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+      actionButton("hc_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
     ),
     wellPanel(
       uiOutput("ui_hc_labels"),
       uiOutput("ui_hc_vars"),
       selectInput(
-        "hc_distance", label = "Distance measure:", choices = hc_distance,
+        "hc_distance",
+        label = "Distance measure:", choices = hc_distance,
         selected = state_single("hc_distance", hc_distance, "sq.euclidean"),
         multiple = FALSE
       ),
       selectInput(
-        "hc_method", label = "Method:", choices = hc_method,
+        "hc_method",
+        label = "Method:", choices = hc_method,
         selected = state_single("hc_method", hc_method, "ward.D"), multiple = FALSE
       ),
       selectizeInput(
-        "hc_plots", label = "Plot(s):", choices = hc_plots,
+        "hc_plots",
+        label = "Plot(s):", choices = hc_plots,
         selected = state_multiple("hc_plots", hc_plots, c("scree", "change")),
         multiple = TRUE,
         options = list(
@@ -94,14 +98,17 @@ output$ui_hclus <- renderUI({
       with(tags, table(
         tr(
           td(numericInput(
-            "hc_cutoff", "Plot cutoff:", min = 0, max = 1,
+            "hc_cutoff", "Plot cutoff:",
+            min = 0, max = 1,
             value = state_init("hc_cutoff", 0.05), step = .02
           ), width = "50%"),
           td(numericInput(
-            "hc_max_cases", "Max cases:", min = 100, max = 100000, step = 100,
+            "hc_max_cases", "Max cases:",
+            min = 100, max = 100000, step = 100,
             value = state_init("hc_max_cases", 5000)
           ), width = "50%")
-        ), width = "100%"
+        ),
+        width = "100%"
       )),
       checkboxInput("hc_standardize", "Standardize", state_init("hc_standardize", TRUE))
     ),
@@ -109,13 +116,14 @@ output$ui_hclus <- renderUI({
       conditionalPanel(
         condition = "input.hc_vars != null",
         numericInput(
-          "hc_nr_clus", "Number of clusters:", min = 2,
+          "hc_nr_clus", "Number of clusters:",
+          min = 2,
           value = state_init("hc_nr_clus", 2)
         ),
         HTML("<label>Store cluster membership:</label>"),
         tags$table(
           tags$td(uiOutput("ui_hc_store_name")),
-          tags$td(actionButton("hc_store", "Store", icon = icon("plus")), class = "top_mini")
+          tags$td(actionButton("hc_store", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top_mini")
         )
       )
     ),
@@ -138,16 +146,26 @@ hc_plot <- reactive({
   plots <- input$hc_plots
   req(plots)
   ph <- plots %>%
-    {if (length(.) == 1 && . == "dendro") 800 else 400}
+    {
+      if (length(.) == 1 && . == "dendro") 800 else 400
+    }
   pw <- if (!radiant.data::is_empty(plots) && length(plots) == 1 && plots == "dendro") 900 else 650
   list(plot_width = pw, plot_height = ph * length(plots))
 })
 
-hc_plot_width <- function()
-  hc_plot() %>% {if (is.list(.)) .$plot_width else 650}
+hc_plot_width <- function() {
+  hc_plot() %>%
+    {
+      if (is.list(.)) .$plot_width else 650
+    }
+}
 
-hc_plot_height <- function()
-  hc_plot() %>% {if (is.list(.)) .$plot_height else 400}
+hc_plot_height <- function() {
+  hc_plot() %>%
+    {
+      if (is.list(.)) .$plot_height else 400
+    }
+}
 
 ## output is called from the main radiant ui.R
 output$hclus <- renderUI({
@@ -189,25 +207,28 @@ output$hclus <- renderUI({
   if (not_available(input$hc_vars)) {
     "This analysis requires one or more variables of type integer or numeric.\nIf these variable types are not available please select another dataset.\n\n" %>%
       suggest_data("toothpaste")
-  } else if (not_pressed(input$hc_run))  {
+  } else if (not_pressed(input$hc_run)) {
     "** Press the Estimate button to generate cluster solution **"
   } else {
     summary(.hclus())
   }
 })
 
-.plot_hclus <- eventReactive({
-  c(input$hc_run, input$hc_plots, input$hc_cutoff)
-}, {
-  if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) {
-    invisible()
-  } else {
-    withProgress(
-      message = "Generating cluster plot", value = 1,
-      capture_plot(plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff))
-    )
+.plot_hclus <- eventReactive(
+  {
+    c(input$hc_run, input$hc_plots, input$hc_cutoff)
+  },
+  {
+    if (length(input$hc_plots) > 1 && "dendro" %in% input$hc_plots) {
+      invisible()
+    } else {
+      withProgress(
+        message = "Generating cluster plot", value = 1,
+        capture_plot(plot(.hclus(), plots = input$hc_plots, cutoff = input$hc_cutoff))
+      )
+    }
   }
-})
+)
 
 hclus_report <- function() {
   if (length(input$hc_plots) > 0) {

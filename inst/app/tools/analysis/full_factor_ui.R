@@ -13,8 +13,9 @@ ff_inputs <- reactive({
   ff_args$data_filter <- if (input$show_filter) input$data_filter else ""
   ff_args$dataset <- input$dataset
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in r_drop(names(ff_args)))
+  for (i in r_drop(names(ff_args))) {
     ff_args[[i]] <- input[[paste0("ff_", i)]]
+  }
   ff_args
 })
 
@@ -64,12 +65,13 @@ output$ui_full_factor <- renderUI({
     conditionalPanel(
       condition = "input.tabs_full_factor == 'Summary'",
       wellPanel(
-        actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+        actionButton("ff_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
       ),
       wellPanel(
         uiOutput("ui_ff_vars"),
         selectInput(
-          "ff_method", label = "Method:", choices = ff_method,
+          "ff_method",
+          label = "Method:", choices = ff_method,
           selected = state_single("ff_method", ff_method, "PCA")
         ),
         checkboxInput("ff_hcor", "Adjust for {factor} variables", value = state_init("ff_hcor", FALSE)),
@@ -79,7 +81,8 @@ output$ui_full_factor <- renderUI({
         ),
         checkboxInput("ff_fsort", "Sort factor loadings", value = state_init("ff_fsort", FALSE)),
         selectInput(
-          "ff_rotation", label = "rotation:", ff_rotation,
+          "ff_rotation",
+          label = "rotation:", ff_rotation,
           selected = state_single("ff_rotation", ff_rotation, "varimax")
         ),
         conditionalPanel(
@@ -87,7 +90,7 @@ output$ui_full_factor <- renderUI({
           tags$table(
             # tags$td(textInput("ff_store_name", "Store scores:", state_init("ff_store_name", "factor"))),
             tags$td(uiOutput("ui_ff_store_name")),
-            tags$td(actionButton("ff_store", "Store", icon = icon("plus")), class = "top")
+            tags$td(actionButton("ff_store", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top")
           )
         )
       )
@@ -102,7 +105,7 @@ output$ui_full_factor <- renderUI({
 
 ff_plot <- reactive({
   if (pressed(input$ff_run) && length(input$ff_vars) > 1 &&
-      isolate(input$ff_nr_fact) > 1) {
+    isolate(input$ff_nr_fact) > 1) {
     plot_height <- plot_width <- 350
     nrFact <- min(isolate(input$ff_nr_fact), length(input$ff_vars))
     nrPlots <- (nrFact * (nrFact - 1)) / 2
@@ -120,11 +123,19 @@ ff_plot <- reactive({
   list(plot_width = plot_width, plot_height = plot_height)
 })
 
-ff_plot_width <- function()
-  ff_plot() %>% {if (is.list(.)) .$plot_width else 650}
+ff_plot_width <- function() {
+  ff_plot() %>%
+    {
+      if (is.list(.)) .$plot_width else 650
+    }
+}
 
-ff_plot_height <- function()
-  ff_plot() %>% {if (is.list(.)) .$plot_height else 400}
+ff_plot_height <- function() {
+  ff_plot() %>%
+    {
+      if (is.list(.)) .$plot_height else 400
+    }
+}
 
 output$full_factor <- renderUI({
   register_print_output("summary_full_factor", ".summary_full_factor")
@@ -161,7 +172,7 @@ output$full_factor <- renderUI({
     "** Press the Estimate button to generate factor analysis results **"
   } else if (not_available(input$ff_vars)) {
     "This analysis requires multiple variables of type numeric or integer.\nIf these variables are not available please select another dataset.\n\n" %>%
-     suggest_data("toothpaste")
+      suggest_data("toothpaste")
   } else if (length(input$ff_vars) < 2) {
     "Please select two or more variables"
   } else {
@@ -177,36 +188,48 @@ output$full_factor <- renderUI({
   })
 })
 
-.summary_full_factor <- eventReactive({
-  c(input$ff_run, input$ff_cutoff, input$ff_fsort)
-}, {
-  if (not_pressed(input$ff_run)) return("** Press the Estimate button to generate factor analysis results **")
-  if (.ff_available() != "available") return(.ff_available())
-  if (is_not(input$ff_nr_fact)) return("Number of factors should be >= 1")
-  validate(
-    need(
-      input$ff_cutoff >= 0 && input$ff_cutoff <= 1,
-      "Provide a correlation cutoff value in the range from 0 to 1"
+.summary_full_factor <- eventReactive(
+  {
+    c(input$ff_run, input$ff_cutoff, input$ff_fsort)
+  },
+  {
+    if (not_pressed(input$ff_run)) {
+      return("** Press the Estimate button to generate factor analysis results **")
+    }
+    if (.ff_available() != "available") {
+      return(.ff_available())
+    }
+    if (is_not(input$ff_nr_fact)) {
+      return("Number of factors should be >= 1")
+    }
+    validate(
+      need(
+        input$ff_cutoff >= 0 && input$ff_cutoff <= 1,
+        "Provide a correlation cutoff value in the range from 0 to 1"
+      )
     )
-  )
-  summary(.full_factor(), cutoff = input$ff_cutoff, fsort = input$ff_fsort)
-})
-
-.plot_full_factor <- eventReactive({
-  c(input$ff_run, !is.null(input$ff_plots))
-}, {
-  if (not_pressed(input$ff_run)) {
-    "** Press the Estimate button to generate factor analysis results **"
-  } else if (.ff_available() != "available") {
-    .ff_available()
-  } else if (is_not(input$ff_nr_fact) || input$ff_nr_fact < 2) {
-    "Plot requires 2 or more factors.\nChange the number of factors in the Summary tab and re-estimate"
-  } else {
-    withProgress(message = "Generating factor plots", value = 1, {
-      plot(.full_factor(), plots = input$ff_plots, shiny = TRUE)
-    })
+    summary(.full_factor(), cutoff = input$ff_cutoff, fsort = input$ff_fsort)
   }
-})
+)
+
+.plot_full_factor <- eventReactive(
+  {
+    c(input$ff_run, !is.null(input$ff_plots))
+  },
+  {
+    if (not_pressed(input$ff_run)) {
+      "** Press the Estimate button to generate factor analysis results **"
+    } else if (.ff_available() != "available") {
+      .ff_available()
+    } else if (is_not(input$ff_nr_fact) || input$ff_nr_fact < 2) {
+      "Plot requires 2 or more factors.\nChange the number of factors in the Summary tab and re-estimate"
+    } else {
+      withProgress(message = "Generating factor plots", value = 1, {
+        plot(.full_factor(), plots = input$ff_plots, shiny = TRUE)
+      })
+    }
+  }
+)
 
 full_factor_report <- function() {
   outputs <- c("summary", "plot")
@@ -249,7 +272,9 @@ observeEvent(input$ff_store, {
 dl_ff_loadings <- function(path) {
   if (pressed(input$ff_run)) {
     .full_factor() %>%
-      {if (is.list(.)) .$floadings else return()} %>%
+      {
+        if (is.list(.)) .$floadings else return()
+      } %>%
       clean_loadings(input$ff_cutoff, input$ff_fsort) %>%
       write.csv(file = path)
   } else {

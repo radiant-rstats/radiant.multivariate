@@ -12,8 +12,9 @@ km_inputs <- reactive({
   # loop needed because reactive values don't allow single bracket indexing
   km_args$data_filter <- if (input$show_filter) input$data_filter else ""
   km_args$dataset <- input$dataset
-  for (i in r_drop(names(km_args)))
+  for (i in r_drop(names(km_args))) {
     km_args[[i]] <- input[[paste0("km_", i)]]
+  }
   km_args
 })
 
@@ -29,7 +30,8 @@ output$ui_km_vars <- renderUI({
 
 output$ui_km_lambda <- renderUI({
   numericInput(
-    "km_lambda", "Lambda:", min = 0,
+    "km_lambda", "Lambda:",
+    min = 0,
     value = state_init("km_lambda", NA)
   )
 })
@@ -55,16 +57,18 @@ run_refresh(km_args, "km", init = "vars", tabs = "tabs_kclus", label = "Estimate
 output$ui_kclus <- renderUI({
   req(input$dataset)
   tagList(
-    conditionalPanel(condition = "input.tabs_kclus == 'Summary'",
+    conditionalPanel(
+      condition = "input.tabs_kclus == 'Summary'",
       wellPanel(
-        actionButton("km_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+        actionButton("km_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
       )
     ),
     wellPanel(
       conditionalPanel(
         condition = "input.tabs_kclus == 'Summary'",
         selectInput(
-          "km_fun", label = "Algorithm:", choices = km_algorithm,
+          "km_fun",
+          label = "Algorithm:", choices = km_algorithm,
           selected = state_single("km_fun", km_algorithm, "kmeans"), multiple = FALSE
         ),
         uiOutput("ui_km_vars"),
@@ -81,11 +85,13 @@ output$ui_kclus <- renderUI({
           condition = "input.km_hc_init == true",
           wellPanel(
             selectInput(
-              "km_distance", label = "Distance measure:", choices = hc_distance,
+              "km_distance",
+              label = "Distance measure:", choices = hc_distance,
               selected = state_single("km_distance", hc_distance, "sq.euclidian"), multiple = FALSE
             ),
             selectInput(
-              "km_method", label = "Method:", choices = hc_method,
+              "km_method",
+              label = "Method:", choices = hc_method,
               selected = state_single("km_method", hc_method, "ward.D"), multiple = FALSE
             )
           )
@@ -93,12 +99,14 @@ output$ui_kclus <- renderUI({
         conditionalPanel(
           condition = "input.km_hc_init == false",
           numericInput(
-            "km_seed", "Set random seed:", min = 0,
+            "km_seed", "Set random seed:",
+            min = 0,
             value = state_init("km_seed", 1234)
           )
         ),
         numericInput(
-          "km_nr_clus", "Number of clusters:", min = 2,
+          "km_nr_clus", "Number of clusters:",
+          min = 2,
           value = state_init("km_nr_clus", 2)
         ),
         conditionalPanel(
@@ -107,14 +115,15 @@ output$ui_kclus <- renderUI({
           tags$label("Store cluster membership:"),
           tags$table(
             tags$td(uiOutput("ui_km_store_name")),
-            tags$td(actionButton("km_store", "Store", icon = icon("plus")), class = "top_mini")
+            tags$td(actionButton("km_store", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top_mini")
           )
         )
       ),
       conditionalPanel(
         condition = "input.tabs_kclus == 'Plot'",
         selectInput(
-          "km_plots", label = "Plot(s):", choices = km_plots,
+          "km_plots",
+          label = "Plot(s):", choices = km_plots,
           selected = state_multiple("km_plots", km_plots, "none"),
           multiple = FALSE
         )
@@ -134,11 +143,19 @@ km_plot <- eventReactive(c(input$km_run, input$km_plots), {
   }
 })
 
-km_plot_width <- function()
-  km_plot() %>% {if (is.list(.)) .$plot_width else 650}
+km_plot_width <- function() {
+  km_plot() %>%
+    {
+      if (is.list(.)) .$plot_width else 650
+    }
+}
 
-km_plot_height <- function()
-  km_plot() %>% {if (is.list(.)) .$plot_height else 400}
+km_plot_height <- function() {
+  km_plot() %>%
+    {
+      if (is.list(.)) .$plot_height else 400
+    }
+}
 
 # output is called from the main radiant ui.R
 output$kclus <- renderUI({
@@ -191,7 +208,9 @@ output$kclus <- renderUI({
 })
 
 .summary_kclus <- reactive({
-  if (.km_available() != "available") return(.km_available())
+  if (.km_available() != "available") {
+    return(.km_available())
+  }
   summary(.kclus())
 })
 
@@ -258,7 +277,9 @@ observeEvent(input$km_store, {
 dl_km_means <- function(path) {
   if (pressed(input$km_run)) {
     .kclus() %>%
-      {if (is.list(.)) write.csv(.$clus_means, file = path)}
+      {
+        if (is.list(.)) write.csv(.$clus_means, file = path)
+      }
   } else {
     cat("No output available. Press the Estimate button to generate the cluster solution", file = path)
   }

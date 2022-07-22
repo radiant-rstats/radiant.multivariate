@@ -11,8 +11,9 @@ pm_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
   pm_args$data_filter <- if (input$show_filter) input$data_filter else ""
   pm_args$dataset <- input$dataset
-  for (i in r_drop(names(pm_args)))
+  for (i in r_drop(names(pm_args))) {
     pm_args[[i]] <- input[[paste0("pm_", i)]]
+  }
   pm_args
 })
 
@@ -20,13 +21,14 @@ pm_plot_args <- as.list(if (exists("plot.prmap")) {
   formals(plot.prmap)
 } else {
   formals(radiant.multivariate:::plot.prmap)
-} )
+})
 
 ## list of function inputs selected by user
 pm_plot_inputs <- reactive({
   ## loop needed because reactive values don't allow single bracket indexing
-  for (i in names(pm_plot_args))
+  for (i in names(pm_plot_args)) {
     pm_plot_args[[i]] <- input[[paste0("pm_", i)]]
+  }
   pm_plot_args
 })
 
@@ -53,7 +55,9 @@ output$ui_pm_attr <- renderUI({
 })
 
 output$ui_pm_pref <- renderUI({
-  if (not_available(input$pm_attr)) return()
+  if (not_available(input$pm_attr)) {
+    return()
+  }
   vars <- varnames()
   toSelect <- .get_class() %in% c("numeric", "integer", "date", "factor")
   vars <- vars[toSelect]
@@ -89,7 +93,7 @@ output$ui_prmap <- renderUI({
     conditionalPanel(
       condition = "input.tabs_prmap == 'Summary'",
       wellPanel(
-        actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play"), class = "btn-success")
+        actionButton("pm_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")
       )
     ),
     wellPanel(
@@ -105,14 +109,15 @@ output$ui_prmap <- renderUI({
         ),
         # checkboxInput("pm_hcor", "Adjust for {factor} variables", value = state_init("pm_hcor", FALSE)),
         numericInput(
-          "pm_cutoff", label = "Loadings cutoff:", min = 0,
+          "pm_cutoff",
+          label = "Loadings cutoff:", min = 0,
           max = 1, state_init("pm_cutoff", 0), step = .05
         ),
         conditionalPanel(
           condition = "input.pm_attr != null",
           tags$table(
             tags$td(uiOutput("ui_pm_store_name")),
-            tags$td(actionButton("pm_store", "Store", icon = icon("plus")), class = "top")
+            tags$td(actionButton("pm_store", "Store", icon = icon("plus", verify_fa = FALSE)), class = "top")
           )
         )
       ),
@@ -141,11 +146,19 @@ pm_plot <- eventReactive(input$pm_run, {
   list(plot_width = 650, plot_height = 650 * nrPlots)
 })
 
-pm_plot_width <- function()
-  pm_plot() %>% {if (is.list(.)) .$plot_width else 650}
+pm_plot_width <- function() {
+  pm_plot() %>%
+    {
+      if (is.list(.)) .$plot_width else 650
+    }
+}
 
-pm_plot_height <- function()
-  pm_plot() %>% {if (is.list(.)) .$plot_height else 650}
+pm_plot_height <- function() {
+  pm_plot() %>%
+    {
+      if (is.list(.)) .$plot_height else 650
+    }
+}
 
 output$prmap <- renderUI({
   register_print_output("summary_prmap", ".summary_prmap")
@@ -188,10 +201,10 @@ output$prmap <- renderUI({
   } else {
     # brand <- .get_data()[[input$pm_brand]]
     # if (length(unique(brand)) < length(brand)) {
-      # "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
-        # suggest_data("retailers")
+    # "Number of observations and unique IDs for the brand variable do not match.\nPlease choose another brand variable or another dataset.\n\n" %>%
+    # suggest_data("retailers")
     # } else {
-      "available"
+    "available"
     # }
   }
 })
@@ -205,7 +218,9 @@ output$prmap <- renderUI({
 })
 
 .summary_prmap <- reactive({
-  if (.prmap_available() != "available") return(.prmap_available())
+  if (.prmap_available() != "available") {
+    return(.prmap_available())
+  }
   validate(
     need(
       input$pm_cutoff >= 0 && input$pm_cutoff <= 1,
@@ -215,17 +230,24 @@ output$prmap <- renderUI({
   summary(.prmap(), cutoff = input$pm_cutoff)
 })
 
-.plot_prmap <- eventReactive({
-  c(input$pm_run, pm_plot_inputs())
-}, {
-  if (.prmap_available() != "available") return(.prmap_available())
-  req("pm_plots" %in% names(input))
-  robj <- .prmap()
-  if (is.character(robj)) return(robj)
-  withProgress(message = "Generating brand maps", value = 1, {
-    do.call(plot, c(list(x = robj), pm_plot_inputs(), shiny = TRUE))
-  })
-})
+.plot_prmap <- eventReactive(
+  {
+    c(input$pm_run, pm_plot_inputs())
+  },
+  {
+    if (.prmap_available() != "available") {
+      return(.prmap_available())
+    }
+    req("pm_plots" %in% names(input))
+    robj <- .prmap()
+    if (is.character(robj)) {
+      return(robj)
+    }
+    withProgress(message = "Generating brand maps", value = 1, {
+      do.call(plot, c(list(x = robj), pm_plot_inputs(), shiny = TRUE))
+    })
+  }
+)
 
 prmap_report <- function() {
   outputs <- c("summary", "plot")
@@ -267,7 +289,9 @@ observeEvent(input$pm_store, {
 dl_pm_loadings <- function(path) {
   if (pressed(input$pm_run)) {
     .prmap() %>%
-      {if (is.list(.)) .$fres$loadings else return()} %>%
+      {
+        if (is.list(.)) .$fres$loadings else return()
+      } %>%
       clean_loadings(input$pm_cutoff, fsort = FALSE) %>%
       write.csv(file = path)
   } else {
