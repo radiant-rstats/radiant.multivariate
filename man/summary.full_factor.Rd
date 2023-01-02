@@ -24,7 +24,7 @@ Summary method for the full_factor function
 See \url{https://radiant-rstats.github.io/docs/multivariate/full_factor.html} for an example in Radiant
 }
 \examples{
-result <- full_factor(shopping , "v1:v6", nr_fact = 2)
+result <- full_factor(shopping, "v1:v6", nr_fact = 2)
 summary(result)
 summary(result, cutoff = .5, fsort = TRUE)
 

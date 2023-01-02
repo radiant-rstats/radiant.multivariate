@@ -553,7 +553,7 @@ conjoint_report <- function() {
     (!radiant.data::is_empty(input$ca_pred_data) || !radiant.data::is_empty(input$ca_pred_cmd))) {
     pred_args <- clean_args(ca_pred_inputs(), ca_pred_args[-1])
     if (!radiant.data::is_empty(pred_args$pred_cmd)) {
-      pred_args$pred_cmd <- strsplit(pred_args$pred_cmd, ";")[[1]]
+      pred_args$pred_cmd <- strsplit(pred_args$pred_cmd, ";\\s*")[[1]]
     } else {
       pred_args$pred_cmd <- NULL
     }

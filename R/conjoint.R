@@ -20,19 +20,20 @@
 #' @seealso \code{\link{plot.conjoint}} to plot results
 #'
 #' @export
-conjoint <- function(
-  dataset, rvar, evar,
-  int = "", by = "none",
-  reverse = FALSE, data_filter = "",
-  envir = parent.frame()
-) {
-
+conjoint <- function(dataset, rvar, evar,
+                     int = "", by = "none",
+                     reverse = FALSE, data_filter = "",
+                     envir = parent.frame()) {
   vars <- c(rvar, evar)
   if (by != "none") vars <- c(vars, by)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   radiant.model::var_check(evar, colnames(dataset)[-1], int) %>%
-    {vars <<- .$vars; evar <<- .$ev; int <<- .$intv}
+    (function(x) {
+      vars <<- x$vars
+      evar <<- x$ev
+      int <<- x$intv
+    })
 
   ## in case : was used to select a range of variables
   # evar <- colnames(dataset)[-1]
@@ -59,11 +60,14 @@ conjoint <- function(
     }
 
     if (reverse) {
-      cdat[[rvar]] <- cdat[[rvar]] %>% {(max(.) + 1) - .}
+      cdat[[rvar]] <- cdat[[rvar]] %>%
+        (function(x) (max(x) + 1) - x)
     }
 
     model <- sshhr(lm(formula, data = cdat))
-    coeff <- tidy(model) %>% na.omit() %>% as.data.frame()
+    coeff <- tidy(model) %>%
+      na.omit() %>%
+      as.data.frame()
     tab <- the_table(coeff, cdat, evar)
 
     coeff$sig_star <- sig_stars(coeff$p.value) %>%
@@ -137,11 +141,8 @@ conjoint <- function(
 #' @importFrom car vif
 #'
 #' @export
-summary.conjoint <- function(
-  object, show = "", mc_diag = FALSE,
-  additional = FALSE, dec = 3, ...
-) {
-
+summary.conjoint <- function(object, show = "", mc_diag = FALSE,
+                             additional = FALSE, dec = 3, ...) {
   cat("Conjoint analysis\n")
   cat("Data                 :", object$df_name, "\n")
   if (!radiant.data::is_empty(object$data_filter)) {
@@ -160,22 +161,22 @@ summary.conjoint <- function(
 
   tab <- object$model_list[[show]]$tab
   cat("Conjoint part-worths:\n")
-  tab$PW[,1:2] %<>% format(justify = "left")
+  tab$PW[, 1:2] %<>% format(justify = "left")
   print(format_df(tab$PW, dec), row.names = FALSE)
   cat("\nConjoint importance weights:\n")
-  tab$IW[,1:2] %<>% format(justify = "left")
+  tab$IW[, 1:2] %<>% format(justify = "left")
   print(format_df(tab$IW, dec), row.names = FALSE)
   cat("\nConjoint regression results:\n\n")
 
   coeff <- object$model_list[[show]]$coeff
   coeff$label %<>% format(justify = "left")
   if (!additional) {
-    coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
+    coeff[, 2] %<>% (function(x) sprintf(paste0("%.", dec, "f"), x))
     print(dplyr::rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
     cat("\n")
   } else {
     if (all(coeff$p.value == "NaN")) {
-      coeff[, 2] %<>% {sprintf(paste0("%.", dec, "f"), .)}
+      coeff[, 2] %<>% (function(x) sprintf(paste0("%.", dec, "f"), x))
       print(dplyr::rename(coeff[, 1:2], `  ` = "label"), row.names = FALSE)
       cat("\nInsufficient variation in explanatory variable(s) to report additional statistics")
       return()
@@ -211,7 +212,7 @@ summary.conjoint <- function(
     if (length(object$evar) > 1) {
       cat("Multicollinearity diagnostics:\n")
       car::vif(object$model_list[[show]]$model) %>%
-        {if (!dim(.) %>% is.null()) .[, "GVIF"] else .} %>% # needed when factors are included
+        (function(x) if (!dim(x) %>% is.null()) x[, "GVIF"] else x) %>% # needed when factors are included
         data.frame(
           VIF = .,
           Rsq = 1 - 1 / .,
@@ -219,7 +220,7 @@ summary.conjoint <- function(
         ) %>%
         round(dec) %>%
         .[order(.$VIF, decreasing = T), ] %>%
-        {if (nrow(.) < 8) t(.) else .} %>%
+        (function(x) if (nrow(x) < 8) t(x) else x) %>%
         print()
     } else {
       cat("Insufficient number of attributes selected to calculate\nmulticollinearity diagnostics")
@@ -252,14 +253,13 @@ summary.conjoint <- function(
 #' @importFrom radiant.model predict_model
 #'
 #' @export
-predict.conjoint <- function(
-  object, pred_data = NULL, pred_cmd = "",
-  conf_lev = 0.95, se = FALSE,
-  interval = "confidence", dec = 3,
-  envir = parent.frame(), ...
-) {
-
-  if (is.character(object)) return(object)
+predict.conjoint <- function(object, pred_data = NULL, pred_cmd = "",
+                             conf_lev = 0.95, se = FALSE,
+                             interval = "confidence", dec = 3,
+                             envir = parent.frame(), ...) {
+  if (is.character(object)) {
+    return(object)
+  }
   if (!isTRUE(se)) {
     interval <- "none"
   } else if (isTRUE(interval == "none")) {
@@ -301,7 +301,6 @@ predict.conjoint <- function(
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec, envir = envir) %>%
       set_attr("radiant_interval", interval) %>%
       set_attr("radiant_pred_data", df_name)
-
   } else {
     predict_conjoint_by(object, pfun, pred_data, pred_cmd, conf_lev, se, dec, envir = envir) %>%
       set_attr("radiant_interval", interval) %>%
@@ -330,13 +329,12 @@ predict.conjoint <- function(
 #' @importFrom radiant.model predict_model
 #'
 #' @export
-predict_conjoint_by <- function(
-  object, pfun, pred_data = NULL, pred_cmd = "",
-  conf_lev = 0.95, se = FALSE, dec = 3,
-  envir = parent.frame(), ...
-) {
-
-  if (is.character(object)) return(object)
+predict_conjoint_by <- function(object, pfun, pred_data = NULL, pred_cmd = "",
+                                conf_lev = 0.95, se = FALSE, dec = 3,
+                                envir = parent.frame(), ...) {
+  if (is.character(object)) {
+    return(object)
+  }
   ## ensure you have a name for the prediction dataset
   if (is.data.frame(pred_data)) {
     attr(pred_data, "radiant_pred_data") <- deparse(substitute(pred_data))
@@ -352,9 +350,15 @@ predict_conjoint_by <- function(
     ## when se is true reordering the columns removes attributes for some reason
     if (i == 1) att <- attributes(pred[[1]])
 
-    if (is.character(pred[[i]])) return(pred[[i]])
-    pred[[i]] %<>% {.[[object$by]] <- bylevs[i]; .} %>%
-      {.[, c(object$by, head(colnames(.), -1))]}
+    if (is.character(pred[[i]])) {
+      return(pred[[i]])
+    }
+    pred[[i]] %<>%
+      (function(x) {
+        x[[object$by]] <- bylevs[i]
+        x
+      }) %>%
+      (function(x) x[, c(object$by, head(colnames(x), -1))])
   }
 
   pred <- bind_rows(pred)
@@ -374,8 +378,9 @@ predict_conjoint_by <- function(
 #' @importFrom radiant.model print_predict_model
 #'
 #' @export
-print.conjoint.predict <- function(x, ..., n = 20)
+print.conjoint.predict <- function(x, ..., n = 20) {
   print_predict_model(x, ..., n = n, header = "Conjoint Analysis")
+}
 
 #' Plot method for the conjoint function
 #'
@@ -397,12 +402,11 @@ print.conjoint.predict <- function(x, ..., n = 20)
 #' @seealso \code{\link{conjoint}} to generate results
 #' @seealso \code{\link{summary.conjoint}} to summarize results
 #'
+#' @importFrom rlang .data
+#'
 #' @export
-plot.conjoint <- function(
-  x, plots = "pw", show = "", scale_plot = FALSE,
-  shiny = FALSE, custom = FALSE, ...
-) {
-
+plot.conjoint <- function(x, plots = "pw", show = "", scale_plot = FALSE,
+                          shiny = FALSE, custom = FALSE, ...) {
   if (x$by == "none" || radiant.data::is_empty(show) || !show %in% names(x$model_list)) {
     show <- names(x$model_list)[1]
   }
@@ -423,8 +427,8 @@ plot.conjoint <- function(
       # ggplot would change the ordering of the price levels
       PW.var$Levels <- factor(PW.var$Levels, levels = PW.var$Levels, ordered = FALSE)
 
-      p <- ggplot(PW.var, aes_string(x = "Levels", y = "PW", group = 1)) +
-        geom_line(color = "blue", linetype = "dotdash", size = .7) +
+      p <- ggplot(PW.var, aes(x = .data$Levels, y = .data$PW, group = 1)) +
+        geom_line(color = "blue", linetype = "dotdash", linewidth = .7) +
         geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
         labs(title = paste("Part-worths for", var, lab), x = "") +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -439,7 +443,7 @@ plot.conjoint <- function(
   if ("iw" %in% plots) {
     IW.df <- the_table[["IW"]]
     lab <- if (x$by == "none") "" else paste0(" (", show, ")")
-    plot_list[["iw"]] <- ggplot(IW.df, aes_string(x = "Attributes", y = "IW", fill = "Attributes")) +
+    plot_list[["iw"]] <- ggplot(IW.df, aes(x = .data$Attributes, y = .data$IW, fill = .data$Attributes)) +
       geom_bar(stat = "identity", alpha = 0.5) +
       theme(legend.position = "none") +
       labs(title = paste0("Importance weights", lab))
@@ -450,7 +454,7 @@ plot.conjoint <- function(
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = min(length(plot_list), 2)) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (isTRUE(shiny)) x else print(x))
     }
   }
 }
@@ -473,14 +477,18 @@ plot.conjoint <- function(
 #'
 #' @export
 the_table <- function(model, dataset, evar) {
-  if (is.character(model)) return(list("PW" = "No attributes selected."))
+  if (is.character(model)) {
+    return(list("PW" = "No attributes selected."))
+  }
 
   attr <- select_at(dataset, .vars = evar) %>%
     mutate_if(is.logical, as.factor) %>%
     mutate_if(is.character, as.factor)
 
   isFct <- sapply(attr, is.factor)
-  if (sum(isFct) < ncol(attr)) return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
+  if (sum(isFct) < ncol(attr)) {
+    return(list("PW" = "Only factors can be used.", "IW" = "Only factors can be used."))
+  }
   bylevs <- lapply(attr[, isFct, drop = FALSE], levels)
   vars <- colnames(attr)[isFct]
 

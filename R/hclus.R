@@ -23,13 +23,10 @@
 #' @importFrom gower gower_dist
 #'
 #' @export
-hclus <- function(
-  dataset, vars, labels = "none", distance = "sq.euclidian",
-  method = "ward.D", max_cases = 5000,
-  standardize = TRUE, data_filter = "",
-  envir = parent.frame()
-) {
-
+hclus <- function(dataset, vars, labels = "none", distance = "sq.euclidian",
+                  method = "ward.D", max_cases = 5000,
+                  standardize = TRUE, data_filter = "",
+                  envir = parent.frame()) {
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, if (labels == "none") vars else c(labels, vars), filt = data_filter, envir = envir) %>%
     as.data.frame() %>%
@@ -60,7 +57,7 @@ hclus <- function(
   }
 
   if (distance == "sq.euclidian") {
-    d <- dist(dataset, method = "euclidean") ^ 2
+    d <- dist(dataset, method = "euclidean")^2
   } else if (distance == "gower") {
     d <- sapply(1:nrow(dataset), function(i) gower::gower_dist(dataset[i, ], dataset)) %>%
       as.dist()
@@ -87,7 +84,9 @@ hclus <- function(
 #'
 #' @export
 summary.hclus <- function(object, ...) {
-  if (is.character(object)) return(object)
+  if (is.character(object)) {
+    return(object)
+  }
 
   cat("Hierarchical cluster analysis\n")
   cat("Data        :", object$df_name, "\n")
@@ -124,16 +123,17 @@ summary.hclus <- function(object, ...) {
 #' @seealso \code{\link{summary.hclus}} to summarize results
 #'
 #' @export
-plot.hclus <- function(
-  x, plots = c("scree", "change"),
-  cutoff = 0.05,
-  shiny = FALSE, custom = FALSE, ...
-) {
-
-  if (radiant.data::is_empty(plots)) return(invisible())
-  if (is.character(x)) return(invisible())
+plot.hclus <- function(x, plots = c("scree", "change"),
+                       cutoff = 0.05,
+                       shiny = FALSE, custom = FALSE, ...) {
+  if (radiant.data::is_empty(plots)) {
+    return(invisible())
+  }
+  if (is.character(x)) {
+    return(invisible())
+  }
   if (is_not(cutoff)) cutoff <- 0
-  x$hc_out$height %<>% {. / max(.)}
+  x$hc_out$height %<>% (function(x) x / max(x))
 
   plot_list <- list()
   if ("scree" %in% plots) {
@@ -145,7 +145,7 @@ plot.hclus <- function(
         stringsAsFactors = FALSE
       ) %>%
       ggplot(aes(x = factor(nr_clus, levels = nr_clus), y = height, group = 1)) +
-      geom_line(color = "blue", linetype = "dotdash", size = .7) +
+      geom_line(color = "blue", linetype = "dotdash", linewidth = .7) +
       geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
       scale_y_continuous(labels = scales::percent) +
       labs(
@@ -158,7 +158,7 @@ plot.hclus <- function(
   if ("change" %in% plots) {
     plot_list[["change"]] <-
       x$hc_out$height[x$hc_out$height > cutoff] %>%
-      {(. - lag(.)) / lag(.)} %>%
+      (function(x) (x - lag(x)) / lag(x)) %>%
       data.frame(
         bump = .,
         nr_clus = paste0((length(.) + 1):2, "-", length(.):1),
@@ -187,14 +187,15 @@ plot.hclus <- function(
     # library(ggraph)
     # https://www.r-graph-gallery.com/335-custom-ggraph-dendrogram/
     # plot_list[["dendro"]] <- ggraph(hc, 'dendrogram', circular = FALSE) +
-      # geom_edge_elbow()
+    # geom_edge_elbow()
 
     if (cutoff == 0) {
       plot(hc, main = "Dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity")
       # plot_list[["dendro"]] <- patchwork::wrap_elements(~ plot(hc), clip = FALSE)
     } else {
       plot(
-        hc, ylim = c(cutoff, 1), leaflab = "none",
+        hc,
+        ylim = c(cutoff, 1), leaflab = "none",
         main = "Cutoff dendrogram", xlab = xlab, ylab = "Within-cluster heterogeneity"
       )
       # plot_list[["dendro"]] <- patchwork::wrap_elements(~ plot(hc), clip = FALSE)
@@ -207,7 +208,7 @@ plot.hclus <- function(
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = 1) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (isTRUE(shiny)) x else print(x))
     }
   }
 }

@@ -25,27 +25,25 @@
 #' @importFrom psych scoreIrt
 #'
 #' @export
-full_factor <- function(
-  dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1,
-  rotation = "varimax", data_filter = "",
-  envir = parent.frame()
-) {
-
+full_factor <- function(dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1,
+                        rotation = "varimax", data_filter = "",
+                        envir = parent.frame()) {
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir) %>%
     mutate_if(is.Date, as.numeric)
   rm(envir)
 
   ## in case : is used
-  if (length(vars) < ncol(dataset))
+  if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
   nrObs <- nrow(dataset)
   nrFac <- max(1, as.numeric(nr_fact))
   if (nrFac > ncol(dataset)) {
     return("The number of factors cannot exceed the number of variables" %>%
-        add_class("full_factor"))
+      add_class("full_factor"))
     nrFac <- ncol(dataset)
   }
 
@@ -59,7 +57,6 @@ full_factor <- function(
     } else {
       cmat <- cmat$correlations
     }
-
   } else {
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     cmat <- cor(dataset)
@@ -67,7 +64,8 @@ full_factor <- function(
 
   if (method == "PCA") {
     fres <- psych::principal(
-      cmat, nfactors = nrFac, rotate = rotation, scores = FALSE,
+      cmat,
+      nfactors = nrFac, rotate = rotation, scores = FALSE,
       oblique.scores = FALSE
     )
     m <- fres$loadings[, colnames(fres$loadings)]
@@ -100,8 +98,8 @@ full_factor <- function(
           warning("Tau values of -Inf found. Adjustment applied")
         }
         diffi <- list()
-        for (i in 1:nf) diffi[[i]] <- tau/sqrt(1 - m[, i]^2)
-        discrim <- m/sqrt(1 - m^2)
+        for (i in 1:nf) diffi[[i]] <- tau / sqrt(1 - m[, i]^2)
+        discrim <- m / sqrt(1 - m^2)
         new.stats <- list(difficulty = diffi, discrimination = discrim)
         psych::score.irt.poly(new.stats, dataset, cut = 0, bounds = c(-4, 4))
       }
@@ -110,10 +108,10 @@ full_factor <- function(
       rm(.irt.tau)
       if (inherits(scores, "try-error")) {
         return(
-          paste0("An error occured estimating latent factor scores using psychIrt. The error message was:\n\n", attr(scores, 'condition')$message) %>% add_class("full_factor")
+          paste0("An error occured estimating latent factor scores using psychIrt. The error message was:\n\n", attr(scores, "condition")$message) %>% add_class("full_factor")
         )
       } else {
-        fres$scores <- apply(scores[,1:nrFac, drop=FALSE], 2, radiant.data::standardize)
+        fres$scores <- apply(scores[, 1:nrFac, drop = FALSE], 2, radiant.data::standardize)
         rm(scores)
         colnames(fres$scores) <- colnames(fres$loadings)
       }
@@ -147,7 +145,7 @@ full_factor <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor(shopping , "v1:v6", nr_fact = 2)
+#' result <- full_factor(shopping, "v1:v6", nr_fact = 2)
 #' summary(result)
 #' summary(result, cutoff = .5, fsort = TRUE)
 #'
@@ -157,12 +155,11 @@ full_factor <- function(
 #' @importFrom psych fa.sort
 #'
 #' @export
-summary.full_factor <- function(
-  object, cutoff = 0, fsort = FALSE,
-  dec = 2, ...
-) {
-
-  if (is.character(object)) return(cat(object))
+summary.full_factor <- function(object, cutoff = 0, fsort = FALSE,
+                                dec = 2, ...) {
+  if (is.character(object)) {
+    return(cat(object))
+  }
 
   cat("Factor analysis\n")
   cat("Data        :", object$df_name, "\n")
@@ -212,8 +209,8 @@ summary.full_factor <- function(
 
   ## fit measures
   cat("\nFit measures:\n")
-  colSums(object$floadings ^ 2) %>%
-    rbind(., . / nrow(object$floadings)) %>%
+  colSums(object$floadings^2) %>%
+    rbind(., 100 * (. / nrow(object$floadings))) %>%
     rbind(., cumsum(.[2, ])) %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
     format_df(dec = dec) %>%
@@ -250,13 +247,14 @@ summary.full_factor <- function(
 #' @param ... further arguments passed to or from other methods
 #'
 #' @examples
-#' result <- full_factor(shopping , "v1:v6", nr_fact = 2)
+#' result <- full_factor(shopping, "v1:v6", nr_fact = 2)
 #' plot(result)
 #'
 #' @seealso \code{\link{full_factor}} to calculate results
 #' @seealso \code{\link{plot.full_factor}} to plot results
 #'
 #' @importFrom ggrepel geom_text_repel
+#' @importFrom rlang .data
 #'
 #' @export
 plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, ...) {
@@ -281,22 +279,22 @@ plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, .
       j_name <- cnames[j]
       df2 <- cbind(df[, c(i_name, j_name)], rnames)
 
-      p <- ggplot(df2, aes_string(x = i_name, y = j_name)) +
+      p <- ggplot(df2, aes(x = .data[[i_name]], y = .data[[j_name]])) +
         theme(legend.position = "none") +
         coord_cartesian(xlim = c(-plot_scale, plot_scale), ylim = c(-plot_scale, plot_scale)) +
         geom_vline(xintercept = 0) +
         geom_hline(yintercept = 0)
 
       if ("resp" %in% plots) {
-        p <- p + geom_point(data = scores, aes_string(x = i_name, y = j_name), alpha = 0.5)
+        p <- p + geom_point(data = scores, aes(x = .data[[i_name]], y = .data[[j_name]]), alpha = 0.5)
       }
 
       if ("attr" %in% plots) {
-        p <- p + geom_point(aes_string(color = "rnames")) +
-          ggrepel::geom_text_repel(aes_string(color = "rnames", label = "rnames")) +
+        p <- p + geom_point(aes(color = .data$rnames)) +
+          ggrepel::geom_text_repel(aes(color = .data$rnames, label = .data$rnames)) +
           geom_segment(
-            aes_string(x = 0, y = 0, xend = i_name, yend = j_name, color = "rnames"),
-            size = 0.5, linetype = "dashed", alpha = 0.5
+            aes(x = 0, y = 0, xend = .data[[i_name]], yend = .data[[j_name]], color = .data$rnames),
+            linewidth = 0.5, linetype = "dashed", alpha = 0.5
           )
       }
 
@@ -309,7 +307,7 @@ plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, .
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = min(length(plot_list), 2)) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (shiny) x else print(x))
     }
   }
 }
@@ -360,10 +358,7 @@ store.full_factor <- function(dataset, object, name = "", ...) {
 #' @importFrom psych fa.sort
 #'
 #' @export
-clean_loadings <- function(
-  floadings, cutoff = 0, fsort = FALSE, dec = 8, repl = NA
-) {
-
+clean_loadings <- function(floadings, cutoff = 0, fsort = FALSE, dec = 8, repl = NA) {
   if (fsort) {
     floadings <- select(psych::fa.sort(floadings), -order)
   }

@@ -1,3 +1,11 @@
+# radiant.multivariate 1.5.0.0
+
+* Improvements to screenshot feature. Navigation bar is omitted and the image is adjusted to the length of the UI.
+* Line graphs treated more similarly to bar-graphs (i.e., can have a binary factor variable on the y-axis)
+* Removed all references to `aes_string` which is being deprecated in ggplot soon
+* Replaced reference to 'size' in favor of 'linewidth' due to changes in ggplot2
+* Code styling
+
 # radiant.multivariate 1.4.4.0
 
 * Added option to create screenshots of settings on a page. Approach is inspired by the snapper package by @yonicd

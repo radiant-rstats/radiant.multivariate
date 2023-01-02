@@ -24,12 +24,9 @@
 #' @importFrom MASS isoMDS
 #'
 #' @export
-mds <- function(
-  dataset, id1, id2, dis, method = "metric",
-  nr_dim = 2, seed = 1234, data_filter = "",
-  envir = parent.frame()
-) {
-
+mds <- function(dataset, id1, id2, dis, method = "metric",
+                nr_dim = 2, seed = 1234, data_filter = "",
+                envir = parent.frame()) {
   nr_dim <- as.numeric(nr_dim)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, c(id1, id2, dis), filt = data_filter, envir = envir, na.rm = FALSE)
@@ -73,7 +70,9 @@ mds <- function(
   # res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
   # if (res$converged == FALSE) return("The MDS algorithm did not converge. Please try again.")
 
-  seed %>% gsub("[^0-9]", "", .) %>% {if (!radiant.data::is_empty(.)) set.seed(seed)}
+  seed %>%
+    gsub("[^0-9]", "", .) %>%
+    (function(x) if (!radiant.data::is_empty(x)) set.seed(seed))
   res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
   res$stress <- res$stress / 100
 
@@ -82,8 +81,7 @@ mds <- function(
     ## Using R^2
     # res$stress <- sqrt(1 - cor(dist(res$points),mds_dis_mat)^2) * 100
     # Using standard Kruskal formula for metric MDS
-    res$stress <- {sum((dist(res$points) - mds_dis_mat) ^ 2) / sum(mds_dis_mat ^ 2)} %>%
-      sqrt(.)
+    res$stress <- sqrt((sum((dist(res$points) - mds_dis_mat)^2) / sum(mds_dis_mat^2)))
   }
 
   as.list(environment()) %>% add_class("mds")
@@ -106,8 +104,9 @@ mds <- function(
 #'
 #' @export
 summary.mds <- function(object, dec = 2, ...) {
-
-  if (is.character(object)) return(cat(object))
+  if (is.character(object)) {
+    return(cat(object))
+  }
 
   cat("(Dis)similarity based brand map (MDS)\n")
   cat("Data        :", object$df_name, "\n")
@@ -121,10 +120,15 @@ summary.mds <- function(object, dec = 2, ...) {
   cat("Observations:", object$nrObs, "\n")
 
   cat("\nOriginal distance data:\n")
-  object$mds_dis_mat %>% round(dec) %>% print()
+  object$mds_dis_mat %>%
+    round(dec) %>%
+    print()
 
   cat("\nRecovered distance data:\n")
-  object$res$points %>% dist() %>% round(dec) %>% print()
+  object$res$points %>%
+    dist() %>%
+    round(dec) %>%
+    print()
 
   cat("\nCoordinates:\n")
   object$res$points %>%
@@ -157,10 +161,13 @@ summary.mds <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{summary.mds}} to plot results
 #'
 #' @importFrom ggrepel geom_text_repel
+#' @importFrom rlang .data
 #'
 #' @export
 plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALSE, ...) {
-  if (is.character(x)) return(cat(x))
+  if (is.character(x)) {
+    return(cat(x))
+  }
 
   ## set extremes for plot
   lim <- max(abs(x$res$points))
@@ -182,13 +189,13 @@ plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALS
     for (j in (i + 1):x$nr_dim) {
       i_name <- paste0("dim", i)
       j_name <- paste0("dim", j)
-      plot_list[[paste0("dim", i, "_dim", j)]] <- ggplot(tbl, aes_string(x = i_name, y = j_name, color = "rnames", label = "rnames")) +
+      plot_list[[paste0("dim", i, "_dim", j)]] <- ggplot(tbl, aes(x = .data[[i_name]], y = .data[[j_name]], color = .data$rnames, label = .data$rnames)) +
         geom_point() +
         ggrepel::geom_text_repel(size = fontsz) +
         theme(legend.position = "none") +
         coord_cartesian(xlim = c(-lim, lim), ylim = c(-lim, lim)) +
-        geom_vline(xintercept = 0, size = 0.3) +
-        geom_hline(yintercept = 0, size = 0.3) +
+        geom_vline(xintercept = 0, linewidth = 0.3) +
+        geom_hline(yintercept = 0, linewidth = 0.3) +
         labs(
           x = paste("Dimension", i),
           y = paste("Dimension", j)
@@ -201,7 +208,7 @@ plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALS
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = 1) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (isTRUE(shiny)) x else print(x))
     }
   }
 }

@@ -10,3 +10,4 @@ _pkgdown.yml
 cran-comments.md
 radiant.multivariate.code-workspace
 .vscode/
+^CRAN-SUBMISSION$

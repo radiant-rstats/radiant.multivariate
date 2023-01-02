@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' pre_factor(shopping, "v1:v6") %>% str()
-#' 
+#'
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #' @seealso \code{\link{plot.pre_factor}} to plot results
 #'
@@ -22,14 +22,14 @@
 #'
 #' @export
 pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = parent.frame()) {
-
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   nrObs <- nrow(dataset)
 
   ## in case : is used
-  if (length(vars) < ncol(dataset))
+  if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
 
@@ -57,7 +57,7 @@ pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = pa
       pre_r2 <- matrix(NA, nrow = nrow(cmat), ncol = 1)
       rownames(pre_r2) <- rownames(cmat)
     } else {
-      pre_r2 <- {1 - (1 / diag(scmat))} %>%
+      pre_r2 <- (1 - (1 / diag(scmat))) %>%
         data.frame(stringsAsFactors = FALSE) %>%
         set_colnames("Rsq")
     }
@@ -97,7 +97,9 @@ pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = pa
 #'
 #' @export
 summary.pre_factor <- function(object, dec = 2, ...) {
-  if (is.character(object)) return(cat(object))
+  if (is.character(object)) {
+    return(cat(object))
+  }
 
   if (is.character(object$pre_r2)) {
     cat(object$pre_r2)
@@ -165,8 +167,8 @@ summary.pre_factor <- function(object, dec = 2, ...) {
       data.frame(
         ` ` = paste0("PC", 1:length(.)),
         Eigenvalues = .,
-        `Variance %` = . / sum(.),
-        `Cumulative %` = cumsum(. / sum(.)),
+        `Variance %` = 100 * (. / sum(.)),
+        `Cumulative %` = 100 * (cumsum(. / sum(.))),
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -192,12 +194,11 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{summary.pre_factor}} to summarize results
 #'
 #' @export
-plot.pre_factor <- function(
-  x, plots = c("scree", "change"), cutoff = 0.2,
-  shiny = FALSE, custom = FALSE, ...
-) {
-
-  if (is.character(x) || is.character(x$pre_r2) || length(plots) == 0) return("")
+plot.pre_factor <- function(x, plots = c("scree", "change"), cutoff = 0.2,
+                            shiny = FALSE, custom = FALSE, ...) {
+  if (is.character(x) || is.character(x$pre_r2) || length(plots) == 0) {
+    return("")
+  }
 
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
   pre_eigen <- with(x, pre_eigen[pre_eigen > cutoff])
@@ -207,17 +208,17 @@ plot.pre_factor <- function(
   if ("scree" %in% plots) {
     plot_list[[which("scree" == plots)]] <-
       ggplot(dat, aes(x = x, y = y, group = 1)) +
-      geom_line(color = "blue", linetype = "dotdash", size = .7) +
+      geom_line(color = "blue", linetype = "dotdash", linewidth = .7) +
       geom_point(color = "blue", size = 4, shape = 21, fill = "white") +
-      geom_hline(yintercept = 1, color = "black", linetype = "solid", size = .5) +
+      geom_hline(yintercept = 1, color = "black", linetype = "solid", linewidth = .5) +
       labs(title = "Screeplot", x = "# factors", y = "Eigenvalues") +
       scale_x_continuous(breaks = dat[["x"]])
   }
 
   if ("change" %in% plots) {
     plot_list[[which("change" == plots)]] <- pre_eigen %>%
-      {(. - lag(.)) / lag(.)} %>%
-      {. / min(., na.rm = TRUE)} %>%
+      (function(x) (x - lag(x)) / lag(x)) %>%
+      (function(x) x / min(x, na.rm = TRUE)) %>%
       data.frame(
         bump = .,
         nr_fact = paste0(0:(length(.) - 1), "-", 1:length(.)),
@@ -237,7 +238,7 @@ plot.pre_factor <- function(
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = 1) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (shiny) x else print(x))
     }
   }
 }

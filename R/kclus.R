@@ -26,12 +26,9 @@
 #' @importFrom clustMixType kproto
 #'
 #' @export
-kclus <- function(
-  dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.euclidian",
-  method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, lambda = NULL,
-  data_filter = "", envir = parent.frame()
-) {
-
+kclus <- function(dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.euclidian",
+                  method = "ward.D", seed = 1234, nr_clus = 2, standardize = TRUE, lambda = NULL,
+                  data_filter = "", envir = parent.frame()) {
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
   rm(envir)
@@ -48,8 +45,9 @@ kclus <- function(
   } else if (fun %in% c("mean", "kmeans")) {
     fun <- "kmeans"
     dataset <- select_if(dataset, function(x) !is.factor(x))
-    if (ncol(dataset) < length(vars))
+    if (ncol(dataset) < length(vars)) {
       cat("** Categorical variables cannot be used with K-means **.\n** Select the K-proto option instead **\n\n")
+    }
     vars <- colnames(dataset)
   } else if (fun == "kproto") {
     if (hc_init) distance <- "gower"
@@ -84,36 +82,43 @@ kclus <- function(
     hc_cent <- c()
     km_out <- dataset %>%
       mutate(clus_var = clus_var) %>%
-      {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %T>% {
+      (function(x) if (standardize) mutate_if(x, is.numeric, ~ as.vector(scale(.))) else x) %T>%
+      (function(x) {
         hc_cent <<-
-          group_by(., clus_var) %>%
+          group_by(x, clus_var) %>%
           summarise_all(center_calc) %>%
           select(-clus_var)
-      } %>%
+      }) %>%
       select(-clus_var) %>%
-      {if (fun == "kproto") {
-         kp <- clustMixType::kproto(as.data.frame(.), k = hc_cent, iter.max = 500, verbose = FALSE, lambda = lambda)
-         ## kproto doesn't provide totss or betweenss by default
-         kp$totss <- clustMixType::kproto(as.data.frame(.), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
-         kp$betweenss <- kp$totss - kp$tot.withinss
-         kp
-       } else {
-         kmeans(., centers = as.matrix(hc_cent), iter.max = 500)
-      }}
+      (function(x) {
+        if (fun == "kproto") {
+          kp <- clustMixType::kproto(as.data.frame(x), k = hc_cent, iter.max = 500, verbose = FALSE, lambda = lambda)
+          ## kproto doesn't provide totss or betweenss by default
+          kp$totss <- clustMixType::kproto(as.data.frame(x), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
+          kp$betweenss <- kp$totss - kp$tot.withinss
+          kp
+        } else {
+          kmeans(x, centers = as.matrix(hc_cent), iter.max = 500)
+        }
+      })
     rm(init, hc_cent)
   } else {
-    seed %>% gsub("[^0-9]", "", .) %>% {if (!radiant.data::is_empty(.)) set.seed(seed)}
+    seed %>%
+      gsub("[^0-9]", "", .) %>%
+      (function(x) if (!radiant.data::is_empty(x)) set.seed(seed))
     km_out <- dataset %>%
-      {if (standardize) mutate_if(., is.numeric, ~ as.vector(scale(.))) else .} %>%
-      {if (fun == "kproto") {
-        kp <- clustMixType::kproto(as.data.frame(.), k = nr_clus, iter.max = 500, verbose = FALSE, lambda = lambda)
-        ## kproto doesn't provide totss or betweenss by default
-        kp$totss <- clustMixType::kproto(as.data.frame(.), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
-        kp$betweenss <- kp$totss - kp$tot.withinss
-        kp
-      } else {
-        kmeans(., centers = nr_clus, nstart = 10, iter.max = 500)
-      }}
+      (function(x) if (standardize) mutate_if(x, is.numeric, ~ as.vector(scale(.))) else x) %>%
+      (function(x) {
+        if (fun == "kproto") {
+          kp <- clustMixType::kproto(as.data.frame(x), k = nr_clus, iter.max = 500, verbose = FALSE, lambda = lambda)
+          ## kproto doesn't provide totss or betweenss by default
+          kp$totss <- clustMixType::kproto(as.data.frame(x), k = 1, iter.max = 1, verbose = FALSE, lambda = lambda)$tot.withinss
+          kp$betweenss <- kp$totss - kp$tot.withinss
+          kp
+        } else {
+          kmeans(x, centers = nr_clus, nstart = 10, iter.max = 500)
+        }
+      })
   }
 
   clus_names <- paste("Cluster", 1:nr_clus)
@@ -201,6 +206,8 @@ summary.kclus <- function(object, dec = 2, ...) {
 #' @seealso \code{\link{summary.kclus}} to summarize results
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
+#' @importFrom rlang .data
+#'
 #' @export
 plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...) {
   x$dataset$Cluster <- as.factor(x$km_out$cluster)
@@ -208,7 +215,7 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
 
   fct_plot <- function(dataset, var1, var2, color = "black", alpha = 0.5) {
     tab <- as.data.frame(table(dataset[[var1]], dataset[[var2]]))
-    ggplot(tab, aes_string(x = "Var2", y = "Freq", fill = "Var1")) +
+    ggplot(tab, aes(x = .data$Var2, y = .data$Freq, fill = .data$Var1)) +
       geom_bar(stat = "identity", position = "fill", alpha = alpha, color = color) +
       scale_y_continuous(labels = scales::percent) +
       labs(y = "", x = var2, fill = var1)
@@ -218,11 +225,12 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
   if ("density" %in% plots) {
     for (var in vars) {
       plot_list[[paste0("dens_", var)]] <- if (is.numeric(x$dataset[[var]])) {
-          ggplot(x$dataset, aes_string(x = var, fill = "Cluster")) +
+        ggplot(x$dataset, aes(x = .data[[var]], fill = .data$Cluster)) +
           geom_density(adjust = 2.5, alpha = 0.3) +
-          labs(y = "") + theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+          labs(y = "") +
+          theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
       } else {
-         fct_plot(x$dataset, "Cluster", var, color = "black", alpha = 0.3)
+        fct_plot(x$dataset, "Cluster", var, color = "black", alpha = 0.3)
       }
     }
   }
@@ -246,33 +254,32 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
             )
           )
 
-          ggplot(dat_summary, aes_string(x = "Cluster", y = "cent", fill = "Cluster")) +
+        ggplot(dat_summary, aes(x = .data$Cluster, y = .data$cent, fill = .data$Cluster)) +
           geom_bar(stat = "identity", alpha = 0.5) +
           geom_errorbar(width = .1, aes(ymin = cent - me, ymax = cent + me)) +
           geom_errorbar(width = .05, aes(ymin = cent - se, ymax = cent + se), color = "blue") +
           theme(legend.position = "none") +
           labs(y = paste0(var, " (mean)"))
       } else {
-         fct_plot(x$dataset, var, "Cluster")
+        fct_plot(x$dataset, var, "Cluster")
       }
     }
   }
   if ("scatter" %in% plots) {
     for (var in vars) {
       plot_list[[paste0("scatter_", var)]] <- if (is.numeric(x$dataset[[var]])) {
-          visualize(
-            x$dataset,
-            xvar = "Cluster", yvar = var,
-            check = "jitter",
-            type = "scatter",
-            linecol = "blue",
-            pointcol = "black",
-            custom = TRUE
-          )
+        visualize(
+          x$dataset,
+          xvar = "Cluster", yvar = var,
+          check = "jitter",
+          type = "scatter",
+          linecol = "blue",
+          pointcol = "black",
+          custom = TRUE
+        )
       } else {
-         fct_plot(x$dataset, var, "Cluster")
+        fct_plot(x$dataset, var, "Cluster")
       }
-
     }
   }
 
@@ -281,7 +288,7 @@ plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...)
       if (length(plot_list) == 1) plot_list[[1]] else plot_list
     } else {
       patchwork::wrap_plots(plot_list, ncol = min(length(plot_list), 2)) %>%
-        {if (shiny) . else print(.)}
+        (function(x) if (isTRUE(shiny)) x else print(x))
     }
   }
 }
