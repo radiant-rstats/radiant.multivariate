@@ -71,7 +71,7 @@ output$ui_pm_pref <- renderUI({
 
 output$ui_pm_plots <- renderUI({
   plot_list <- c("Brands" = "brand", "Attributes" = "attr")
-  if (!radiant.data::is_empty(input$pm_pref)) plot_list <- c(plot_list, c("Preferences" = "pref"))
+  if (!is.empty(input$pm_pref)) plot_list <- c(plot_list, c("Preferences" = "pref"))
   checkboxGroupInput(
     "pm_plots", NULL, plot_list,
     selected = state_group("pm_plots"),
@@ -254,8 +254,8 @@ prmap_report <- function() {
   inp_out <- list(list(cutoff = input$pm_cutoff, dec = 2), "")
   inp_out[[2]] <- clean_args(pm_plot_inputs(), pm_plot_args[-1])
   inp <- clean_args(pm_inputs(), pm_args)
-  if (!radiant.data::is_empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
-  if (!radiant.data::is_empty(input$pm_store_name)) {
+  if (!is.empty(inp$nr_dim)) inp$nr_dim <- as_integer(inp$nr_dim)
+  if (!is.empty(input$pm_store_name)) {
     fixed <- fix_names(input$pm_store_name)
     updateTextInput(session, "pm_store_name", value = fixed)
     xcmd <- glue('{input$dataset} <- store({input$dataset}, result, name = "{fixed}")')

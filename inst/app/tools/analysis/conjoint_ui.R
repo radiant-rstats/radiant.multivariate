@@ -123,9 +123,9 @@ output$ui_ca_show_interactions <- renderUI({
 
 output$ui_ca_int <- renderUI({
   if (isolate("ca_show_interactions" %in% names(input)) &&
-    radiant.data::is_empty(input$ca_show_interactions)) {
+    is.empty(input$ca_show_interactions)) {
     choices <- character(0)
-  } else if (radiant.data::is_empty(input$ca_show_interactions)) {
+  } else if (is.empty(input$ca_show_interactions)) {
     return()
   } else {
     vars <- input$ca_evar
@@ -167,7 +167,7 @@ output$ui_ca_show <- renderUI({
 })
 
 ## reset ca_show if needed
-observeEvent(input$ca_by == "none" && !radiant.data::is_empty(input$ca_show), {
+observeEvent(input$ca_by == "none" && !is.empty(input$ca_show), {
   updateSelectInput(session = session, inputId = "ca_show", selected = NULL)
 })
 
@@ -458,13 +458,13 @@ output$conjoint <- renderUI({
   if (ca_available() != "available") {
     return(ca_available())
   }
-  if (radiant.data::is_empty(input$ca_predict, "none")) {
+  if (is.empty(input$ca_predict, "none")) {
     return("** Select prediction input **")
   }
-  if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && radiant.data::is_empty(input$ca_pred_data)) {
+  if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && is.empty(input$ca_pred_data)) {
     return("** Select data for prediction **")
   }
-  if (input$ca_predict == "cmd" && radiant.data::is_empty(input$ca_pred_cmd)) {
+  if (input$ca_predict == "cmd" && is.empty(input$ca_pred_cmd)) {
     return("** Enter prediction commands **")
   }
 
@@ -491,13 +491,13 @@ output$conjoint <- renderUI({
     return(ca_available())
   }
   req(input$ca_pred_plot, available(input$ca_xvar))
-  if (radiant.data::is_empty(input$ca_predict, "none")) {
+  if (is.empty(input$ca_predict, "none")) {
     return(invisible())
   }
-  if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && radiant.data::is_empty(input$ca_pred_data)) {
+  if ((input$ca_predict == "data" || input$ca_predict == "datacmd") && is.empty(input$ca_pred_data)) {
     return(invisible())
   }
-  if (input$ca_predict == "cmd" && radiant.data::is_empty(input$ca_pred_cmd)) {
+  if (input$ca_predict == "cmd" && is.empty(input$ca_pred_cmd)) {
     return(invisible())
   }
   withProgress(message = "Generating prediction plot", value = 1, {
@@ -508,7 +508,7 @@ output$conjoint <- renderUI({
 .plot_conjoint <- reactive({
   if (not_pressed(input$ca_run)) {
     return("** Press the Estimate button to estimate the model **")
-  } else if (radiant.data::is_empty(input$ca_plots, "none")) {
+  } else if (is.empty(input$ca_plots, "none")) {
     return("Please select a conjoint plot from the drop-down menu")
   }
   input$ca_scale_plot
@@ -528,7 +528,7 @@ conjoint_report <- function() {
   inp_out <- list("", "")
   inp_out[[1]] <- clean_args(ca_sum_inputs(), ca_sum_args[-1])
   figs <- FALSE
-  if (!radiant.data::is_empty(input$ca_plots, "none")) {
+  if (!is.empty(input$ca_plots, "none")) {
     inp_out[[2]] <- clean_args(ca_plot_inputs(), ca_plot_args[-1])
     inp_out[[2]]$custom <- FALSE
     outputs <- c(outputs, "plot")
@@ -537,28 +537,28 @@ conjoint_report <- function() {
   xcmd <- ""
 
   if (input$ca_by != "none") {
-    if (!radiant.data::is_empty(input$ca_store_pw_name)) {
+    if (!is.empty(input$ca_store_pw_name)) {
       fixed <- fix_names(input$ca_store_pw_name)
       updateTextInput(session, "ca_store_pw_name", value = fixed)
       xcmd <- glue('{xcmd}{fixed} <- result$PW\nregister("{fixed}")\n\n')
     }
-    if (!radiant.data::is_empty(input$ca_store_iw_name)) {
+    if (!is.empty(input$ca_store_iw_name)) {
       fixed <- fix_names(input$ca_store_iw_name)
       updateTextInput(session, "ca_store_iw_name", value = fixed)
       xcmd <- glue('{xcmd}{fixed} <- result$IW\nregister("{fixed}")\n\n')
     }
   }
 
-  if (!radiant.data::is_empty(input$ca_predict, "none") &&
-    (!radiant.data::is_empty(input$ca_pred_data) || !radiant.data::is_empty(input$ca_pred_cmd))) {
+  if (!is.empty(input$ca_predict, "none") &&
+    (!is.empty(input$ca_pred_data) || !is.empty(input$ca_pred_cmd))) {
     pred_args <- clean_args(ca_pred_inputs(), ca_pred_args[-1])
-    if (!radiant.data::is_empty(pred_args$pred_cmd)) {
+    if (!is.empty(pred_args$pred_cmd)) {
       pred_args$pred_cmd <- strsplit(pred_args$pred_cmd, ";\\s*")[[1]]
     } else {
       pred_args$pred_cmd <- NULL
     }
 
-    if (!radiant.data::is_empty(pred_args$pred_data)) {
+    if (!is.empty(pred_args$pred_data)) {
       pred_args$pred_data <- as.symbol(pred_args$pred_data)
     } else {
       pred_args$pred_data <- NULL
@@ -566,7 +566,7 @@ conjoint_report <- function() {
 
     inp_out[[2 + figs]] <- pred_args
     fixed <- "pred"
-    if (!radiant.data::is_empty(input$ca_by, "none") && !radiant.data::is_empty(input$ca_store_pred_name)) {
+    if (!is.empty(input$ca_by, "none") && !is.empty(input$ca_store_pred_name)) {
       fixed <- fix_names(input$ca_store_pred_name)
       updateTextInput(session, "ca_store_pred_name", value = fixed)
       outputs <- c(outputs, paste0(fixed, " <- predict"))
@@ -575,7 +575,7 @@ conjoint_report <- function() {
       outputs <- c(outputs, "pred <- predict")
       xcmd <- paste0(xcmd, "print(pred, n = 10)")
       if (input$ca_predict %in% c("data", "datacmd")) {
-        if (radiant.data::is_empty(input$ca_by, "none")) {
+        if (is.empty(input$ca_by, "none")) {
           fixed <- unlist(strsplit(input$ca_store_pred_name, "(\\s*,\\s*|\\s*;\\s*)")) %>%
             fix_names() %>%
             deparse(., control = getOption("dctrl"), width.cutoff = 500L)
@@ -587,7 +587,7 @@ conjoint_report <- function() {
       }
     }
 
-    if (input$ca_pred_plot && !radiant.data::is_empty(input$ca_xvar)) {
+    if (input$ca_pred_plot && !is.empty(input$ca_xvar)) {
       inp_out[[3 + figs]] <- clean_args(ca_pred_plot_inputs(), ca_pred_plot_args[-1])
       inp_out[[3 + figs]]$result <- pred_args$pred_name
       outputs <- c(outputs, "plot")
@@ -639,7 +639,7 @@ observeEvent(input$ca_store_iw, {
 })
 
 observeEvent(input$ca_store_pred, {
-  req(!radiant.data::is_empty(input$ca_pred_data), pressed(input$ca_run))
+  req(!is.empty(input$ca_pred_data), pressed(input$ca_run))
   pred <- .predict_conjoint()
   if (is.null(pred)) {
     return()
@@ -665,7 +665,7 @@ observeEvent(input$ca_store_pred, {
 
 dl_ca_PWs <- function(path) {
   if (pressed(input$ca_run)) {
-    if (radiant.data::is_empty(input$ca_show)) {
+    if (is.empty(input$ca_show)) {
       tab <- .conjoint()$model_list[["full"]]$tab
     } else {
       tab <- .conjoint()$model_list[[input$ca_show]]$tab

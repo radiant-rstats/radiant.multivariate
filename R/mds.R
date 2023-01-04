@@ -72,7 +72,7 @@ mds <- function(dataset, id1, id2, dis, method = "metric",
 
   seed %>%
     gsub("[^0-9]", "", .) %>%
-    (function(x) if (!radiant.data::is_empty(x)) set.seed(seed))
+    (function(x) if (!is.empty(x)) set.seed(seed))
   res <- MASS::isoMDS(mds_dis_mat, k = nr_dim, trace = FALSE)
   res$stress <- res$stress / 100
 
@@ -110,7 +110,7 @@ summary.mds <- function(object, dec = 2, ...) {
 
   cat("(Dis)similarity based brand map (MDS)\n")
   cat("Data        :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")
@@ -179,7 +179,7 @@ plot.mds <- function(x, rev_dim = NULL, fontsz = 5, shiny = FALSE, custom = FALS
     set_colnames(paste0("dim", seq_len(ncol(.))))
   tbl$rnames <- rownames(tbl)
   ## reverse selected dimensions
-  if (!radiant.data::is_empty(rev_dim)) {
+  if (!is.empty(rev_dim)) {
     rev_dim <- as.integer(rev_dim)
     tbl[, rev_dim] <- -1 * tbl[, rev_dim]
   }

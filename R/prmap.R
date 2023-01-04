@@ -28,7 +28,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
                   data_filter = "", envir = parent.frame()) {
   nr_dim <- as.numeric(nr_dim)
   vars <- c(brand, attr)
-  if (!radiant.data::is_empty(pref)) vars <- c(vars, pref)
+  if (!is.empty(pref)) vars <- c(vars, pref)
   df_name <- if (is_string(dataset)) dataset else deparse(substitute(dataset))
   dataset <- get_data(dataset, vars, filt = data_filter, envir = envir)
 
@@ -80,7 +80,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
     set_rownames(.[["brands"]]) %>%
     select(-1)
 
-  if (!radiant.data::is_empty(pref)) {
+  if (!is.empty(pref)) {
     p_data <- get_data(dataset, pref, envir = envir) %>%
       mutate_if(is.Date, as.numeric)
     anyPrefCat <- sapply(p_data, function(x) is.numeric(x)) == FALSE
@@ -131,11 +131,11 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
 
   cat("Attribute based brand map\n")
   cat("Data        :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Attributes  :", paste0(object$attr, collapse = ", "), "\n")
-  if (!radiant.data::is_empty(object$pref)) {
+  if (!is.empty(object$pref)) {
     cat("Preferences :", paste0(object$pref, collapse = ", "), "\n")
   }
   cat("Dimensions  :", object$nr_dim, "\n")
@@ -183,7 +183,7 @@ summary.prmap <- function(object, cutoff = 0, dec = 2, ...) {
   print_lds[ind] <- ""
   print(print_lds)
 
-  if (!radiant.data::is_empty(object$pref)) {
+  if (!is.empty(object$pref)) {
     cat("\nPreference correlations:\n")
     print(round(object$pref_cor, dec), digits = dec)
   }
@@ -255,7 +255,7 @@ plot.prmap <- function(x, plots = "", scaling = 2, fontsz = 5, seed = 1234,
     mutate(rnames = rownames(.), type = "brand")
 
   ## preference coordinates
-  if (!radiant.data::is_empty(x$pref_cor)) {
+  if (!is.empty(x$pref_cor)) {
     pm_dat$pref <- x$pref_cor %>%
       select(-ncol(.)) %>%
       set_colnames(paste0("dim", seq_len(ncol(.)))) %>%
@@ -299,7 +299,7 @@ plot.prmap <- function(x, plots = "", scaling = 2, fontsz = 5, seed = 1234,
           y = paste("Dimension", j)
         )
 
-      if (!radiant.data::is_empty(plots)) {
+      if (!is.empty(plots)) {
         p <- p + ggrepel::geom_text_repel(
           data = filter(pm_dat, !!as.symbol("type") %in% plots),
           aes(x = .data[[i_name]], y = .data[[j_name]], label = .data$rnames, color = .data$type),

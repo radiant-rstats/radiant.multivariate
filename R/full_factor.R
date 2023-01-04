@@ -163,7 +163,7 @@ summary.full_factor <- function(object, cutoff = 0, fsort = FALSE,
 
   cat("Factor analysis\n")
   cat("Data        :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
@@ -332,7 +332,7 @@ plot.full_factor <- function(x, plots = "attr", shiny = FALSE, custom = FALSE, .
 #'
 #' @export
 store.full_factor <- function(dataset, object, name = "", ...) {
-  if (radiant.data::is_empty(name)) name <- "factor"
+  if (is.empty(name)) name <- "factor"
   fscores <- as.data.frame(object$fres$scores, stringsAsFactors = FALSE)
   indr <- indexr(dataset, object$vars, object$data_filter)
   fs <- data.frame(matrix(NA, nrow = indr$nr, ncol = ncol(fscores)), stringsAsFactors = FALSE)

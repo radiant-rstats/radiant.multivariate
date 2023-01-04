@@ -90,7 +90,7 @@ summary.hclus <- function(object, ...) {
 
   cat("Hierarchical cluster analysis\n")
   cat("Data        :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
@@ -126,7 +126,7 @@ summary.hclus <- function(object, ...) {
 plot.hclus <- function(x, plots = c("scree", "change"),
                        cutoff = 0.05,
                        shiny = FALSE, custom = FALSE, ...) {
-  if (radiant.data::is_empty(plots)) {
+  if (is.empty(plots)) {
     return(invisible())
   }
   if (is.character(x)) {
@@ -233,7 +233,7 @@ plot.hclus <- function(x, plots = c("scree", "change"),
 #'
 #' @export
 store.hclus <- function(dataset, object, nr_clus = 2, name = "", ...) {
-  if (radiant.data::is_empty(name)) name <- paste0("hclus", nr_clus)
+  if (is.empty(name)) name <- paste0("hclus", nr_clus)
   indr <- indexr(dataset, object$vars, object$data_filter)
   hm <- rep(NA, indr$nr)
   hm[indr$ind] <- cutree(object$hc_out, nr_clus)

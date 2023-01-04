@@ -37,7 +37,7 @@ conjoint <- function(dataset, rvar, evar,
 
   ## in case : was used to select a range of variables
   # evar <- colnames(dataset)[-1]
-  if (!radiant.data::is_empty(by, "none")) {
+  if (!is.empty(by, "none")) {
     evar <- base::setdiff(evar, by)
     vars <- base::setdiff(vars, by)
     bylevs <- dataset[[by]] %>%
@@ -85,7 +85,7 @@ conjoint <- function(dataset, rvar, evar,
   }
 
   ## creating PW and IW data.frames
-  if (!radiant.data::is_empty(by, "none")) {
+  if (!is.empty(by, "none")) {
     cn <- gsub("\\|", "_", model_list[[1]]$coeff$label) %>%
       gsub("[^A-z0-9_\\.]", "", .)
 
@@ -145,7 +145,7 @@ summary.conjoint <- function(object, show = "", mc_diag = FALSE,
                              additional = FALSE, dec = 3, ...) {
   cat("Conjoint analysis\n")
   cat("Data                 :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter               :", gsub("\\n", "", object$data_filter), "\n")
   }
   if (object$by != "none") {
@@ -155,7 +155,7 @@ summary.conjoint <- function(object, show = "", mc_diag = FALSE,
   cat("Response variable    :", rvar, "\n")
   cat("Explanatory variables:", paste0(object$evar, collapse = ", "), "\n\n")
 
-  if (object$by == "none" || radiant.data::is_empty(show) || !show %in% names(object$model_list)) {
+  if (object$by == "none" || is.empty(show) || !show %in% names(object$model_list)) {
     show <- names(object$model_list)[1]
   }
 
@@ -296,7 +296,7 @@ predict.conjoint <- function(object, pred_data = NULL, pred_cmd = "",
     pred_val
   }
 
-  if (radiant.data::is_empty(object$by, "none")) {
+  if (is.empty(object$by, "none")) {
     object$model <- object$model_list[["full"]]$model
     predict_model(object, pfun, "conjoint.predict", pred_data, pred_cmd, conf_lev, se, dec, envir = envir) %>%
       set_attr("radiant_interval", interval) %>%
@@ -407,7 +407,7 @@ print.conjoint.predict <- function(x, ..., n = 20) {
 #' @export
 plot.conjoint <- function(x, plots = "pw", show = "", scale_plot = FALSE,
                           shiny = FALSE, custom = FALSE, ...) {
-  if (x$by == "none" || radiant.data::is_empty(show) || !show %in% names(x$model_list)) {
+  if (x$by == "none" || is.empty(show) || !show %in% names(x$model_list)) {
     show <- names(x$model_list)[1]
   }
 

@@ -108,7 +108,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 
   cat("Pre-factor analysis diagnostics\n")
   cat("Data        :", object$df_name, "\n")
-  if (!radiant.data::is_empty(object$data_filter)) {
+  if (!is.empty(object$data_filter)) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(object$vars, collapse = ", "), "\n")
@@ -141,7 +141,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
   cat("Null hyp. : variables are not correlated\n")
   cat("Alt. hyp. : variables are correlated\n")
   bt <- object$btest$p.value
-  bt <- if (!radiant.data::is_empty(bt) && bt < .001) "< .001" else round(bt, dec + 1)
+  bt <- if (!is.empty(bt) && bt < .001) "< .001" else round(bt, dec + 1)
   cat(paste0(
     "Chi-square: ", round(object$btest$chisq, 2), " df(",
     object$btest$df, "), p.value ", bt, "\n"
