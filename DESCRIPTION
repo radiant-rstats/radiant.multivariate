@@ -11,7 +11,7 @@ Depends:
     R (>= 4.0.0),
     radiant.data (>= 1.4.4)
 Imports:
-    radiant.model (>= 1.4.1),
+    radiant.model (>= 1.5.0),
     shiny (>= 1.7.1),
     dplyr (>= 1.0.7),
     rlang (>= 0.4.10),
