@@ -1,3 +1,8 @@
+# radiant.model 1.6.0
+
+* Using "Radiant for R" in UI to differentiate from "Radiant for Python"
+* Addressed a package documentation issue due to a change in roxygen2
+
 # radiant.multivariate 1.5.0.0
 
 * Improvements to screenshot feature. Navigation bar is omitted and the image is adjusted to the length of the UI.

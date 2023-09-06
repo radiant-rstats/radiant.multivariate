@@ -7,7 +7,6 @@ globalVariables(c(
 #' radiant.multivariate
 #'
 #' @name radiant.multivariate
-#' @docType package
 #' @import radiant.data shiny ggplot2
 #' @importFrom dplyr select select_at select_if filter mutate mutate_if funs group_by group_by_at lag slice bind_rows mutate_all summarise_all rename
 #' @importFrom rlang .data
