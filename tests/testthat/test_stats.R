@@ -22,7 +22,7 @@ test_that("City MDS points", {
     "Boston", "NY", "DC", "Miami", "Chicago",
     "Seattle", "SF", "LA", "Denver"
   ), NULL))
-  expect_equal(res1, res2)
+  expect_equal(abs(res1), abs(res2))
 })
 
 test_that("Computer perceptual map", {

@@ -1,3 +1,7 @@
+# radiant.model 1.6.1
+
+* Updated test for MDS to account for the possibility that signs can be switched.
+
 # radiant.model 1.6.0
 
 * Using "Radiant for R" in UI to differentiate from "Radiant for Python"
