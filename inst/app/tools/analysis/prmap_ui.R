@@ -88,7 +88,7 @@ output$ui_pm_store_name <- renderUI({
 run_refresh(pm_args, "pm", init = "attr", tabs = "tabs_prmap", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_prmap <- renderUI({
-  req(input$dataset)
+  # req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_prmap == 'Summary'",

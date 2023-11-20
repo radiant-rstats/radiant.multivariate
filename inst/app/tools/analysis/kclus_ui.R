@@ -55,7 +55,7 @@ output$ui_km_store_name <- renderUI({
 run_refresh(km_args, "km", init = "vars", tabs = "tabs_kclus", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_kclus <- renderUI({
-  req(input$dataset)
+  # req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_kclus == 'Summary'",

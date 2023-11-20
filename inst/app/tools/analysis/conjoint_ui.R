@@ -234,7 +234,7 @@ output$ui_ca_pred_data <- renderUI({
 })
 
 output$ui_conjoint <- renderUI({
-  req(input$dataset)
+  # req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_conjoint == 'Summary'",

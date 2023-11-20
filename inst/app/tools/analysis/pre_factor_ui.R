@@ -33,7 +33,7 @@ output$ui_pf_vars <- renderUI({
 run_refresh(pf_args, "pf", init = "vars", tabs = "tabs_pre_factor", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_pre_factor <- renderUI({
-  req(input$dataset)
+  # req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_pre_factor == 'Summary'",
