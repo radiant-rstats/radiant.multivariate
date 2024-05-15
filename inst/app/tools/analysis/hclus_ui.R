@@ -66,7 +66,7 @@ output$ui_hc_store_name <- renderUI({
 run_refresh(hc_args, "hc", init = "vars", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_hclus <- renderUI({
-  # req(input$dataset)
+  req(input$dataset)
   tagList(
     wellPanel(
       actionButton("hc_run", "Estimate model", width = "100%", icon = icon("play", verify_fa = FALSE), class = "btn-success")

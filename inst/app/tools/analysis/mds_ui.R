@@ -77,7 +77,7 @@ output$ui_mds_rev_dim <- renderUI({
 run_refresh(mds_args, "mds", init = "id1", tabs = "tabs_mds", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_mds <- renderUI({
-  # req(input$dataset)
+  req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_mds == 'Summary'",

@@ -1,8 +1,13 @@
-# radiant.model 1.6.1
+# radiant.multivariate 1.6.6
+
+* Require Shiny 1.8.1. Adjustments related to icon-buttons were made to address a breaking change in Shiny 1.8.1
+* Reverting changes that removed `req(input$dataset)` in different places
+
+# radiant.multivariate 1.6.1
 
 * Updated test for MDS to account for the possibility that signs can be switched.
 
-# radiant.model 1.6.0
+# radiant.multivariate 1.6.0
 
 * Using "Radiant for R" in UI to differentiate from "Radiant for Python"
 * Addressed a package documentation issue due to a change in roxygen2

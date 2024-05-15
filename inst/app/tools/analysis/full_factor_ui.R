@@ -42,7 +42,7 @@ output$ui_ff_store_name <- renderUI({
 run_refresh(ff_args, "ff", init = "vars", tabs = "tabs_full_factor", label = "Estimate model", relabel = "Re-estimate model")
 
 output$ui_full_factor <- renderUI({
-  # req(input$dataset)
+  req(input$dataset)
   tagList(
     conditionalPanel(
       condition = "input.tabs_full_factor == 'Plot'",
