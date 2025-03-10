@@ -8,7 +8,7 @@ globalVariables(c(
 #'
 #' @name radiant.multivariate
 #' @import radiant.data shiny ggplot2
-#' @importFrom dplyr select select_at select_if filter mutate mutate_if funs group_by group_by_at lag slice bind_rows mutate_all summarise_all rename
+#' @importFrom dplyr select select_at select_if filter mutate mutate_if funs group_by group_by_at lag slice bind_rows mutate_all summarise_all rename summarise across everything
 #' @importFrom rlang .data
 #' @importFrom magrittr %>% %<>% %T>% set_colnames set_rownames set_names
 #' @importFrom scales percent

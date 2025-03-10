@@ -1,3 +1,7 @@
+# radiant.multivariate 1.6.7
+
+* Fixed labeling bug in mds function
+
 # radiant.multivariate 1.6.6
 
 * Require Shiny 1.8.1. Adjustments related to icon-buttons were made to address a breaking change in Shiny 1.8.1

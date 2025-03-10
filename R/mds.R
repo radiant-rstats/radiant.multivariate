@@ -33,7 +33,8 @@ mds <- function(dataset, id1, id2, dis, method = "metric",
 
   init_row <- nrow(dataset)
   dataset <- na.omit(dataset)
-  nr_na <- init_row - nrow(dataset)
+  nr_row <- nrow(dataset)
+  nr_na <- init_row - nr_row
   if (nr_na > 0) {
     return(paste0("The map cannot be created because the provided data contains ", nr_na, " rows with\nmissing data. Please choose other ID variables or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset.") %>%
       add_class("mds"))
@@ -48,23 +49,26 @@ mds <- function(dataset, id1, id2, dis, method = "metric",
   lab <- unique(c(id1_dat, id2_dat))
   nrLev <- length(lab)
 
-  lower <- (nrLev * (nrLev - 1)) / 2
+  lower_nr <- (nrLev * (nrLev - 1)) / 2
   nrObs <- length(d)
 
-  ## setup the distance matrix
-  mds_dis_mat <- diag(nrLev)
-  if (lower == nrObs) {
-    mds_dis_mat[lower.tri(mds_dis_mat, diag = FALSE)] <- d
-  } else if ((lower + nrLev) == nrObs) {
-    mds_dis_mat[lower.tri(mds_dis_mat, diag = TRUE)] <- d
-  } else {
+  mds_dis_mat <- matrix(0, nrow = nrLev, ncol = nrLev) %>%
+    set_rownames(lab) %>%
+    set_colnames(lab)
+
+  if (lower_nr != nrObs && (lower_nr + nrLev) != nrObs) {
     return("Number of observations and unique IDs for the brand variable do not match.\nPlease choose other ID variables or another dataset.\n\nFor an example dataset go to Data > Manage, select 'examples' from the\n'Load data of type' dropdown, and press the 'Load examples' button. Then\nselect the \'city' dataset." %>%
       add_class("mds"))
-  }
+  } else {
+    for (i in seq_len(nr_row)) {
+      id1 <- id1_dat[i]
+      id2 <- id2_dat[i]
+      mds_dis_mat[id1, id2] <- d[i]
+      mds_dis_mat[id2, id1] <- d[i]
+    }
 
-  mds_dis_mat %<>% set_rownames(lab) %>%
-    set_colnames(lab) %>%
-    as.dist()
+    mds_dis_mat <- as.dist(mds_dis_mat)
+  }
 
   ## Alternative method, metaMDS - requires vegan
   # res <- suppressWarnings(metaMDS(mds_dis_mat, k = nr_dim, trymax = 500))
@@ -114,7 +118,7 @@ summary.mds <- function(object, dec = 2, ...) {
     cat("Filter      :", gsub("\\n", "", object$data_filter), "\n")
   }
   cat("Variables   :", paste0(c(object$id1, object$id2, object$dis), collapse = ", "), "\n")
-  cat("Dimensions:", object$nr_dim, "\n")
+  cat("Dimensions  :", object$nr_dim, "\n")
   meth <- if (object$method == "non-metric") "Non-metric" else "Metric"
   cat("Method      :", meth, "\n")
   cat("Observations:", object$nrObs, "\n")

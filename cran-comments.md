@@ -1,5 +1,20 @@
 ## Resubmission
 
+This is a resubmission. In this version I fixed a labeling bug in the "mds" function. See NEWS.md for details.
+
+## Test environments
+
+* macOS (ARM) and R 4.4.1
+* win-builder (devel)
+
+## R CMD check results
+
+There were no ERRORs, WARNINGs, or NOTEs.
+
+# Previous cran-comments
+
+## Resubmission
+
 This is a resubmission. In this version I require shiny version 1.8.1 or newer and have addressed a breaking change introduced in that version of shiny. See NEWS.md for details.
 
 ## Test environments
@@ -12,7 +27,7 @@ This is a resubmission. In this version I require shiny version 1.8.1 or newer a
 
 There were no ERRORs, WARNINGs, or NOTEs.
 
-# Previous cran-comments
+
 
 ## Resubmission
 
