@@ -24,6 +24,7 @@
 #' @seealso \code{\link{store.kclus}} to add cluster membership to the selected dataset
 #'
 #' @importFrom clustMixType kproto
+#' @importFrom dplyr across everything summarise
 #'
 #' @export
 kclus <- function(dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.euclidian",
@@ -55,6 +56,13 @@ kclus <- function(dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.
       fun <- "kmeans"
       cat("** K-means used when no categorical variables included **\n\n")
     }
+  }
+
+  ## check if there is variation in the data
+  not_vary <- vars[summarise(dataset, across(everything(), does_vary)) == FALSE]
+  if (length(not_vary) > 0) {
+    return(paste0("The following variable(s) show no variation. Please select other variables.\n\n** ", paste0(not_vary, collapse = ", "), " **") %>%
+      add_class("kclus"))
   }
 
   max_freq <- function(x) as.factor(names(which.max(table(x))))
@@ -152,6 +160,9 @@ kclus <- function(dataset, vars, fun = "kmeans", hc_init = TRUE, distance = "sq.
 #'
 #' @export
 summary.kclus <- function(object, dec = 2, ...) {
+  if (is.character(object)) {
+    return(object)
+  }
   cat(paste0("K-", substring(object$fun, 2), " cluster analysis\n"))
   cat("Data         :", object$df_name, "\n")
   if (!is.empty(object$data_filter)) {
@@ -210,6 +221,10 @@ summary.kclus <- function(object, dec = 2, ...) {
 #'
 #' @export
 plot.kclus <- function(x, plots = "density", shiny = FALSE, custom = FALSE, ...) {
+  if (is.character(x)) {
+    return(x)
+  }
+
   x$dataset$Cluster <- as.factor(x$km_out$cluster)
   vars <- colnames(x$dataset) %>% .[-length(.)]
 

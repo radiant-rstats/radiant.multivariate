@@ -23,6 +23,7 @@
 #' @importFrom GPArotation quartimax oblimin simplimax
 #' @importFrom polycor hetcor
 #' @importFrom psych scoreIrt
+#' @importFrom dplyr across everything summarise
 #'
 #' @export
 full_factor <- function(dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1,
@@ -36,6 +37,13 @@ full_factor <- function(dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1
   ## in case : is used
   if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
+
+  ## check if there is variation in the data
+  not_vary <- vars[summarise(dataset, across(everything(), does_vary)) == FALSE]
+  if (length(not_vary) > 0) {
+    return(paste0("The following variable(s) show no variation. Please select other variables.\n\n** ", paste0(not_vary, collapse = ", "), " **") %>%
+      add_class("full_factor"))
   }
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE

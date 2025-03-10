@@ -19,6 +19,7 @@
 #' @importFrom psych KMO cortest.bartlett
 #' @importFrom lubridate is.Date
 #' @importFrom polycor hetcor
+#' @importFrom dplyr across everything summarise
 #'
 #' @export
 pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = parent.frame()) {
@@ -29,6 +30,13 @@ pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = pa
   ## in case : is used
   if (length(vars) < ncol(dataset)) {
     vars <- colnames(dataset)
+  }
+
+  ## check if there is variation in the data
+  not_vary <- vars[summarise(dataset, across(everything(), does_vary)) == FALSE]
+  if (length(not_vary) > 0) {
+    return(paste0("The following variable(s) show no variation. Please select other variables.\n\n** ", paste0(not_vary, collapse = ", "), " **") %>%
+      add_class("pre_factor"))
   }
 
   anyCategorical <- sapply(dataset, function(x) is.numeric(x) || is.Date(x)) == FALSE
@@ -197,7 +205,7 @@ summary.pre_factor <- function(object, dec = 2, ...) {
 plot.pre_factor <- function(x, plots = c("scree", "change"), cutoff = 0.2,
                             shiny = FALSE, custom = FALSE, ...) {
   if (is.character(x) || is.character(x$pre_r2) || length(plots) == 0) {
-    return("")
+    return(x)
   }
 
   cutoff <- ifelse(is_not(cutoff), .2, cutoff)
