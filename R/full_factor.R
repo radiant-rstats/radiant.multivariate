@@ -56,7 +56,7 @@ full_factor <- function(dataset, vars, method = "PCA", hcor = FALSE, nr_fact = 1
   }
 
   if (hcor) {
-    cmat <- try(sshhr(polycor::hetcor(dataset, ML = FALSE, std.err = FALSE)), silent = TRUE)
+    cmat <- try(sshhr(polycor::hetcor(as.data.frame(dataset), ML = FALSE, std.err = FALSE)), silent = TRUE)
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     if (inherits(cmat, "try-error")) {
       warning("Calculating the heterogeneous correlation matrix produced an error.\nUsing standard correlation matrix instead")

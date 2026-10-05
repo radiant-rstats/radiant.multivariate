@@ -43,7 +43,7 @@ pre_factor <- function(dataset, vars, hcor = FALSE, data_filter = "", envir = pa
 
   if (hcor) {
     dataset <- mutate_if(dataset, is.Date, as.numeric)
-    cmat <- try(sshhr(polycor::hetcor(dataset, ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
+    cmat <- try(sshhr(polycor::hetcor(as.data.frame(dataset), ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
     dataset <- mutate_all(dataset, radiant.data::as_numeric)
     if (inherits(cmat, "try-error")) {
       message("Calculating the heterogenous correlation matrix produced an error.\nUsing standard correlation matrix instead")

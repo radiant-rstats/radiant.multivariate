@@ -48,7 +48,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
 
   if (hcor) {
     f_data <- mutate_if(f_data, is.Date, as.numeric)
-    cmat <- try(sshhr(polycor::hetcor(f_data, ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
+    cmat <- try(sshhr(polycor::hetcor(as.data.frame(f_data), ML = FALSE, std.err = FALSE)$correlations), silent = TRUE)
     f_data <- mutate_all(f_data, radiant.data::as_numeric)
     if (inherits(cmat, "try-error")) {
       message("Calculating the heterogeneous correlation matrix produced an error.\nUsing standard correlation matrix instead")
@@ -85,7 +85,7 @@ prmap <- function(dataset, brand, attr, pref = "", nr_dim = 2, hcor = FALSE,
       mutate_if(is.Date, as.numeric)
     anyPrefCat <- sapply(p_data, function(x) is.numeric(x)) == FALSE
     if (sum(anyPrefCat) > 0) {
-      pref_cor <- sshhr(polycor::hetcor(cbind(p_data, fres$scores), ML = FALSE, std.err = FALSE)$correlations)
+      pref_cor <- sshhr(polycor::hetcor(as.data.frame(cbind(p_data, fres$scores)), ML = FALSE, std.err = FALSE)$correlations)
       pref_cor <- as.data.frame(pref_cor[-((length(pref) + 1):nrow(pref_cor)), -(1:length(pref))], stringsAsFactor = FALSE)
     } else {
       pref_cor <- p_data %>%
